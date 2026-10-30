@@ -110,7 +110,7 @@ input.i:focus, select.i:focus, textarea.i:focus { outline: 2px solid var(--c); o
   box-shadow: 0 20px 50px rgba(0,0,0,.25); animation: aparecer .14s ease-out;
 }
 
-.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .78rem; font-weight: 700; background: #eee; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .82rem; font-weight: 700; background: #eee; color: #4a4540; }
 .pill-ok { background: #def7e7; color: var(--ok); }
 .pill-warn { background: #fdf0d5; color: var(--warn); }
 .pill-bad { background: #fde2e2; color: var(--bad); }
@@ -129,10 +129,10 @@ input.i:focus, select.i:focus, textarea.i:focus { outline: 2px solid var(--c); o
 }
 .tabs {
   position: sticky; top: 0; z-index: 5; background: var(--bg);
-  display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; margin: 0 -16px;
-  scrollbar-width: none; border-bottom: 1px solid var(--line);
+  /* Todas las categorías a la vista: se acomodan en varias filas en vez de deslizarse de lado */
+  display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px; margin: 0 -16px;
+  border-bottom: 1px solid var(--line);
 }
-.tabs::-webkit-scrollbar { display: none; }
 .tab { white-space: nowrap; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-weight: 600; font-size: .9rem; cursor: pointer; text-decoration: none; }
 .tab.on { background: var(--c); color: #fff; border-color: var(--c); }
 .prod { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
@@ -140,11 +140,11 @@ input.i:focus, select.i:focus, textarea.i:focus { outline: 2px solid var(--c); o
 .prod h3 { font-size: 1rem; margin: 0 0 2px; }
 .prod p { font-size: .875rem; color: var(--muted); margin: 0 0 6px; }
 .precio { font-weight: 700; }
-.agotado { opacity: .5; }
+.agotado { opacity: .62; }
 .cant { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
 .cant button { width: 36px; height: 36px; border: 0; background: none; font-size: 1.2rem; font-weight: 700; cursor: pointer; color: var(--c); }
 .cant span { min-width: 22px; text-align: center; font-weight: 700; }
-.mas { width: 36px; height: 36px; border-radius: 999px; border: 0; background: var(--c); color: #fff; font-size: 1.4rem; font-weight: 700; cursor: pointer; line-height: 1; }
+.mas { width: 40px; height: 40px; border-radius: 999px; border: 0; background: var(--c); color: #fff; font-size: 1.4rem; font-weight: 700; cursor: pointer; line-height: 1; }
 
 .barra {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
@@ -157,6 +157,11 @@ input.i:focus, select.i:focus, textarea.i:focus { outline: 2px solid var(--c); o
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; max-height: 92vh; overflow-y: auto;
   background: var(--bg); border-radius: 20px 20px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
   max-width: 720px; margin: 0 auto;
+}
+/* Total y botón de WhatsApp siempre visibles al pie de la hoja, aunque haya que bajar para ver los campos */
+.hoja-pie {
+  position: sticky; bottom: calc(-18px - env(safe-area-inset-bottom)); margin: 0 -16px calc(-18px - env(safe-area-inset-bottom));
+  padding: 10px 16px calc(14px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--line);
 }
 .seg { display: flex; gap: 6px; background: #ebe6e0; padding: 4px; border-radius: 12px; margin-bottom: 12px; }
 .seg button { flex: 1; border: 0; background: none; padding: 9px 4px; border-radius: 9px; font-weight: 600; cursor: pointer; font-size: .9rem; }

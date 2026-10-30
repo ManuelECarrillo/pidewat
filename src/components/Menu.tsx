@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Categoria, Negocio, Producto } from "@/lib/tipos";
+import type { Categoria, NegocioMenu, Producto } from "@/lib/tipos";
 import { dinero } from "@/lib/formato";
 import { linkWhatsapp, mensajePedido, totalPedido, type LineaPedido } from "@/lib/whatsapp";
 
@@ -11,7 +11,7 @@ type Tipo = "mesa" | "recoger" | "domicilio";
 export default function Menu({
   negocio, categorias, productos, mesaInicial, link,
 }: {
-  negocio: Negocio; categorias: Categoria[]; productos: Producto[]; mesaInicial?: string; link: string;
+  negocio: NegocioMenu; categorias: Categoria[]; productos: Producto[]; mesaInicial?: string; link: string;
 }) {
   const clave = `pidewat:${negocio.slug}`;
   const [carrito, setCarrito] = useState<Carrito>({});
@@ -69,7 +69,8 @@ export default function Menu({
       direccion: direccion.trim(), notas: notas.trim(), envio, link,
     });
     if (negocio.id !== "demo") {
-      const cuerpo = JSON.stringify({ business_id: negocio.id, total, order_type: tipo, items: lineas });
+      const items = Object.entries(carrito).filter(([id, n]) => n > 0 && porId.get(id)?.available).map(([id, cantidad]) => ({ id, cantidad }));
+      const cuerpo = JSON.stringify({ business_id: negocio.id, order_type: tipo, items });
       try { navigator.sendBeacon("/api/pedido", new Blob([cuerpo], { type: "application/json" })); } catch {}
     }
     setCarrito({});
@@ -192,17 +193,18 @@ export default function Menu({
               </label>
             </div>
 
-            {envio > 0 && <div className="row between small muted"><span>Envío</span><span>{dinero(envio)}</span></div>}
-            <div className="row between" style={{ fontWeight: 800, fontSize: "1.15rem", margin: "6px 0 14px" }}>
-              <span>Total</span><span>{dinero(total)}</span>
+            <div className="hoja-pie">
+              {envio > 0 && <div className="row between small muted"><span>Envío</span><span>{dinero(envio)}</span></div>}
+              <div className="row between" style={{ fontWeight: 800, fontSize: "1.15rem", margin: "2px 0 10px" }}>
+                <span>Total</span><span>{dinero(total)}</span>
+              </div>
+              <button className="btn btn-wa btn-block" style={{ fontSize: "1.05rem", padding: 14 }} disabled={!lineas.length || Boolean(falta)} onClick={enviar}>
+                {falta || "Enviar pedido por WhatsApp"}
+              </button>
+              <p className="small muted" style={{ textAlign: "center", margin: "8px 0 0" }}>
+                Se abre WhatsApp con tu pedido ya escrito. Solo dale enviar.
+              </p>
             </div>
-
-            <button className="btn btn-wa btn-block" style={{ fontSize: "1.05rem", padding: 14 }} disabled={!lineas.length || Boolean(falta)} onClick={enviar}>
-              {falta || "Enviar pedido por WhatsApp"}
-            </button>
-            <p className="small muted" style={{ textAlign: "center", marginTop: 10 }}>
-              Se abre WhatsApp con tu pedido ya escrito. Solo dale enviar.
-            </p>
           </div>
         </>
       )}

@@ -104,9 +104,9 @@ $$;
 -- ---------------------------------------------------------------
 
 revoke all on public.businesses from anon, authenticated;
+-- (plan, prueba y pagos no: el menú decide si está en pausa en el servidor)
 grant select (id, slug, name, whatsapp, description, address, hours, logo_url, cover_url, color, mode,
-  accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note,
-  plan, trial_ends_at, paid_until, paused)
+  accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note)
   on public.businesses to anon;
 grant select on public.businesses to authenticated;
 -- el dueño edita sus datos, pero no su plan, su prueba ni su pago
@@ -147,6 +147,7 @@ drop policy if exists "dueño maneja productos" on public.products;
 create policy "dueño maneja productos" on public.products for all to authenticated
   using (public.owns_business(business_id)) with check (public.owns_business(business_id));
 
+revoke all on public.categories, public.products from anon;
 grant select on public.categories, public.products to anon;
 grant select, insert, update, delete on public.categories, public.products to authenticated;
 
@@ -158,6 +159,10 @@ drop policy if exists "dueño ve sus pagos" on public.payments;
 create policy "dueño ve sus pagos" on public.payments for select to authenticated using (public.owns_business(business_id) or public.is_admin());
 grant select on public.payments to authenticated;
 -- order_events y payments se escriben solo desde el servidor (service role)
+revoke all on public.admins, public.payments, public.order_events from anon, authenticated;
+grant select on public.admins, public.payments, public.order_events to authenticated;
+revoke execute on function public.is_admin(), public.owns_business(uuid) from anon, public;
+grant execute on function public.is_admin(), public.owns_business(uuid) to authenticated;
 
 -- ---------------------------------------------------------------
 -- Fotos: bucket público "imagenes", carpeta = id del negocio

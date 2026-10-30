@@ -5,22 +5,31 @@ import { categoriasDemo, negocioDemo, productosDemo } from "@/lib/demo";
 import { estadoNegocio } from "@/lib/estado";
 import { siteUrl } from "@/lib/formato";
 import { SLUGS_RESERVADOS } from "@/lib/planes";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseConfigurado, supabasePublico } from "@/lib/supabase/publico";
-import { COLUMNAS_PUBLICAS, type Categoria, type Negocio, type Producto } from "@/lib/tipos";
+import { COLUMNAS_MENU, type Categoria, type NegocioMenu, type Producto } from "@/lib/tipos";
 
 export const revalidate = 30;
 
 async function cargar(slug: string) {
-  if (slug === "demo") return { negocio: negocioDemo, categorias: categoriasDemo, productos: productosDemo };
+  if (slug === "demo") {
+    const { plan, trial_ends_at, paid_until, paused, ...negocio } = negocioDemo;
+    return { negocio, activo: true, categorias: categoriasDemo, productos: productosDemo };
+  }
   if (SLUGS_RESERVADOS.has(slug) || !supabaseConfigurado()) return null;
   const sb = supabasePublico();
-  const { data: negocio } = await sb.from("businesses").select(COLUMNAS_PUBLICAS).eq("slug", slug).maybeSingle<Negocio>();
+  const { data: negocio } = await sb.from("businesses").select(COLUMNAS_MENU).eq("slug", slug).maybeSingle<NegocioMenu>();
   if (!negocio) return null;
-  const [{ data: categorias }, { data: productos }] = await Promise.all([
+  const [{ data: cobro }, { data: categorias }, { data: productos }] = await Promise.all([
+    // Si está en pausa se decide aquí en el servidor; esas fechas nunca llegan al navegador
+    supabaseAdmin().from("businesses").select("trial_ends_at, paid_until, paused").eq("id", negocio.id).single(),
     sb.from("categories").select("*").eq("business_id", negocio.id).order("position").order("name"),
     sb.from("products").select("*").eq("business_id", negocio.id).order("position").order("name"),
   ]);
-  return { negocio, categorias: (categorias || []) as Categoria[], productos: (productos || []) as Producto[] };
+  return {
+    negocio, activo: cobro ? estadoNegocio(cobro).activo : true,
+    categorias: (categorias || []) as Categoria[], productos: (productos || []) as Producto[],
+  };
 }
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ mesa?: string }> };
@@ -42,7 +51,6 @@ export default async function PaginaNegocio({ params, searchParams }: Props) {
   const d = await cargar(slug);
   if (!d) notFound();
   const { negocio } = d;
-  const estado = estadoNegocio(negocio);
   const link = `${siteUrl().replace(/^https?:\/\//, "")}/${negocio.slug}`;
   const inicial = negocio.name.trim().charAt(0).toUpperCase();
 
@@ -61,7 +69,7 @@ export default async function PaginaNegocio({ params, searchParams }: Props) {
         </div>
       </div>
 
-      {estado.activo ? (
+      {d.activo ? (
         <Menu negocio={negocio} categorias={d.categorias} productos={d.productos} mesaInicial={mesa?.slice(0, 6)} link={link} />
       ) : (
         <div className="wrap" style={{ paddingTop: 24 }}>
