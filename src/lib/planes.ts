@@ -3,7 +3,8 @@ export const DIAS_GRACIA = 7;
 
 export const PLANES = {
   base: { nombre: "Base", mensual: 149, anual: 1490 },
-  plus: { nombre: "Plus", mensual: 199, anual: 1990 },
+  // Plus ya no se vende (2026-10-30: un solo plan). Se queda por los negocios que lo tengan guardado.
+  plus: { nombre: "Base", mensual: 149, anual: 1490 },
 } as const;
 
 export type Plan = keyof typeof PLANES;

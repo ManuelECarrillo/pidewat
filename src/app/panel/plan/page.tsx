@@ -28,12 +28,12 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
       {negocio.mp_preapproval_id && <div className="alerta alerta-ok">Tienes el cobro automático mensual activo con Mercado Pago.</div>}
 
       {mpConfigurado() ? (
-        <div className="grid2">
-          {(["base", "plus"] as const).map((plan) => (
+        <div style={{ maxWidth: 420 }}>
+          {(["base"] as const).map((plan) => (
             <div className="card" key={plan}>
-              <div className="row between"><strong>Plan {PLANES[plan].nombre}</strong>{negocio.plan === plan && <span className="pill">Tu plan</span>}</div>
+              <div className="row between"><strong>Plan {PLANES[plan].nombre}</strong><span className="pill">Tu plan</span></div>
               <div className="kpi">{dinero(PLANES[plan].mensual)}<span className="small muted"> /mes</span></div>
-              <p className="small muted">{plan === "base" ? "Todo para recibir pedidos por WhatsApp." : "Todo lo del Base + lo que más te piden."}</p>
+              <p className="small muted">Todo para recibir pedidos por WhatsApp, sin comisión.</p>
               <form action={irAPagar}>
                 <input type="hidden" name="plan" value={plan} />
                 <label className="f small">Correo de tu cuenta de Mercado Pago
