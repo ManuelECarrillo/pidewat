@@ -1,4 +1,5 @@
 import BotonEnviar from "@/components/BotonEnviar";
+import Selector from "@/components/Selector";
 import ImagenInput from "@/components/ImagenInput";
 import { dinero } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
@@ -16,12 +17,10 @@ function FormProducto({ p, categorias, negocioId, catDefecto }: { p?: Producto; 
         <label className="f grow">Precio
           <input className="i" name="price" inputMode="decimal" required defaultValue={p ? String(p.price) : ""} placeholder="0" />
         </label>
-        <label className="f grow">Categoría
-          <select className="i" name="category_id" defaultValue={p?.category_id || catDefecto || ""}>
-            <option value="">Sin categoría</option>
-            {categorias.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </label>
+        <div className="f grow">Categoría
+          <Selector name="category_id" valor={p?.category_id || catDefecto || ""}
+            opciones={[{ value: "", label: "Sin categoría" }, ...categorias.map((c) => ({ value: c.id, label: c.name }))]} />
+        </div>
       </div>
       <label className="f">Descripción <span className="h">Opcional</span>
         <input className="i" name="description" defaultValue={p?.description || ""} placeholder="Ingredientes, tamaño…" />

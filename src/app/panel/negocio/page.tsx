@@ -1,4 +1,6 @@
 import BotonEnviar from "@/components/BotonEnviar";
+import Selector from "@/components/Selector";
+import SelectorColor from "@/components/SelectorColor";
 import ImagenInput from "@/components/ImagenInput";
 import { siteUrl } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
@@ -28,15 +30,15 @@ export default async function PanelNegocio({ searchParams }: { searchParams: Pro
         <h3>Imagen</h3>
         <ImagenInput name="logo_url" negocioId={n.id} valor={n.logo_url} etiqueta="Logo" />
         <ImagenInput name="cover_url" negocioId={n.id} valor={n.cover_url} etiqueta="Foto de portada" />
-        <label className="f">Color principal
-          <input className="i" type="color" name="color" defaultValue={n.color} style={{ width: 80, padding: 4 }} />
-        </label>
-        <label className="f">Tipo de negocio
-          <select className="i" name="mode" defaultValue={n.mode}>
-            <option value="menu">Restaurante / comida (menú y platillos)</option>
-            <option value="catalogo">Tienda (catálogo y productos)</option>
-          </select>
-        </label>
+        <div className="f">Color principal
+          <SelectorColor name="color" valor={n.color} />
+        </div>
+        <div className="f">Tipo de negocio
+          <Selector name="mode" valor={n.mode} opciones={[
+            { value: "menu", label: "Restaurante / comida", hint: "Menú y platillos" },
+            { value: "catalogo", label: "Tienda", hint: "Catálogo y productos" },
+          ]} />
+        </div>
       </div>
 
       <div className="card">

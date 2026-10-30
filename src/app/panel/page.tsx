@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AvisoEstado, { pillEstado } from "@/components/AvisoEstado";
+import InstalarApp from "@/components/InstalarApp";
 import CompartirLink from "@/components/CompartirLink";
 import { estadoNegocio } from "@/lib/estado";
 import { dinero, siteUrl } from "@/lib/formato";
@@ -30,6 +31,7 @@ export default async function Panel() {
         {pillEstado(estado)}
       </div>
       <AvisoEstado estado={estado} />
+      <InstalarApp />
 
       {!productos && (
         <div className="alerta">

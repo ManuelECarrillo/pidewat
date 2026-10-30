@@ -1,4 +1,5 @@
 import Link from "next/link";
+import InstalarApp from "@/components/InstalarApp";
 import FormEntrar from "./FormEntrar";
 
 export const metadata = { title: "Entrar" };
@@ -13,6 +14,7 @@ export default async function Entrar({ searchParams }: { searchParams: Promise<{
         <div className="alerta" style={{ marginBottom: 12 }}>Tu cuenta todavía no tiene un negocio. Escríbenos por WhatsApp y te lo damos de alta.</div>
       )}
       <FormEntrar />
+      <div style={{ marginTop: 14 }}><InstalarApp variante="boton" /></div>
     </main>
   );
 }

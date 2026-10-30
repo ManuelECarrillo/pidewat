@@ -5,6 +5,8 @@ export const metadata: Metadata = {
   title: { default: "Pidewat · Pedidos ordenados por WhatsApp", template: "%s · Pidewat" },
   description: "Tu menú en un link y un QR. Tus clientes arman su pedido y te llega ordenado por WhatsApp, sin comisión.",
   manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "Pidewat", statusBarStyle: "default" },
+  icons: { apple: "/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#1f8a4c" };

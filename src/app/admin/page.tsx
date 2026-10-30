@@ -8,6 +8,7 @@ import { requiereAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { NegocioCompleto } from "@/lib/tipos";
 import { altaNegocio } from "./acciones";
+import Selector from "@/components/Selector";
 
 export default async function Admin() {
   await requiereAdmin();
@@ -52,9 +53,9 @@ export default async function Admin() {
             <label className="f">Link <span className="h">Opcional. Si lo dejas vacío se arma con el nombre (ej. el-fogon)</span><input className="i" name="slug" /></label>
             <label className="f">WhatsApp del negocio <span className="h">10 dígitos</span><input className="i" name="whatsapp" inputMode="tel" required /></label>
             <label className="f">Correo del dueño <span className="h">Con esto entra a su panel</span><input className="i" name="email" type="email" required /></label>
-            <label className="f">Tipo
-              <select className="i" name="mode"><option value="menu">Restaurante (menú)</option><option value="catalogo">Tienda (catálogo)</option></select>
-            </label>
+            <div className="f">Tipo
+              <Selector name="mode" opciones={[{ value: "menu", label: "Restaurante (menú)" }, { value: "catalogo", label: "Tienda (catálogo)" }]} />
+            </div>
           </FormConResultado>
         </div>
       </details>
