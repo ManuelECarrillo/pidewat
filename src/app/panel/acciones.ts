@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requiereDueno } from "@/lib/sesion";
 import { normalizarWhatsapp } from "@/lib/formato";
+import type { ResultadoAlta } from "@/app/admin/acciones";
 
 const txt = (f: FormData, k: string, max = 300) => String(f.get(k) ?? "").trim().slice(0, max) || null;
 const num = (f: FormData, k: string) => Math.max(0, Number(String(f.get(k) ?? "0").replace(/[^0-9.]/g, "")) || 0);
@@ -83,4 +84,15 @@ export async function guardarNegocio(f: FormData) {
   }).eq("id", negocio.id);
   refrescar(negocio.slug);
   redirect("/panel/negocio?ok=1");
+}
+
+// El dueño cambia la contraseña que le mandamos por WhatsApp (así deja de servir si alguien ve ese chat).
+export async function cambiarClave(_: ResultadoAlta | null, f: FormData): Promise<ResultadoAlta> {
+  const { sb } = await requiereDueno();
+  const clave = String(f.get("clave") ?? "");
+  if (clave.length < 8) return { ok: false, mensaje: "Usa al menos 8 letras o números." };
+  if (clave !== String(f.get("clave2") ?? "")) return { ok: false, mensaje: "Las dos contraseñas no son iguales." };
+  const { error } = await sb.auth.updateUser({ password: clave });
+  if (error) return { ok: false, mensaje: "No se pudo cambiar. Intenta con otra contraseña o escríbenos por WhatsApp." };
+  return { ok: true, mensaje: "Listo, tu contraseña cambió. Úsala la próxima vez que entres." };
 }

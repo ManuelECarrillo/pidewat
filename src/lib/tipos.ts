@@ -43,5 +43,7 @@ export type Producto = {
   position: number;
 };
 
-export const COLUMNAS_PUBLICAS =
-  "id, slug, name, whatsapp, description, address, hours, logo_url, cover_url, color, mode, accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note, plan, trial_ends_at, paid_until, paused";
+// Lo que sale en el menú público. Plan, prueba y pagos no: el público no tiene por qué saber quién paga.
+export type NegocioMenu = Omit<Negocio, "plan" | "trial_ends_at" | "paid_until" | "paused">;
+export const COLUMNAS_MENU =
+  "id, slug, name, whatsapp, description, address, hours, logo_url, cover_url, color, mode, accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note";

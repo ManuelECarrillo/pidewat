@@ -58,6 +58,7 @@ Tu panel para cambiar precios y platillos:
 ${siteUrl()}/entrar
 Correo: ${correo}
 Contraseña: ${claveTexto}
+(Al entrar, cámbiala en "Mi negocio" por una que solo tú sepas.)
 
 Tienes ${DIAS_PRUEBA} días gratis. Cualquier cosa me escribes por aquí.`;
   return { ok: true, mensaje: `Negocio creado: /${slug}`, whatsapp, texto };

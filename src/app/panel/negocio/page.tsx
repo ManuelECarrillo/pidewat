@@ -1,15 +1,17 @@
 import BotonEnviar from "@/components/BotonEnviar";
+import FormConResultado from "@/components/FormConResultado";
 import Selector from "@/components/Selector";
 import SelectorColor from "@/components/SelectorColor";
 import ImagenInput from "@/components/ImagenInput";
 import { siteUrl } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
-import { guardarNegocio } from "../acciones";
+import { cambiarClave, guardarNegocio } from "../acciones";
 
 export default async function PanelNegocio({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
   const { negocio: n } = await requiereDueno();
   const { ok, error } = await searchParams;
   return (
+    <>
     <form action={guardarNegocio} className="stack" style={{ maxWidth: 640 }}>
       <h1 style={{ fontSize: "1.5rem" }}>Mi negocio</h1>
       {ok && <div className="alerta alerta-ok">Cambios guardados. Tu menú se actualiza en menos de un minuto.</div>}
@@ -54,5 +56,15 @@ export default async function PanelNegocio({ searchParams }: { searchParams: Pro
 
       <BotonEnviar className="btn btn-p btn-block">Guardar</BotonEnviar>
     </form>
+
+    <div className="card" style={{ maxWidth: 640, marginTop: 24 }}>
+      <h3>Tu contraseña</h3>
+      <p className="small muted">Si te la mandamos por WhatsApp, cámbiala por una que solo tú sepas.</p>
+      <FormConResultado action={cambiarClave} boton="Cambiar contraseña">
+        <label className="f">Contraseña nueva<input className="i" name="clave" type="password" autoComplete="new-password" minLength={8} required /></label>
+        <label className="f">Escríbela otra vez<input className="i" name="clave2" type="password" autoComplete="new-password" minLength={8} required /></label>
+      </FormConResultado>
+    </div>
+    </>
   );
 }
