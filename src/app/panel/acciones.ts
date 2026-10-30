@@ -1,0 +1,86 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { requiereDueno } from "@/lib/sesion";
+import { normalizarWhatsapp } from "@/lib/formato";
+
+const txt = (f: FormData, k: string, max = 300) => String(f.get(k) ?? "").trim().slice(0, max) || null;
+const num = (f: FormData, k: string) => Math.max(0, Number(String(f.get(k) ?? "0").replace(/[^0-9.]/g, "")) || 0);
+const si = (f: FormData, k: string) => f.get(k) === "on";
+
+function refrescar(slug: string) {
+  revalidatePath(`/${slug}`);
+  revalidatePath("/panel", "layout");
+}
+
+export async function guardarProducto(f: FormData) {
+  const { sb, negocio } = await requiereDueno();
+  const id = txt(f, "id", 40);
+  const datos = {
+    business_id: negocio.id,
+    name: txt(f, "name", 120) || "Sin nombre",
+    description: txt(f, "description", 400),
+    price: num(f, "price"),
+    category_id: txt(f, "category_id", 40),
+    image_url: txt(f, "image_url", 500),
+    available: !f.has("available_present") || si(f, "available"),
+  };
+  if (id) await sb.from("products").update(datos).eq("id", id).eq("business_id", negocio.id);
+  else await sb.from("products").insert({ ...datos, position: Date.now() % 1_000_000_000 });
+  refrescar(negocio.slug);
+}
+
+export async function alternarAgotado(f: FormData) {
+  const { sb, negocio } = await requiereDueno();
+  await sb.from("products").update({ available: f.get("available") === "true" }).eq("id", String(f.get("id"))).eq("business_id", negocio.id);
+  refrescar(negocio.slug);
+}
+
+export async function borrarProducto(f: FormData) {
+  const { sb, negocio } = await requiereDueno();
+  await sb.from("products").delete().eq("id", String(f.get("id"))).eq("business_id", negocio.id);
+  refrescar(negocio.slug);
+}
+
+export async function guardarCategoria(f: FormData) {
+  const { sb, negocio } = await requiereDueno();
+  const id = txt(f, "id", 40);
+  const name = txt(f, "name", 60);
+  if (!name) return;
+  const position = Number(f.get("position")) || 0;
+  if (id) await sb.from("categories").update({ name, position }).eq("id", id).eq("business_id", negocio.id);
+  else await sb.from("categories").insert({ business_id: negocio.id, name, position });
+  refrescar(negocio.slug);
+}
+
+export async function borrarCategoria(f: FormData) {
+  const { sb, negocio } = await requiereDueno();
+  await sb.from("categories").delete().eq("id", String(f.get("id"))).eq("business_id", negocio.id);
+  refrescar(negocio.slug);
+}
+
+export async function guardarNegocio(f: FormData) {
+  const { sb, negocio } = await requiereDueno();
+  const whatsapp = normalizarWhatsapp(String(f.get("whatsapp") ?? ""));
+  if (!/^[0-9]{10,15}$/.test(whatsapp)) redirect("/panel/negocio?error=whatsapp");
+  const color = String(f.get("color") ?? "");
+  await sb.from("businesses").update({
+    name: txt(f, "name", 80) || negocio.name,
+    whatsapp,
+    description: txt(f, "description", 300),
+    address: txt(f, "address", 200),
+    hours: txt(f, "hours", 200),
+    logo_url: txt(f, "logo_url", 500),
+    cover_url: txt(f, "cover_url", 500),
+    color: /^#[0-9a-f]{6}$/i.test(color) ? color : negocio.color,
+    mode: f.get("mode") === "catalogo" ? "catalogo" : "menu",
+    accepts_table: si(f, "accepts_table"),
+    accepts_pickup: si(f, "accepts_pickup"),
+    accepts_delivery: si(f, "accepts_delivery"),
+    delivery_fee: num(f, "delivery_fee"),
+    delivery_note: txt(f, "delivery_note", 200),
+  }).eq("id", negocio.id);
+  refrescar(negocio.slug);
+  redirect("/panel/negocio?ok=1");
+}
