@@ -13,7 +13,11 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
   const estado = estadoNegocio(negocio);
   const { data: pagos } = await sb.from("payments").select("*").eq("business_id", negocio.id).order("created_at", { ascending: false }).limit(24);
   const ventas = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP;
-  const textoTransfer = encodeURIComponent(`Hola, quiero pagar Pidewat para ${negocio.name} por transferencia.`);
+  const textoTransfer = encodeURIComponent(`Hola, quiero pagar Pidewat para ${negocio.name} por transferencia (${dinero(PLANES.base.mensual)} al mes).`);
+  const textoCobro =
+    estado.clave === "prueba" ? `Estás en tu prueba gratis hasta el ${fecha(negocio.trial_ends_at)}. Después son ${dinero(PLANES.base.mensual)} al mes.`
+    : estado.clave === "activo" ? `Pagado hasta el ${fecha(estado.hasta)}.`
+    : `Para seguir recibiendo pedidos paga ${dinero(PLANES.base.mensual)}.`;
 
   return (
     <div className="stack" style={{ maxWidth: 720 }}>
@@ -27,31 +31,31 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
       <AvisoEstado estado={estado} />
       {negocio.mp_preapproval_id && <div className="alerta alerta-ok">Tienes el cobro automático mensual activo con Mercado Pago.</div>}
 
-      {mpConfigurado() ? (
-        <div style={{ maxWidth: 420 }}>
-          {(["base"] as const).map((plan) => (
-            <div className="card" key={plan}>
-              <div className="row between"><strong>Plan {PLANES[plan].nombre}</strong><span className="pill">Tu plan</span></div>
-              <div className="kpi">{dinero(PLANES[plan].mensual)}<span className="small muted"> /mes</span></div>
-              <p className="small muted">Todo para recibir pedidos por WhatsApp, sin comisión.</p>
-              <form action={irAPagar}>
-                <input type="hidden" name="plan" value={plan} />
-                <label className="f small">Correo de tu cuenta de Mercado Pago
-                  <input className="i" type="email" name="correo" required defaultValue={user.email || ""} />
-                </label>
-                <div className="stack">
-                  <BotonEnviar className="btn btn-p btn-block">Pagar {dinero(PLANES[plan].mensual)} al mes (automático)</BotonEnviar>
-                </div>
-              </form>
-              <form action={irAPagar} style={{ marginTop: 8 }}>
-                <input type="hidden" name="plan" value={plan} />
-                <input type="hidden" name="ciclo" value="anual" />
-                <BotonEnviar className="btn btn-block">Pagar un año: {dinero(PLANES[plan].anual)}</BotonEnviar>
-              </form>
-            </div>
-          ))}
-        </div>
-      ) : null}
+      {/* Siempre a la vista cuánto se paga, haya o no Mercado Pago */}
+      <div className="card" style={{ maxWidth: 420 }}>
+        <div className="row between"><strong>Plan Pidewat</strong><span className="pill">Tu plan</span></div>
+        <div className="kpi">{dinero(PLANES.base.mensual)}<span className="small muted"> al mes</span></div>
+        <p className="small muted" style={{ marginTop: 4 }}>
+          O {dinero(PLANES.base.anual)} por un año (ahorras {dinero(PLANES.base.mensual * 12 - PLANES.base.anual)}). Sin comisión por pedido.
+        </p>
+        <p className="small" style={{ margin: "8px 0 12px" }}>{textoCobro}</p>
+        {mpConfigurado() && (
+          <>
+            <form action={irAPagar}>
+              <input type="hidden" name="plan" value="base" />
+              <label className="f small">Correo de tu cuenta de Mercado Pago
+                <input className="i" type="email" name="correo" required defaultValue={user.email || ""} />
+              </label>
+              <BotonEnviar className="btn btn-p btn-block">Pagar {dinero(PLANES.base.mensual)} al mes (automático)</BotonEnviar>
+            </form>
+            <form action={irAPagar} style={{ marginTop: 8 }}>
+              <input type="hidden" name="plan" value="base" />
+              <input type="hidden" name="ciclo" value="anual" />
+              <BotonEnviar className="btn btn-block">Pagar un año: {dinero(PLANES.base.anual)}</BotonEnviar>
+            </form>
+          </>
+        )}
+      </div>
 
       <div className="card">
         <h3>¿Prefieres transferencia o efectivo?</h3>

@@ -7,7 +7,7 @@ import { dinero, siteUrl } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
 
 export default async function Panel() {
-  const { sb, negocio } = await requiereDueno();
+  const { sb, negocio, user } = await requiereDueno();
   const estado = estadoNegocio(negocio);
   const hace30 = new Date(Date.now() - 30 * 86_400_000).toISOString();
   const hace7 = Date.now() - 7 * 86_400_000;
@@ -31,6 +31,13 @@ export default async function Panel() {
         {pillEstado(estado)}
       </div>
       <AvisoEstado estado={estado} />
+      {/* Hasta que la cambie: la contraseña que le mandamos por WhatsApp la puede ver quien vea ese chat */}
+      {!user.user_metadata?.clave_propia && (
+        <div className="alerta">
+          🔒 <strong>Te recomendamos cambiar tu contraseña.</strong> La que te mandamos por WhatsApp la puede ver cualquiera que vea ese chat.{" "}
+          <Link href="/panel/negocio#clave"><strong>Cambiarla ahora</strong></Link>
+        </div>
+      )}
       <InstalarApp />
 
       {!productos && (

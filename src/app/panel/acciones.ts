@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requiereDueno } from "@/lib/sesion";
 import { normalizarWhatsapp } from "@/lib/formato";
+import { limpiarHorario } from "@/lib/horario";
 import type { ResultadoAlta } from "@/app/admin/acciones";
 
 const txt = (f: FormData, k: string, max = 300) => String(f.get(k) ?? "").trim().slice(0, max) || null;
@@ -99,6 +100,11 @@ export async function guardarNegocio(f: FormData) {
     delivery_fee: num(f, "delivery_fee"),
     delivery_note: txt(f, "delivery_note", 200),
   }).eq("id", negocio.id);
+  // Aparte, para que si todavía no se corre la migración del horario lo demás se guarde igual
+  let horario = null;
+  try { horario = limpiarHorario(JSON.parse(String(f.get("horario") || "null"))); } catch {}
+  const { error } = await sb.from("businesses").update({ horario }).eq("id", negocio.id);
+  if (error) console.error("horario sin guardar (¿falta la migración 2026-10-30-horario?)", error.message);
   refrescar(negocio.slug);
   redirect("/panel/negocio?ok=1");
 }
@@ -109,7 +115,8 @@ export async function cambiarClave(_: ResultadoAlta | null, f: FormData): Promis
   const clave = String(f.get("clave") ?? "");
   if (clave.length < 8) return { ok: false, mensaje: "Usa al menos 8 letras o números." };
   if (clave !== String(f.get("clave2") ?? "")) return { ok: false, mensaje: "Las dos contraseñas no son iguales." };
-  const { error } = await sb.auth.updateUser({ password: clave });
+  // clave_propia: deja de salir el aviso "cambia tu contraseña" en el panel
+  const { error } = await sb.auth.updateUser({ password: clave, data: { clave_propia: true } });
   if (error) return { ok: false, mensaje: "No se pudo cambiar. Intenta con otra contraseña o escríbenos por WhatsApp." };
   return { ok: true, mensaje: "Listo, tu contraseña cambió. Úsala la próxima vez que entres." };
 }

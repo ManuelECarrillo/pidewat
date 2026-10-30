@@ -3,6 +3,8 @@ import FormConResultado from "@/components/FormConResultado";
 import Selector from "@/components/Selector";
 import SelectorColor from "@/components/SelectorColor";
 import ImagenInput from "@/components/ImagenInput";
+import EditorHorario from "@/components/EditorHorario";
+import { limpiarHorario } from "@/lib/horario";
 import { siteUrl } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
 import { cambiarClave, guardarNegocio } from "../acciones";
@@ -24,8 +26,12 @@ export default async function PanelNegocio({ searchParams }: { searchParams: Pro
         </label>
         <label className="f">Descripción corta<input className="i" name="description" defaultValue={n.description || ""} placeholder="Ej. Gorditas y antojitos duranguenses" /></label>
         <label className="f">Dirección<input className="i" name="address" defaultValue={n.address || ""} /></label>
-        <label className="f">Horario<input className="i" name="hours" defaultValue={n.hours || ""} placeholder="Lun a Sáb 8:00 a 17:00" /></label>
         <p className="small muted" style={{ marginBottom: 0 }}>Tu link: {siteUrl()}/{n.slug} (para cambiarlo, escríbenos).</p>
+      </div>
+
+      <div className="card">
+        <h3>Horario</h3>
+        <EditorHorario valor={limpiarHorario(n.horario)} texto={n.hours || ""} />
       </div>
 
       <div className="card">
@@ -57,7 +63,7 @@ export default async function PanelNegocio({ searchParams }: { searchParams: Pro
       <BotonEnviar className="btn btn-p btn-block">Guardar</BotonEnviar>
     </form>
 
-    <div className="card" style={{ maxWidth: 640, marginTop: 24 }}>
+    <div className="card" id="clave" style={{ maxWidth: 640, marginTop: 24, scrollMarginTop: 80 }}>
       <h3>Tu contraseña</h3>
       <p className="small muted">Si te la mandamos por WhatsApp, cámbiala por una que solo tú sepas.</p>
       <FormConResultado action={cambiarClave} boton="Cambiar contraseña">

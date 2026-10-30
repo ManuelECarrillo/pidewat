@@ -6,9 +6,9 @@ export type Opcion = { value: string; label: string; hint?: string };
 
 // Lista desplegable con el estilo de la app (reemplaza al <select> gris del sistema).
 export default function Selector({
-  name, opciones, valor, ariaLabel,
+  name, opciones, valor, ariaLabel, onChange,
 }: {
-  name: string; opciones: Opcion[]; valor?: string; ariaLabel?: string;
+  name?: string; opciones: Opcion[]; valor?: string; ariaLabel?: string; onChange?: (v: string) => void;
 }) {
   const [actual, setActual] = useState(valor ?? opciones[0]?.value ?? "");
   const [abierto, setAbierto] = useState(false);
@@ -16,6 +16,10 @@ export default function Selector({
 
   useEffect(() => {
     if (!abierto) return;
+    // En listas largas (ej. las horas) que abra ya en la opción elegida
+    const lista = caja.current?.querySelector<HTMLElement>(".sel-lista");
+    const elegida = lista?.querySelector<HTMLElement>("button.on");
+    if (lista && elegida) lista.scrollTop = elegida.offsetTop - lista.clientHeight / 2 + elegida.offsetHeight / 2;
     const fuera = (e: PointerEvent) => { if (!caja.current?.contains(e.target as Node)) setAbierto(false); };
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setAbierto(false); };
     document.addEventListener("pointerdown", fuera);
@@ -27,7 +31,7 @@ export default function Selector({
 
   return (
     <div className="sel" ref={caja}>
-      <input type="hidden" name={name} value={actual} />
+      {name && <input type="hidden" name={name} value={actual} />}
       <button type="button" className={`sel-btn ${abierto ? "on" : ""}`} aria-haspopup="listbox" aria-expanded={abierto} aria-label={ariaLabel}
         onClick={() => setAbierto((a) => !a)}>
         <span className="grow" style={{ textAlign: "left" }}>{elegida?.label ?? "Elegir…"}</span>
@@ -37,7 +41,7 @@ export default function Selector({
         <ul className="sel-lista" role="listbox">
           {opciones.map((o) => (
             <li key={o.value} role="option" aria-selected={o.value === actual}>
-              <button type="button" className={o.value === actual ? "on" : ""} onClick={() => { setActual(o.value); setAbierto(false); }}>
+              <button type="button" className={o.value === actual ? "on" : ""} onClick={() => { setActual(o.value); setAbierto(false); onChange?.(o.value); }}>
                 <span className="grow">
                   {o.label}
                   {o.hint && <span className="small muted" style={{ display: "block" }}>{o.hint}</span>}

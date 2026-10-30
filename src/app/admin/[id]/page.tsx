@@ -39,7 +39,7 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
         {pillEstado(e)}
       </div>
       <div className="small muted">
-        <a href={`/${n.slug}`} target="_blank">{siteUrl()}/{n.slug}</a> · {n.owner_email} · WhatsApp {n.whatsapp} · {productos || 0} productos ·
+        <a href={`/${n.slug}?desde=admin-${n.id}`}>{siteUrl()}/{n.slug}</a> · {n.owner_email} · WhatsApp {n.whatsapp} · {productos || 0} productos ·
         prueba hasta {fecha(n.trial_ends_at)}{n.paid_until ? ` · pagado hasta ${fecha(n.paid_until)}` : ""}
       </div>
 

@@ -123,7 +123,7 @@ export async function nuevaClave(_: ResultadoAlta | null, f: FormData): Promise<
   const { sb, n } = await negocio(f);
   if (!n.owner_id) return { ok: false, mensaje: "Este negocio no tiene dueño." };
   const clave = claveNueva();
-  const { error } = await sb.auth.admin.updateUserById(n.owner_id, { password: clave });
+  const { error } = await sb.auth.admin.updateUserById(n.owner_id, { password: clave, user_metadata: { clave_propia: false } });
   if (error) return { ok: false, mensaje: error.message };
   return {
     ok: true, mensaje: "Contraseña nueva creada.", whatsapp: n.whatsapp,

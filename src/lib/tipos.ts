@@ -27,6 +27,7 @@ export type NegocioCompleto = Negocio & {
   mp_preapproval_id: string | null;
   notes: string | null;
   created_at: string;
+  horario?: unknown; // existe después de correr supabase/migraciones/2026-10-30-horario.sql
 };
 
 export type Categoria = { id: string; business_id: string; name: string; position: number };

@@ -4,14 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import type { Categoria, NegocioMenu, Producto } from "@/lib/tipos";
 import { dinero } from "@/lib/formato";
 import { linkWhatsapp, mensajePedido, totalPedido, type LineaPedido } from "@/lib/whatsapp";
+import { estadoHorario, type EstadoHorario, type Horario } from "@/lib/horario";
 
 type Carrito = Record<string, number>;
 type Tipo = "mesa" | "recoger" | "domicilio";
 
 export default function Menu({
-  negocio, categorias, productos, mesaInicial, link,
+  negocio, categorias, productos, mesaInicial, link, horario = null,
 }: {
-  negocio: NegocioMenu; categorias: Categoria[]; productos: Producto[]; mesaInicial?: string; link: string;
+  negocio: NegocioMenu; categorias: Categoria[]; productos: Producto[]; mesaInicial?: string; link: string; horario?: Horario | null;
 }) {
   const clave = `pidewat:${negocio.slug}`;
   const [carrito, setCarrito] = useState<Carrito>({});
@@ -43,6 +44,16 @@ export default function Menu({
     try { localStorage.setItem(clave, JSON.stringify({ carrito, nombre, direccion })); } catch {}
   }, [clave, carrito, nombre, direccion]);
 
+  // Abierto o cerrado según el horario del negocio; se revisa cada minuto por si cambia mientras ven el menú
+  const [hora, setHora] = useState<EstadoHorario | null>(null);
+  useEffect(() => {
+    const revisar = () => setHora(estadoHorario(horario));
+    revisar();
+    const t = setInterval(revisar, 60_000);
+    return () => clearInterval(t);
+  }, [horario]);
+  const cerrado = hora?.abierto === false;
+
   const porId = useMemo(() => new Map(productos.map((p) => [p.id, p])), [productos]);
   const lineas: LineaPedido[] = Object.entries(carrito)
     .filter(([id, n]) => n > 0 && porId.get(id)?.available)
@@ -61,9 +72,10 @@ export default function Menu({
     { id: "otros", nombre: "Otros", items: visibles.filter((p) => !p.category_id || !categorias.some((c) => c.id === p.category_id)) },
   ].filter((g) => g.items.length);
 
-  const falta = tipo === "domicilio" && !direccion.trim() ? "Escribe tu dirección" : !nombre.trim() ? "Escribe tu nombre" : null;
+  const falta = cerrado ? "Cerrado ahora" : tipo === "domicilio" && !direccion.trim() ? "Escribe tu dirección" : !nombre.trim() ? "Escribe tu nombre" : null;
 
   function enviar() {
+    if (cerrado) return;
     const texto = mensajePedido({
       negocio: negocio.name, modo: negocio.mode, lineas, tipo, mesa, nombreCliente: nombre.trim(),
       direccion: direccion.trim(), notas: notas.trim(), envio, link,
@@ -83,6 +95,12 @@ export default function Menu({
   return (
     <>
       <div className="wrap" style={{ paddingBottom: 8 }}>
+        {hora && (
+          <div className={`alerta ${hora.abierto ? "alerta-ok" : "alerta-bad"}`} style={{ marginTop: 14 }} role="status">
+            <strong>{hora.texto}</strong>
+            {!hora.abierto && <div className="small">Puedes ver el menú, pero los pedidos se reciben solo en horario.</div>}
+          </div>
+        )}
         {productos.length > 8 && (
           <input className="i" type="search" placeholder={negocio.mode === "menu" ? "Buscar platillo…" : "Buscar producto…"}
             value={buscar} onChange={(e) => setBuscar(e.target.value)} style={{ marginTop: 14 }} />
@@ -112,7 +130,7 @@ export default function Menu({
                       <span className="precio">{dinero(Number(p.price))}</span>
                       {!p.available ? (
                         <span className="pill">Agotado</span>
-                      ) : n === 0 ? (
+                      ) : cerrado ? null : n === 0 ? (
                         <button className="mas" aria-label={`Agregar ${p.name}`} onClick={() => cambiar(p.id, 1)}>+</button>
                       ) : (
                         <span className="cant">
@@ -131,7 +149,7 @@ export default function Menu({
         {!grupos.length && <p className="muted" style={{ padding: "24px 0" }}>{q ? "No encontramos nada con esa palabra." : "Pronto verás aquí el menú."}</p>}
       </div>
 
-      {piezas > 0 && !abierto && (
+      {piezas > 0 && !abierto && !cerrado && (
         <div className="barra">
           <button className="btn btn-p" onClick={() => setAbierto(true)}>
             <span>Ver pedido · {piezas} {piezas === 1 ? "artículo" : "artículos"}</span>

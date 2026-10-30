@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Menu from "@/components/Menu";
 import { categoriasDemo, negocioDemo, productosDemo } from "@/lib/demo";
 import { estadoNegocio } from "@/lib/estado";
+import { limpiarHorario } from "@/lib/horario";
 import { siteUrl } from "@/lib/formato";
 import { SLUGS_RESERVADOS } from "@/lib/planes";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -14,25 +15,27 @@ export const revalidate = 30;
 async function cargar(slug: string) {
   if (slug === "demo") {
     const { plan, trial_ends_at, paid_until, paused, ...negocio } = negocioDemo;
-    return { negocio, activo: true, categorias: categoriasDemo, productos: productosDemo };
+    return { negocio, activo: true, horario: null, categorias: categoriasDemo, productos: productosDemo };
   }
   if (SLUGS_RESERVADOS.has(slug) || !supabaseConfigurado()) return null;
   const sb = supabasePublico();
   const { data: negocio } = await sb.from("businesses").select(COLUMNAS_MENU).eq("slug", slug).maybeSingle<NegocioMenu>();
   if (!negocio) return null;
-  const [{ data: cobro }, { data: categorias }, { data: productos }] = await Promise.all([
+  const [{ data: cobro }, { data: conHorario }, { data: categorias }, { data: productos }] = await Promise.all([
     // Si está en pausa se decide aquí en el servidor; esas fechas nunca llegan al navegador
     supabaseAdmin().from("businesses").select("trial_ends_at, paid_until, paused").eq("id", negocio.id).single(),
+    // Aparte: si aún no se corre la migración del horario, esta consulta falla sola y el menú sigue
+    supabaseAdmin().from("businesses").select("horario").eq("id", negocio.id).maybeSingle(),
     sb.from("categories").select("*").eq("business_id", negocio.id).order("position").order("name"),
     sb.from("products").select("*").eq("business_id", negocio.id).order("position").order("name"),
   ]);
   return {
-    negocio, activo: cobro ? estadoNegocio(cobro).activo : true,
+    negocio, activo: cobro ? estadoNegocio(cobro).activo : true, horario: limpiarHorario(conHorario?.horario),
     categorias: (categorias || []) as Categoria[], productos: (productos || []) as Producto[],
   };
 }
 
-type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ mesa?: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ mesa?: string; desde?: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -47,7 +50,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PaginaNegocio({ params, searchParams }: Props) {
   const { slug } = await params;
-  const { mesa } = await searchParams;
+  const { mesa, desde } = await searchParams;
+  // Si el dueño (o nosotros) llegó desde su panel, un botón para regresar sin salirse de la app instalada
+  const volver = desde === "panel" ? "/panel" : desde?.startsWith("admin-") && /^admin-[0-9a-f-]{36}$/.test(desde) ? `/admin/${desde.slice(6)}` : null;
   const d = await cargar(slug);
   if (!d) notFound();
   const { negocio } = d;
@@ -56,6 +61,12 @@ export default async function PaginaNegocio({ params, searchParams }: Props) {
 
   return (
     <main style={{ ["--c" as string]: negocio.color }}>
+      {volver && (
+        <a href={volver} className="volver-panel">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          Volver a mi panel
+        </a>
+      )}
       <div className="portada" style={negocio.cover_url ? { backgroundImage: `url(${negocio.cover_url})` } : undefined} />
       <div className="wrap cabecera">
         <div className="logo" style={negocio.logo_url ? { backgroundImage: `url(${negocio.logo_url})` } : undefined}>
@@ -70,7 +81,7 @@ export default async function PaginaNegocio({ params, searchParams }: Props) {
       </div>
 
       {d.activo ? (
-        <Menu negocio={negocio} categorias={d.categorias} productos={d.productos} mesaInicial={mesa?.slice(0, 6)} link={link} />
+        <Menu negocio={negocio} categorias={d.categorias} productos={d.productos} mesaInicial={mesa?.slice(0, 6)} link={link} horario={d.horario} />
       ) : (
         <div className="wrap" style={{ paddingTop: 24 }}>
           <div className="alerta">

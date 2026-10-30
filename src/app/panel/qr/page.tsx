@@ -21,6 +21,7 @@ export default async function HojaQR({ searchParams }: { searchParams: Promise<{
         @media print { .no-print { display: none } body { background: #fff } .tq { border-color: #ddd } }
       `}</style>
       <div className="no-print row between wrap-flex" style={{ marginBottom: 16 }}>
+        <a href="/panel" className="btn btn-sm">← Volver a mi panel</a>
         <p className="muted" style={{ margin: 0 }}>Imprime en hojas tamaño carta y recorta por la línea punteada.</p>
         <Imprimir />
       </div>
