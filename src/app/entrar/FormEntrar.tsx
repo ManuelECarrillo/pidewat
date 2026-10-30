@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 
+// UX-005: que "olvidé mi contraseña" sea un botón que abre WhatsApp, no solo un texto
+const ventas = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP || "";
+
 export default function FormEntrar() {
   const router = useRouter();
   const [correo, setCorreo] = useState("");
@@ -32,7 +35,13 @@ export default function FormEntrar() {
       </label>
       {error && <p style={{ color: "var(--bad)" }}>{error}</p>}
       <button className="btn btn-p btn-block" disabled={cargando}>{cargando ? "Entrando…" : "Entrar"}</button>
-      <p className="small muted" style={{ marginTop: 12, marginBottom: 0 }}>¿Olvidaste tu contraseña? Escríbenos por WhatsApp y te mandamos una nueva.</p>
+      <p className="small muted" style={{ marginTop: 12, marginBottom: 0 }}>
+        ¿Olvidaste tu contraseña?{" "}
+        {ventas ? (
+          <a href={`https://wa.me/${ventas}?text=${encodeURIComponent("Hola, olvidé mi contraseña de Pidewat.")}`}>Escríbenos por WhatsApp</a>
+        ) : "Escríbenos por WhatsApp"}{" "}
+        y te mandamos una nueva.
+      </p>
     </form>
   );
 }
