@@ -15,11 +15,12 @@ Lista viva que leen todos los agentes (ver `docs/agentes/README.md`). Orden: gra
 | SEG-006 | ⚪ | Permisos de tabla de más (solo los frena RLS) | verificado (2026-10-30: `anon` no puede leer `payments`, `order_events`, `admins` ni insertar productos ni llamar `is_admin`) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | SEG-007 | ⚪ | Webhook acepta todo si falta la clave secreta | en arreglo (rama `taller-2026-10-30`). Confirmado en vivo: hoy en Vercel falta `MP_WEBHOOK_SECRET` | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | SEG-008 | ⚪ | Categoría ajena y fotos de cualquier sitio en platillos | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
-| SEG-009 | ⚪ | Avisos de dependencias (postcss vía Next) | abierto (sigue igual el 2026-10-30: 1 moderado, 1 alto; el arreglo pide Next 16) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
+| SEG-009 | ⚪ | Avisos de dependencias (postcss vía Next) | en arreglo (rama `taller-2026-10-30`: se fuerza postcss 8.5.32 sin cambiar de Next; `npm audit` da 0) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | UX-003 | ⚪ | Botones "+" y chips de menos de 44 px | arreglado a medias en main 1e23c2e ("+" de 40 px, chips y −/+ de 36 px) → en arreglo (rama `taller-2026-10-30`, área de toque de 44 px) | [2026-10-30-probador](2026-10-30-probador.md) |
 | UX-004 | ⚪ | "Agotado" se lee poco | verificado (2026-10-30: 13 px, texto oscuro, sin botón "+") | [2026-10-30-probador](2026-10-30-probador.md) |
-| SEG-010 | ⚪ | El límite de `/api/pedido` es solo por negocio, no por persona | abierto | [2026-10-30-taller](2026-10-30-taller.md) |
+| SEG-010 | ⚪ | El límite de `/api/pedido` es solo por negocio, no por persona | en arreglo (rama `taller-2026-10-30`; falta correr `supabase/migraciones/2026-10-30-limite-por-persona.sql`) | [2026-10-30-taller](2026-10-30-taller.md) |
 | UX-005 | ⚪ | "¿Olvidaste tu contraseña?" no se puede tocar | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
 | QA-001 | ⚪ | Se cuenta envío aunque el negocio no tenga envío | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
+| QA-002 | 🟡 | Un precio escrito "28,50" se guardaba como $2850 | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
 
-Siguiente número libre: SEG-011 · UX-007 · QA-002 · DIS-001
+Siguiente número libre: SEG-011 · UX-007 · QA-003 · DIS-001
