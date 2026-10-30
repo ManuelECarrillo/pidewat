@@ -71,7 +71,11 @@ export const cancelarPreapproval = (id: string) =>
 // Revisa la firma x-signature del webhook (si configuraste MP_WEBHOOK_SECRET).
 export function firmaValida(req: Request, dataId: string) {
   const secreto = process.env.MP_WEBHOOK_SECRET;
-  if (!secreto) return true;
+  // SEG-007: sin la clave secreta no podemos saber si el aviso es de Mercado Pago, así que lo rechazamos
+  if (!secreto) {
+    console.error("webhook MP rechazado: falta MP_WEBHOOK_SECRET en Vercel");
+    return false;
+  }
   const firma = req.headers.get("x-signature") || "";
   const reqId = req.headers.get("x-request-id") || "";
   const partes = Object.fromEntries(firma.split(",").map((p) => p.trim().split("=") as [string, string]));

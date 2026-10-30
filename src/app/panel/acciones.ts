@@ -15,16 +15,28 @@ function refrescar(slug: string) {
   revalidatePath("/panel", "layout");
 }
 
+// SEG-008: solo enlaces https (nada de "javascript:" ni "data:") en fotos y logos
+const imagen = (f: FormData, k: string) => {
+  const url = txt(f, k, 500);
+  return url && /^https:\/\//i.test(url) ? url : null;
+};
+
 export async function guardarProducto(f: FormData) {
   const { sb, negocio } = await requiereDueno();
   const id = txt(f, "id", 40);
+  // SEG-008: la categoría tiene que ser de este negocio; si no, el platillo queda en "Otros"
+  let category_id = txt(f, "category_id", 40);
+  if (category_id) {
+    const { data: cat } = await sb.from("categories").select("id").eq("id", category_id).eq("business_id", negocio.id).maybeSingle();
+    if (!cat) category_id = null;
+  }
   const datos = {
     business_id: negocio.id,
     name: txt(f, "name", 120) || "Sin nombre",
     description: txt(f, "description", 400),
     price: num(f, "price"),
-    category_id: txt(f, "category_id", 40),
-    image_url: txt(f, "image_url", 500),
+    category_id,
+    image_url: imagen(f, "image_url"),
     available: !f.has("available_present") || si(f, "available"),
   };
   if (id) await sb.from("products").update(datos).eq("id", id).eq("business_id", negocio.id);
@@ -72,8 +84,8 @@ export async function guardarNegocio(f: FormData) {
     description: txt(f, "description", 300),
     address: txt(f, "address", 200),
     hours: txt(f, "hours", 200),
-    logo_url: txt(f, "logo_url", 500),
-    cover_url: txt(f, "cover_url", 500),
+    logo_url: imagen(f, "logo_url"),
+    cover_url: imagen(f, "cover_url"),
     color: /^#[0-9a-f]{6}$/i.test(color) ? color : negocio.color,
     mode: f.get("mode") === "catalogo" ? "catalogo" : "menu",
     accepts_table: si(f, "accepts_table"),
