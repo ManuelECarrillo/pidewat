@@ -7,7 +7,12 @@ import { normalizarWhatsapp } from "@/lib/formato";
 import type { ResultadoAlta } from "@/app/admin/acciones";
 
 const txt = (f: FormData, k: string, max = 300) => String(f.get(k) ?? "").trim().slice(0, max) || null;
-const num = (f: FormData, k: string) => Math.max(0, Number(String(f.get(k) ?? "0").replace(/[^0-9.]/g, "")) || 0);
+// QA-002: "$1,250", "28.50" y "28,50" se leen bien; antes "28.50.1" o "28,50" terminaban en 0 o en 2850
+const num = (f: FormData, k: string) => {
+  let t = String(f.get(k) ?? "").replace(/[^0-9.,]/g, "");
+  t = /,\d{1,2}$/.test(t) && !t.includes(".") ? t.replace(",", ".") : t.replace(/,/g, "");
+  return Math.max(0, parseFloat(t) || 0);
+};
 const si = (f: FormData, k: string) => f.get(k) === "on";
 
 function refrescar(slug: string) {

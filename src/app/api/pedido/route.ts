@@ -1,9 +1,19 @@
+import { createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
 import { estadoNegocio } from "@/lib/estado";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_POR_MINUTO = 20;
+const MAX_POR_PERSONA = 5;
+
+// SEG-010: la IP se guarda revuelta (HMAC con una llave del servidor), nunca tal cual:
+// sirve para contar pedidos por persona sin guardar un dato personal.
+function huellaIp(req: Request) {
+  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || req.headers.get("x-real-ip") || "";
+  if (!ip) return null;
+  return createHmac("sha256", process.env.SUPABASE_SERVICE_ROLE_KEY || "pidewat").update(ip).digest("hex").slice(0, 32);
+}
 
 // Registra que un cliente mandó un pedido (para las estadísticas del dueño). Nunca bloquea el pedido.
 // No confiamos en lo que manda el navegador: los nombres, precios y el total salen de la base.
@@ -20,6 +30,14 @@ export async function POST(req: Request) {
     const haceUnMinuto = new Date(Date.now() - 60_000).toISOString();
     const { count } = await sb.from("order_events").select("id", { count: "exact", head: true }).eq("business_id", n.id).gte("created_at", haceUnMinuto);
     if ((count ?? 0) >= MAX_POR_MINUTO) return NextResponse.json({ ok: true });
+
+    // SEG-010: y por persona, para que una sola no se acabe el cupo del negocio ni infle sus números.
+    // Si todavía no se corre la migración del 2026-10-30 (columna ip_hash), la consulta falla y no se aplica.
+    const ip_hash = huellaIp(req);
+    if (ip_hash) {
+      const { count: deEsaPersona, error } = await sb.from("order_events").select("id", { count: "exact", head: true }).eq("ip_hash", ip_hash).gte("created_at", haceUnMinuto);
+      if (!error && (deEsaPersona ?? 0) >= MAX_POR_PERSONA) return NextResponse.json({ ok: true });
+    }
 
     const pedidos = new Map<string, number>();
     for (const l of Array.isArray(b.items) ? b.items.slice(0, 60) : []) {
@@ -38,7 +56,9 @@ export async function POST(req: Request) {
     const order_type = permitidos[String(b.order_type)] ? String(b.order_type) : null;
     const envio = order_type === "domicilio" ? Number(n.delivery_fee) || 0 : 0;
     const total = items.reduce((s, l) => s + l.cantidad * l.precio, 0) + envio;
-    await sb.from("order_events").insert({ business_id: n.id, total, items, order_type });
+    const fila: Record<string, unknown> = { business_id: n.id, total, items, order_type };
+    const { error } = await sb.from("order_events").insert(ip_hash ? { ...fila, ip_hash } : fila);
+    if (error?.code === "PGRST204" || error?.code === "42703") await sb.from("order_events").insert(fila); // aún sin la columna ip_hash
   } catch {}
   return NextResponse.json({ ok: true });
 }

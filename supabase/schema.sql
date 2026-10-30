@@ -70,9 +70,11 @@ create table if not exists public.order_events (
   total numeric(10,2) not null default 0,
   items jsonb not null default '[]',
   order_type text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  ip_hash text -- huella revuelta de la IP (HMAC), para el límite por persona
 );
 create index if not exists order_events_business_idx on public.order_events (business_id, created_at desc);
+create index if not exists order_events_ip_idx on public.order_events (ip_hash, created_at desc) where ip_hash is not null;
 
 create table if not exists public.payments (
   id uuid primary key default gen_random_uuid(),
@@ -153,14 +155,14 @@ grant select, insert, update, delete on public.categories, public.products to au
 
 drop policy if exists "dueño ve sus pedidos" on public.order_events;
 create policy "dueño ve sus pedidos" on public.order_events for select to authenticated using (public.owns_business(business_id) or public.is_admin());
-grant select on public.order_events to authenticated;
 
 drop policy if exists "dueño ve sus pagos" on public.payments;
 create policy "dueño ve sus pagos" on public.payments for select to authenticated using (public.owns_business(business_id) or public.is_admin());
 grant select on public.payments to authenticated;
 -- order_events y payments se escriben solo desde el servidor (service role)
 revoke all on public.admins, public.payments, public.order_events from anon, authenticated;
-grant select on public.admins, public.payments, public.order_events to authenticated;
+grant select on public.admins, public.payments to authenticated;
+grant select (id, business_id, total, items, order_type, created_at) on public.order_events to authenticated;
 revoke execute on function public.is_admin(), public.owns_business(uuid) from anon, public;
 grant execute on function public.is_admin(), public.owns_business(uuid) to authenticated;
 
