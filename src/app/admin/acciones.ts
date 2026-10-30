@@ -126,7 +126,7 @@ export async function nuevaClave(_: ResultadoAlta | null, f: FormData): Promise<
   if (error) return { ok: false, mensaje: error.message };
   return {
     ok: true, mensaje: "Contraseña nueva creada.", whatsapp: n.whatsapp,
-    texto: `Tu nueva contraseña de Pidewa es: ${clave}\nEntra en ${siteUrl()}/entrar con tu correo ${n.owner_email}`,
+    texto: `Tu nueva contraseña de Pidewat es: ${clave}\nEntra en ${siteUrl()}/entrar con tu correo ${n.owner_email}`,
   };
 }
 

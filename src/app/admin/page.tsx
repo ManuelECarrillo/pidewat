@@ -38,7 +38,7 @@ export default async function Admin() {
           {porVencer.length ? porVencer.map(({ n, e }) => (
             <div key={n.id} className="row between small" style={{ marginTop: 6 }}>
               <Link href={`/admin/${n.id}`}>{n.name}</Link>
-              <a className="btn btn-sm btn-wa" target="_blank" href={`https://wa.me/${n.whatsapp}?text=${encodeURIComponent(`Hola, ¿cómo le ha ido con su menú de Pidewa? Su prueba gratis vence en ${e.clave === "prueba" ? e.diasRestantes : 0} días. Con ${dinero(PLANES.base.mensual)} al mes sigue igual. ¿Lo activamos?`)}`}>Recordar</a>
+              <a className="btn btn-sm btn-wa" target="_blank" href={`https://wa.me/${n.whatsapp}?text=${encodeURIComponent(`Hola, ¿cómo le ha ido con su menú de Pidewat? Su prueba gratis vence en ${e.clave === "prueba" ? e.diasRestantes : 0} días. Con ${dinero(PLANES.base.mensual)} al mes sigue igual. ¿Lo activamos?`)}`}>Recordar</a>
             </div>
           )) : <div className="muted small" style={{ marginTop: 6 }}>Nada por ahora.</div>}
         </div>

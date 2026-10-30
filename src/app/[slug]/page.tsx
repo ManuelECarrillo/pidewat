@@ -74,7 +74,7 @@ export default async function PaginaNegocio({ params, searchParams }: Props) {
       )}
 
       <footer className="pie">
-        Menú hecho con <a href="/">Pidewa</a> · Pedidos por WhatsApp sin comisión
+        Menú hecho con <a href="/">Pidewat</a> · Pedidos por WhatsApp sin comisión
       </footer>
     </main>
   );

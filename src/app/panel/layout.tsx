@@ -8,7 +8,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     <>
       <header className="top">
         <div className="wrap-ancho">
-          <Link href="/panel" className="marca">Pide<b>wa</b></Link>
+          <Link href="/panel" className="marca">Pide<b>wat</b></Link>
           <nav className="nav grow">
             <Link href="/panel">Inicio</Link>
             <Link href="/panel/menu">Menú</Link>

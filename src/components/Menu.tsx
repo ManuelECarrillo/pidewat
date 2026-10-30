@@ -13,7 +13,7 @@ export default function Menu({
 }: {
   negocio: Negocio; categorias: Categoria[]; productos: Producto[]; mesaInicial?: string; link: string;
 }) {
-  const clave = `pidewa:${negocio.slug}`;
+  const clave = `pidewat:${negocio.slug}`;
   const [carrito, setCarrito] = useState<Carrito>({});
   const [abierto, setAbierto] = useState(false);
   const [buscar, setBuscar] = useState("");

@@ -1,4 +1,4 @@
--- Pidewa: esquema de base de datos (Supabase / Postgres)
+-- Pidewat: esquema de base de datos (Supabase / Postgres)
 -- Correr completo en Supabase > SQL Editor > New query. Se puede volver a correr.
 
 create extension if not exists pgcrypto;

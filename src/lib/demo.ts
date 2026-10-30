@@ -1,13 +1,13 @@
 import type { Categoria, Negocio, Producto } from "./tipos";
 
-// Negocio de demostración (inventado) para enseñar Pidewa sin base de datos: /demo
+// Negocio de demostración (inventado) para enseñar Pidewat sin base de datos: /demo
 const B = "demo";
 
 export const negocioDemo: Negocio = {
   id: B,
   slug: "demo",
   name: "El Fogón de Durango",
-  whatsapp: process.env.NEXT_PUBLIC_PIDEWA_WHATSAPP || "5216180000000",
+  whatsapp: process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP || "5216180000000",
   description: "Gorditas, caldillo y antojitos duranguenses hechos al momento.",
   address: "Av. 20 de Noviembre 123, Centro, Durango",
   hours: "Lun a Sáb 8:00 a 17:00 · Dom 9:00 a 15:00",

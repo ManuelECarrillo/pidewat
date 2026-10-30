@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Pidewa",
-    short_name: "Pidewa",
+    name: "Pidewat",
+    short_name: "Pidewat",
     description: "Pedidos ordenados por WhatsApp",
     start_url: "/panel",
     display: "standalone",

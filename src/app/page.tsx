@@ -2,8 +2,8 @@ import Link from "next/link";
 import { PLANES, DIAS_PRUEBA } from "@/lib/planes";
 import { dinero } from "@/lib/formato";
 
-const ventas = process.env.NEXT_PUBLIC_PIDEWA_WHATSAPP || "";
-const textoVentas = encodeURIComponent("Hola, quiero probar Pidewa en mi negocio.");
+const ventas = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP || "";
+const textoVentas = encodeURIComponent("Hola, quiero probar Pidewat en mi negocio.");
 
 const ejemplo = `Hola *El Fogón de Durango*, quiero hacer un pedido:
 
@@ -21,7 +21,7 @@ export default function Inicio() {
     <main>
       <header className="top">
         <div className="wrap-ancho">
-          <Link href="/" className="marca">Pide<b>wa</b></Link>
+          <Link href="/" className="marca">Pide<b>wat</b></Link>
           <div className="grow" />
           <Link href="/entrar" className="btn btn-sm">Entrar</Link>
         </div>
@@ -73,7 +73,7 @@ export default function Inicio() {
         <p className="muted" style={{ marginTop: 14 }}>{DIAS_PRUEBA} días gratis, sin tarjeta. Si no te convence, no pagas nada.</p>
       </section>
 
-      <footer className="pie" style={{ paddingBottom: 40 }}>Pidewa · Hecho en Durango, México</footer>
+      <footer className="pie" style={{ paddingBottom: 40 }}>Pidewat · Hecho en Durango, México</footer>
     </main>
   );
 }

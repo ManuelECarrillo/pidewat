@@ -8,7 +8,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <>
       <header className="top">
         <div className="wrap-ancho">
-          <Link href="/admin" className="marca">Pide<b>wa</b> <span className="pill">admin</span></Link>
+          <Link href="/admin" className="marca">Pide<b>wat</b> <span className="pill">admin</span></Link>
           <div className="grow" />
           <form action="/salir" method="post"><button className="btn btn-sm">Salir</button></form>
         </div>

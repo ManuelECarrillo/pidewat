@@ -12,8 +12,8 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
   const { mp } = await searchParams;
   const estado = estadoNegocio(negocio);
   const { data: pagos } = await sb.from("payments").select("*").eq("business_id", negocio.id).order("created_at", { ascending: false }).limit(24);
-  const ventas = process.env.NEXT_PUBLIC_PIDEWA_WHATSAPP;
-  const textoTransfer = encodeURIComponent(`Hola, quiero pagar Pidewa para ${negocio.name} por transferencia.`);
+  const ventas = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP;
+  const textoTransfer = encodeURIComponent(`Hola, quiero pagar Pidewat para ${negocio.name} por transferencia.`);
 
   return (
     <div className="stack" style={{ maxWidth: 720 }}>

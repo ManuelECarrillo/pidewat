@@ -30,7 +30,7 @@ export async function crearSuscripcion(o: { negocioId: string; nombre: string; p
   const r = await mp<{ id: string; init_point: string }>("/preapproval", {
     method: "POST",
     body: JSON.stringify({
-      reason: `Pidewa ${PLANES[o.plan].nombre} · ${o.nombre}`,
+      reason: `Pidewat ${PLANES[o.plan].nombre} · ${o.nombre}`,
       external_reference: referencia(o.negocioId, "mensual", o.plan),
       payer_email: o.correo,
       back_url: `${siteUrl()}/panel/plan?mp=ok`,
@@ -46,13 +46,13 @@ export async function crearPagoAnual(o: { negocioId: string; nombre: string; pla
   const r = await mp<{ init_point: string }>("/checkout/preferences", {
     method: "POST",
     body: JSON.stringify({
-      items: [{ title: `Pidewa ${PLANES[o.plan].nombre} anual · ${o.nombre}`, quantity: 1, unit_price: PLANES[o.plan].anual, currency_id: "MXN" }],
+      items: [{ title: `Pidewat ${PLANES[o.plan].nombre} anual · ${o.nombre}`, quantity: 1, unit_price: PLANES[o.plan].anual, currency_id: "MXN" }],
       external_reference: referencia(o.negocioId, "anual", o.plan),
       payer: o.correo ? { email: o.correo } : undefined,
       back_urls: { success: `${siteUrl()}/panel/plan?mp=ok`, pending: `${siteUrl()}/panel/plan?mp=pendiente`, failure: `${siteUrl()}/panel/plan?mp=error` },
       auto_return: "approved",
       notification_url: `${siteUrl()}/api/mp/webhook`,
-      statement_descriptor: "PIDEWA",
+      statement_descriptor: "PIDEWAT",
     }),
   });
   return r.init_point;
