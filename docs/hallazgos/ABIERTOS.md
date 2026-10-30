@@ -18,7 +18,6 @@ Lista viva que leen todos los agentes (ver `docs/agentes/README.md`). Orden: gra
 | SEG-009 | ⚪ | Avisos de dependencias (postcss vía Next) | abierto (sigue igual el 2026-10-30: 1 moderado, 1 alto; el arreglo pide Next 16) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | UX-003 | ⚪ | Botones "+" y chips de menos de 44 px | arreglado a medias en main 1e23c2e ("+" de 40 px, chips y −/+ de 36 px) → en arreglo (rama `taller-2026-10-30`, área de toque de 44 px) | [2026-10-30-probador](2026-10-30-probador.md) |
 | UX-004 | ⚪ | "Agotado" se lee poco | verificado (2026-10-30: 13 px, texto oscuro, sin botón "+") | [2026-10-30-probador](2026-10-30-probador.md) |
-
 | SEG-010 | ⚪ | El límite de `/api/pedido` es solo por negocio, no por persona | abierto | [2026-10-30-taller](2026-10-30-taller.md) |
 | UX-005 | ⚪ | "¿Olvidaste tu contraseña?" no se puede tocar | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
 | QA-001 | ⚪ | Se cuenta envío aunque el negocio no tenga envío | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
