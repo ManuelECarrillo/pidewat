@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     if (!UUID.test(String(b.business_id))) return NextResponse.json({ ok: false }, { status: 400 });
     const sb = supabaseAdmin();
 
-    const { data: n } = await sb.from("businesses").select("id, delivery_fee, trial_ends_at, paid_until, paused").eq("id", b.business_id).maybeSingle();
+    const { data: n } = await sb.from("businesses").select("id, delivery_fee, accepts_table, accepts_pickup, accepts_delivery, trial_ends_at, paid_until, paused").eq("id", b.business_id).maybeSingle();
     if (!n || !estadoNegocio(n).activo) return NextResponse.json({ ok: true });
 
     // Límite por negocio: más de 20 pedidos en un minuto no es un restaurante, es alguien inflando las estadísticas
@@ -33,7 +33,9 @@ export async function POST(req: Request) {
     const items = (productos || []).map((p) => ({ nombre: p.name, cantidad: pedidos.get(p.id)!, precio: Number(p.price) }));
     if (!items.length) return NextResponse.json({ ok: true });
 
-    const order_type = ["mesa", "recoger", "domicilio"].includes(b.order_type) ? b.order_type : null;
+    // QA-001: solo las formas de pedir que el negocio tiene prendidas (si no da envío, no se suma envío)
+    const permitidos = { mesa: n.accepts_table, recoger: n.accepts_pickup, domicilio: n.accepts_delivery } as Record<string, boolean>;
+    const order_type = permitidos[String(b.order_type)] ? String(b.order_type) : null;
     const envio = order_type === "domicilio" ? Number(n.delivery_fee) || 0 : 0;
     const total = items.reduce((s, l) => s + l.cantidad * l.precio, 0) + envio;
     await sb.from("order_events").insert({ business_id: n.id, total, items, order_type });

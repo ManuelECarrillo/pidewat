@@ -10,6 +10,7 @@ Lista viva que leen todos los agentes (ver `docs/agentes/README.md`). Orden: gra
 | SEG-004 | 🟡 | Contraseña por WhatsApp sin poder cambiarla | arreglado (main 1e23c2e) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | UX-001 | 🟡 | Barra de categorías se desliza de lado | verificado (2026-10-30: a 360 px los chips se acomodan en filas, `scrollWidth = clientWidth`) | [2026-10-30-probador](2026-10-30-probador.md) |
 | UX-002 | 🟡 | Botón "Pedir por WhatsApp" escondido en la hoja del pedido | verificado (2026-10-30: total y botón fijos al pie de la hoja a 360×740) | [2026-10-30-probador](2026-10-30-probador.md) |
+| UX-006 | 🟡 | El negocio de prueba el-fogon tiene portada y logo que no son de comida | necesita a Eduardo (cambiar fotos desde su panel) | [2026-10-30-taller](2026-10-30-taller.md) |
 | SEG-005 | ⚪ | Sin encabezados de seguridad | en arreglo (rama `taller-2026-10-30`; CSP queda pendiente) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | SEG-006 | ⚪ | Permisos de tabla de más (solo los frena RLS) | verificado (2026-10-30: `anon` no puede leer `payments`, `order_events`, `admins` ni insertar productos ni llamar `is_admin`) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | SEG-007 | ⚪ | Webhook acepta todo si falta la clave secreta | en arreglo (rama `taller-2026-10-30`). Confirmado en vivo: hoy en Vercel falta `MP_WEBHOOK_SECRET` | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
@@ -18,4 +19,8 @@ Lista viva que leen todos los agentes (ver `docs/agentes/README.md`). Orden: gra
 | UX-003 | ⚪ | Botones "+" y chips de menos de 44 px | arreglado a medias en main 1e23c2e ("+" de 40 px, chips y −/+ de 36 px) → en arreglo (rama `taller-2026-10-30`, área de toque de 44 px) | [2026-10-30-probador](2026-10-30-probador.md) |
 | UX-004 | ⚪ | "Agotado" se lee poco | verificado (2026-10-30: 13 px, texto oscuro, sin botón "+") | [2026-10-30-probador](2026-10-30-probador.md) |
 
-Siguiente número libre: SEG-010 · UX-005 · QA-001 · DIS-001
+| SEG-010 | ⚪ | El límite de `/api/pedido` es solo por negocio, no por persona | abierto | [2026-10-30-taller](2026-10-30-taller.md) |
+| UX-005 | ⚪ | "¿Olvidaste tu contraseña?" no se puede tocar | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
+| QA-001 | ⚪ | Se cuenta envío aunque el negocio no tenga envío | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
+
+Siguiente número libre: SEG-011 · UX-007 · QA-002 · DIS-001
