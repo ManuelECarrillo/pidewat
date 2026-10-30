@@ -11,16 +11,16 @@ Lista viva que leen todos los agentes (ver `docs/agentes/README.md`). Orden: gra
 | UX-001 | 🟡 | Barra de categorías se desliza de lado | verificado (2026-10-30: a 360 px los chips se acomodan en filas, `scrollWidth = clientWidth`) | [2026-10-30-probador](2026-10-30-probador.md) |
 | UX-002 | 🟡 | Botón "Pedir por WhatsApp" escondido en la hoja del pedido | verificado (2026-10-30: total y botón fijos al pie de la hoja a 360×740) | [2026-10-30-probador](2026-10-30-probador.md) |
 | UX-006 | 🟡 | El negocio de prueba el-fogon tiene portada y logo que no son de comida | necesita a Eduardo (cambiar fotos desde su panel) | [2026-10-30-taller](2026-10-30-taller.md) |
-| SEG-005 | ⚪ | Sin encabezados de seguridad | en arreglo (rama `taller-2026-10-30`; CSP queda pendiente) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
+| SEG-005 | ⚪ | Sin encabezados de seguridad | arreglado (main f4b15db; CSP completa queda pendiente) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | SEG-006 | ⚪ | Permisos de tabla de más (solo los frena RLS) | verificado (2026-10-30: `anon` no puede leer `payments`, `order_events`, `admins` ni insertar productos ni llamar `is_admin`) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
-| SEG-007 | ⚪ | Webhook acepta todo si falta la clave secreta | en arreglo (rama `taller-2026-10-30`). Confirmado en vivo: hoy en Vercel falta `MP_WEBHOOK_SECRET` | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
-| SEG-008 | ⚪ | Categoría ajena y fotos de cualquier sitio en platillos | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
-| SEG-009 | ⚪ | Avisos de dependencias (postcss vía Next) | en arreglo (rama `taller-2026-10-30`: se fuerza postcss 8.5.32 sin cambiar de Next; `npm audit` da 0) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
-| UX-003 | ⚪ | Botones "+" y chips de menos de 44 px | arreglado a medias en main 1e23c2e ("+" de 40 px, chips y −/+ de 36 px) → en arreglo (rama `taller-2026-10-30`, área de toque de 44 px) | [2026-10-30-probador](2026-10-30-probador.md) |
+| SEG-007 | ⚪ | Webhook acepta todo si falta la clave secreta | arreglado (main f4b15db). Falta que Eduardo ponga `MP_WEBHOOK_SECRET` en Vercel antes de cobrar | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
+| SEG-008 | ⚪ | Categoría ajena y fotos de cualquier sitio en platillos | arreglado (main f4b15db) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
+| SEG-009 | ⚪ | Avisos de dependencias (postcss vía Next) | arreglado (main: se fuerza postcss 8.5.32 sin cambiar de Next; `npm audit` da 0) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
+| UX-003 | ⚪ | Botones "+" y chips de menos de 44 px | arreglado (main f4b15db, área de toque de 44 px) | [2026-10-30-probador](2026-10-30-probador.md) |
 | UX-004 | ⚪ | "Agotado" se lee poco | verificado (2026-10-30: 13 px, texto oscuro, sin botón "+") | [2026-10-30-probador](2026-10-30-probador.md) |
-| SEG-010 | ⚪ | El límite de `/api/pedido` es solo por negocio, no por persona | en arreglo (rama `taller-2026-10-30`; falta correr `supabase/migraciones/2026-10-30-limite-por-persona.sql`) | [2026-10-30-taller](2026-10-30-taller.md) |
-| UX-005 | ⚪ | "¿Olvidaste tu contraseña?" no se puede tocar | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
-| QA-001 | ⚪ | Se cuenta envío aunque el negocio no tenga envío | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
-| QA-002 | 🟡 | Un precio escrito "28,50" se guardaba como $2850 | en arreglo (rama `taller-2026-10-30`) | [2026-10-30-taller](2026-10-30-taller.md) |
+| SEG-010 | ⚪ | El límite de `/api/pedido` es solo por negocio, no por persona | arreglado en código (main; sin la columna sigue guardando pedidos). Falta correr `supabase/migraciones/2026-10-30-limite-por-persona.sql` para que cuente por persona | [2026-10-30-taller](2026-10-30-taller.md) |
+| UX-005 | ⚪ | "¿Olvidaste tu contraseña?" no se puede tocar | arreglado (main f4b15db) | [2026-10-30-taller](2026-10-30-taller.md) |
+| QA-001 | ⚪ | Se cuenta envío aunque el negocio no tenga envío | arreglado (main f4b15db) | [2026-10-30-taller](2026-10-30-taller.md) |
+| QA-002 | 🟡 | Un precio escrito "28,50" se guardaba como $2850 | arreglado (main) | [2026-10-30-taller](2026-10-30-taller.md) |
 
 Siguiente número libre: SEG-011 · UX-007 · QA-003 · DIS-001
