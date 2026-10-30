@@ -5,7 +5,7 @@ Lista viva que leen todos los agentes (ver `docs/agentes/README.md`). Orden: gra
 | ID | Gravedad | Qué | Estado | Reporte |
 |---|---|---|---|---|
 | SEG-001 | 🟡 | Cualquiera puede inflar los pedidos de un negocio (`/api/pedido`) | abierto | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
-| SEG-002 | 🟡 | Apagar registro libre y prender protección de contraseñas filtradas en Supabase | necesita a Eduardo | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
+| SEG-002 | 🟡 | Apagar registro libre y prender protección de contraseñas filtradas en Supabase | arreglado (Eduardo lo apagó el 2026-10-30; falta verificar con `/auth/v1/settings`) | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | SEG-003 | 🟡 | El público ve plan, prueba y pagado hasta de todos los negocios | abierto | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | SEG-004 | 🟡 | Contraseña por WhatsApp sin poder cambiarla | abierto | [2026-10-30-seguridad](2026-10-30-seguridad.md) |
 | UX-001 | 🟡 | Barra de categorías se desliza de lado | abierto | [2026-10-30-probador](2026-10-30-probador.md) |

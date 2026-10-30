@@ -31,7 +31,7 @@
 - **Qué pasa:** si está prendido, cualquiera puede crearse una cuenta con la llave pública. Hoy no le da acceso a nada (no tiene negocio), pero es una puerta abierta innecesaria y cualquier error futuro de permisos la convierte en un problema. Hoy hay 2 usuarios y ninguno sobra.
 - **Cómo se comprueba:** `GET https://<proyecto>.supabase.co/auth/v1/settings` con la llave pública → `disable_signup` debe ser `true`.
 - **Arreglo propuesto:** apagarlo en el panel de Supabase. De paso, prender "Leaked password protection" (aviso del asesor de Supabase).
-- **Estado:** necesita a Eduardo (dos clics en Supabase)
+- **Estado:** arreglado (Eduardo apagó el registro el 2026-10-30; falta verificar con `/auth/v1/settings`)
 
 ### SEG-003 · 🟡 Media · El público puede ver quién paga y cuándo le vence
 - **Dónde:** `supabase/schema.sql:99` (`grant select (… plan, trial_ends_at, paid_until, paused)` a `anon`)
