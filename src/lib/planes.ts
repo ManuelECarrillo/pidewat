@@ -2,8 +2,8 @@ export const DIAS_PRUEBA = 14;
 export const DIAS_GRACIA = 7;
 
 export const PLANES = {
-  base: { nombre: "Base", mensual: 99, anual: 990 },
-  plus: { nombre: "Plus", mensual: 149, anual: 1490 },
+  base: { nombre: "Base", mensual: 149, anual: 1490 },
+  plus: { nombre: "Plus", mensual: 199, anual: 1990 },
 } as const;
 
 export type Plan = keyof typeof PLANES;
