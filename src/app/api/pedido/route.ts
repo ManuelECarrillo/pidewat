@@ -1,9 +1,11 @@
+import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { estadoNegocio } from "@/lib/estado";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_POR_MINUTO = 20;
+const MAX_POR_PERSONA = 5; // en 10 minutos, desde el mismo celular o internet
 
 // Registra que un cliente mandó un pedido (para las estadísticas del dueño). Nunca bloquea el pedido.
 // No confiamos en lo que manda el navegador: los nombres, precios y el total salen de la base.
@@ -20,6 +22,15 @@ export async function POST(req: Request) {
     const haceUnMinuto = new Date(Date.now() - 60_000).toISOString();
     const { count } = await sb.from("order_events").select("id", { count: "exact", head: true }).eq("business_id", n.id).gte("created_at", haceUnMinuto);
     if ((count ?? 0) >= MAX_POR_MINUTO) return NextResponse.json({ ok: true });
+
+    // SEG-010: límite por persona. No guardamos la IP, solo una huella que no se puede revertir
+    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
+    const origen = ip ? crypto.createHash("sha256").update(`${ip}|${n.id}`).digest("hex").slice(0, 16) : null;
+    if (origen) {
+      const haceDiez = new Date(Date.now() - 600_000).toISOString();
+      const { count: mios } = await sb.from("order_events").select("id", { count: "exact", head: true }).eq("business_id", n.id).eq("origen", origen).gte("created_at", haceDiez);
+      if ((mios ?? 0) >= MAX_POR_PERSONA) return NextResponse.json({ ok: true });
+    }
 
     const pedidos = new Map<string, number>();
     for (const l of Array.isArray(b.items) ? b.items.slice(0, 60) : []) {
@@ -38,7 +49,7 @@ export async function POST(req: Request) {
     const order_type = permitidos[String(b.order_type)] ? String(b.order_type) : null;
     const envio = order_type === "domicilio" ? Number(n.delivery_fee) || 0 : 0;
     const total = items.reduce((s, l) => s + l.cantidad * l.precio, 0) + envio;
-    await sb.from("order_events").insert({ business_id: n.id, total, items, order_type });
+    await sb.from("order_events").insert({ business_id: n.id, total, items, order_type, origen });
   } catch {}
   return NextResponse.json({ ok: true });
 }

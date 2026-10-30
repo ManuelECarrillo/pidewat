@@ -70,8 +70,10 @@ create table if not exists public.order_events (
   total numeric(10,2) not null default 0,
   items jsonb not null default '[]',
   order_type text,
+  origen text, -- huella del celular que pidió (hash de IP + negocio), para el límite por persona
   created_at timestamptz not null default now()
 );
+alter table public.order_events add column if not exists origen text;
 create index if not exists order_events_business_idx on public.order_events (business_id, created_at desc);
 
 create table if not exists public.payments (
