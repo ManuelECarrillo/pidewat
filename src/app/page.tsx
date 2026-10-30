@@ -56,18 +56,12 @@ export default function Inicio() {
 
       <section className="wrap" style={{ paddingBottom: 48 }}>
         <h2>Precio</h2>
-        <div className="grid2">
+        <div style={{ maxWidth: 420 }}>
           <div className="card">
-            <div className="muted">Plan {PLANES.base.nombre}</div>
+            <div className="muted">Un solo plan, todo incluido</div>
             <div className="kpi">{dinero(PLANES.base.mensual)}<span className="small muted"> /mes</span></div>
             <p className="small muted">o {dinero(PLANES.base.anual)} al año (2 meses gratis)</p>
-            <p>Menú ilimitado, pedidos sin comisión, QR, fotos, horario, envío a domicilio.</p>
-          </div>
-          <div className="card">
-            <div className="muted">Plan {PLANES.plus.nombre}</div>
-            <div className="kpi">{dinero(PLANES.plus.mensual)}<span className="small muted"> /mes</span></div>
-            <p className="small muted">o {dinero(PLANES.plus.anual)} al año</p>
-            <p>Todo lo del Base, más estadísticas de lo que más te piden.</p>
+            <p>Menú ilimitado, pedidos sin comisión, QR, fotos, horario, envío a domicilio y lo que más te piden.</p>
           </div>
         </div>
         <p className="muted" style={{ marginTop: 14 }}>{DIAS_PRUEBA} días gratis, sin tarjeta. Si no te convence, no pagas nada.</p>

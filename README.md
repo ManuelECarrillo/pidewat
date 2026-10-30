@@ -5,7 +5,7 @@ Pedidos ordenados por WhatsApp para negocios locales. Cada negocio tiene su men�
 - **Menú público** `/<link>` (y `/<link>?mesa=4` desde el QR de cada mesa). `/demo` es un ejemplo que no usa base de datos.
 - **Panel del dueño** `/panel`: link y QR (también tarjetas por mesa para imprimir), pedidos de la semana, menú (platillos, fotos, agotado, categorías), datos del negocio (horario, envío, color), plan y pagos.
 - **Panel nuestro** `/admin`: ingreso mensual, pruebas por vencer con recordatorio por WhatsApp, alta de negocios (crea la cuenta del dueño y arma el mensaje de bienvenida), cargar menú pegando texto, registrar pagos manuales, extender prueba, pausar, contraseña nueva.
-- **Cobro**: 14 días gratis → Base 149 MXN/mes o Plus 199 (anual 1490 / 1990) con Mercado Pago. Mensual = Suscripción con cobro automático; anual = pago único (tarjeta, OXXO, transferencia). Si vence, 7 días de gracia y luego el menú queda "en pausa" (no se borra nada).
+- **Cobro**: 14 días gratis → un solo plan de 149 MXN/mes (anual 1490) con Mercado Pago. Mensual = Suscripción con cobro automático; anual = pago único (tarjeta, OXXO, transferencia). Si vence, 7 días de gracia y luego el menú queda "en pausa" (no se borra nada).
 
 Stack: Next.js 15 + Supabase (Postgres, login y fotos) + Vercel. Costo: 0 hasta ~200 negocios.
 

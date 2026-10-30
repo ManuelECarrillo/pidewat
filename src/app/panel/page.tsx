@@ -50,15 +50,11 @@ export default async function Panel() {
           <p className="small muted" style={{ marginTop: 8 }}>
             {dinero(suma(lista))} en pedidos enviados en 30 días, sin pagar comisión.
           </p>
-          {negocio.plan === "plus" ? (
-            top.length > 0 && (
-              <>
-                <h4 style={{ margin: "12px 0 6px" }}>Lo que más te piden</h4>
-                <ol style={{ margin: 0, paddingLeft: 20 }}>{top.map(([n, c]) => <li key={n}>{n} <span className="muted">({c})</span></li>)}</ol>
-              </>
-            )
-          ) : (
-            <p className="small muted">Con el plan Plus ves también lo que más te piden.</p>
+          {top.length > 0 && (
+            <>
+              <h4 style={{ margin: "12px 0 6px" }}>Lo que más te piden</h4>
+              <ol style={{ margin: 0, paddingLeft: 20 }}>{top.map(([n, c]) => <li key={n}>{n} <span className="muted">({c})</span></li>)}</ol>
+            </>
           )}
           <p className="small muted" style={{ marginBottom: 0 }}>Cuenta cada vez que un cliente toca “Enviar pedido por WhatsApp”.</p>
         </div>

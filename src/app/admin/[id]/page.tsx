@@ -56,9 +56,6 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
               <div className="f grow">Forma
                 <Selector name="method" opciones={["transferencia", "efectivo", "mercadopago", "otro"].map((m) => ({ value: m, label: m[0].toUpperCase() + m.slice(1) }))} />
               </div>
-              <div className="f grow">Plan
-                <Selector name="plan" valor={n.plan} opciones={[{ value: "base", label: "Base" }, { value: "plus", label: "Plus" }]} />
-              </div>
             </div>
             <label className="f">Nota<input className="i" name="note" /></label>
             <BotonEnviar>Registrar y extender</BotonEnviar>
@@ -104,9 +101,6 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
           {oculto}
           <div className="row">
             <label className="f grow">Link<input className="i" name="slug" defaultValue={n.slug} /></label>
-            <div className="f grow">Plan
-              <Selector name="plan" valor={n.plan} opciones={[{ value: "base", label: "Base" }, { value: "plus", label: "Plus" }]} />
-            </div>
           </div>
           <label className="f">Notas (solo las vemos nosotros)<textarea className="i" name="notes" defaultValue={n.notes || ""} /></label>
           <BotonEnviar>Guardar</BotonEnviar>
