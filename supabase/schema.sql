@@ -19,6 +19,7 @@ create table if not exists public.businesses (
   description text,
   address text,
   hours text,
+  horario jsonb, -- {dias:[{abre,cierra}|null x7]}, 0 = domingo; null = recibe pedidos siempre
   logo_url text,
   cover_url text,
   color text not null default '#e4572e',
@@ -107,12 +108,12 @@ $$;
 
 revoke all on public.businesses from anon, authenticated;
 -- (plan, prueba y pagos no: el menú decide si está en pausa en el servidor)
-grant select (id, slug, name, whatsapp, description, address, hours, logo_url, cover_url, color, mode,
+grant select (id, slug, name, whatsapp, description, address, hours, horario, logo_url, cover_url, color, mode,
   accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note)
   on public.businesses to anon;
 grant select on public.businesses to authenticated;
 -- el dueño edita sus datos, pero no su plan, su prueba ni su pago
-grant update (name, whatsapp, description, address, hours, logo_url, cover_url, color, mode,
+grant update (name, whatsapp, description, address, hours, horario, logo_url, cover_url, color, mode,
   accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note)
   on public.businesses to authenticated;
 

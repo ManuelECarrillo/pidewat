@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import BotonVolver from "@/components/BotonVolver";
 import Menu from "@/components/Menu";
 import { categoriasDemo, negocioDemo, productosDemo } from "@/lib/demo";
 import { estadoNegocio } from "@/lib/estado";
@@ -18,7 +19,9 @@ async function cargar(slug: string) {
   }
   if (SLUGS_RESERVADOS.has(slug) || !supabaseConfigurado()) return null;
   const sb = supabasePublico();
-  const { data: negocio } = await sb.from("businesses").select(COLUMNAS_MENU).eq("slug", slug).maybeSingle<NegocioMenu>();
+  let { data: negocio, error } = await sb.from("businesses").select(COLUMNAS_MENU).eq("slug", slug).maybeSingle<NegocioMenu>();
+  // Mientras no se corra la migración del horario (2026-10-30-horario.sql), el menú sigue funcionando sin él
+  if (error) ({ data: negocio } = await sb.from("businesses").select(COLUMNAS_MENU.replace(", horario", "")).eq("slug", slug).maybeSingle<NegocioMenu>());
   if (!negocio) return null;
   const [{ data: cobro }, { data: categorias }, { data: productos }] = await Promise.all([
     // Si está en pausa se decide aquí en el servidor; esas fechas nunca llegan al navegador
@@ -32,7 +35,7 @@ async function cargar(slug: string) {
   };
 }
 
-type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ mesa?: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ mesa?: string; desde?: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -47,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PaginaNegocio({ params, searchParams }: Props) {
   const { slug } = await params;
-  const { mesa } = await searchParams;
+  const { mesa, desde } = await searchParams;
   const d = await cargar(slug);
   if (!d) notFound();
   const { negocio } = d;
@@ -56,6 +59,7 @@ export default async function PaginaNegocio({ params, searchParams }: Props) {
 
   return (
     <main style={{ ["--c" as string]: negocio.color }}>
+      {(desde === "panel" || desde === "admin") && <BotonVolver a={desde === "admin" ? "/admin" : "/panel"} />}
       <div className="portada" style={negocio.cover_url ? { backgroundImage: `url(${negocio.cover_url})` } : undefined} />
       <div className="wrap cabecera">
         <div className="logo" style={negocio.logo_url ? { backgroundImage: `url(${negocio.logo_url})` } : undefined}>

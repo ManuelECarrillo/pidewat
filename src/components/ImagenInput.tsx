@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { avisarCambio } from "./Selector";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 
 // Achica la foto en el celular antes de subirla (máx. 1000 px, JPG) para que el menú cargue rápido.
@@ -17,6 +18,8 @@ async function achicar(archivo: File, max = 1000): Promise<Blob> {
 export default function ImagenInput({ name, negocioId, valor, etiqueta = "Foto" }: { name: string; negocioId: string; valor?: string | null; etiqueta?: string }) {
   const [url, setUrl] = useState(valor || "");
   const [estado, setEstado] = useState("");
+  const caja = useRef<HTMLDivElement>(null);
+  const poner = (u: string) => { setUrl(u); avisarCambio(caja.current); };
 
   async function subir(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -28,7 +31,7 @@ export default function ImagenInput({ name, negocioId, valor, etiqueta = "Foto" 
       const sb = supabaseNavegador();
       const { error } = await sb.storage.from("imagenes").upload(ruta, blob, { contentType: "image/jpeg", upsert: false });
       if (error) throw error;
-      setUrl(sb.storage.from("imagenes").getPublicUrl(ruta).data.publicUrl);
+      poner(sb.storage.from("imagenes").getPublicUrl(ruta).data.publicUrl);
       setEstado("");
     } catch {
       setEstado("No se pudo subir. Intenta con otra foto.");
@@ -36,7 +39,7 @@ export default function ImagenInput({ name, negocioId, valor, etiqueta = "Foto" 
   }
 
   return (
-    <div className="f">
+    <div className="f" ref={caja}>
       {etiqueta}
       <input type="hidden" name={name} value={url} />
       <div className="row" style={{ marginTop: 6 }}>
@@ -45,7 +48,7 @@ export default function ImagenInput({ name, negocioId, valor, etiqueta = "Foto" 
           {url ? "Cambiar" : "Subir foto"}
           <input type="file" accept="image/*" onChange={subir} style={{ display: "none" }} />
         </label>
-        {url && <button type="button" className="btn btn-sm btn-bad" onClick={() => setUrl("")}>Quitar</button>}
+        {url && <button type="button" className="btn btn-sm btn-bad" onClick={() => poner("")}>Quitar</button>}
       </div>
       {estado && <div className="small muted" style={{ marginTop: 4 }}>{estado}</div>}
     </div>

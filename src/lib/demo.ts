@@ -11,6 +11,7 @@ export const negocioDemo: Negocio = {
   description: "Gorditas, caldillo y antojitos duranguenses hechos al momento.",
   address: "Av. 20 de Noviembre 123, Centro, Durango",
   hours: "Lun a Sáb 8:00 a 17:00 · Dom 9:00 a 15:00",
+  horario: null, // la demo siempre recibe pedidos, para enseñarla a cualquier hora
   logo_url: null,
   cover_url: null,
   color: "#d9480f",

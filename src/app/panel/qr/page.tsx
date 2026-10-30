@@ -1,3 +1,4 @@
+import Link from "next/link";
 import QRCode from "qrcode";
 import { siteUrl } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
@@ -21,7 +22,8 @@ export default async function HojaQR({ searchParams }: { searchParams: Promise<{
         @media print { .no-print { display: none } body { background: #fff } .tq { border-color: #ddd } }
       `}</style>
       <div className="no-print row between wrap-flex" style={{ marginBottom: 16 }}>
-        <p className="muted" style={{ margin: 0 }}>Imprime en hojas tamaño carta y recorta por la línea punteada.</p>
+        <Link href="/panel" className="btn btn-sm">← Volver</Link>
+        <p className="muted grow" style={{ margin: 0 }}>Imprime en hojas tamaño carta y recorta por la línea punteada.</p>
         <Imprimir />
       </div>
       <div className="hoja-qr">

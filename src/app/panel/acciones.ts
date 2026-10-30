@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requiereDueno } from "@/lib/sesion";
 import { normalizarWhatsapp } from "@/lib/formato";
+import { leerHorario, resumenHorario } from "@/lib/horario";
 import type { ResultadoAlta } from "@/app/admin/acciones";
 
 const txt = (f: FormData, k: string, max = 300) => String(f.get(k) ?? "").trim().slice(0, max) || null;
@@ -83,12 +84,14 @@ export async function guardarNegocio(f: FormData) {
   const whatsapp = normalizarWhatsapp(String(f.get("whatsapp") ?? ""));
   if (!/^[0-9]{10,15}$/.test(whatsapp)) redirect("/panel/negocio?error=whatsapp");
   const color = String(f.get("color") ?? "");
-  await sb.from("businesses").update({
+  const horario = leerHorario(f.get("horario"));
+  const datos = {
     name: txt(f, "name", 80) || negocio.name,
     whatsapp,
     description: txt(f, "description", 300),
     address: txt(f, "address", 200),
-    hours: txt(f, "hours", 200),
+    horario,
+    hours: horario ? resumenHorario(horario) : txt(f, "hours", 200),
     logo_url: imagen(f, "logo_url"),
     cover_url: imagen(f, "cover_url"),
     color: /^#[0-9a-f]{6}$/i.test(color) ? color : negocio.color,
@@ -98,7 +101,12 @@ export async function guardarNegocio(f: FormData) {
     accepts_delivery: si(f, "accepts_delivery"),
     delivery_fee: num(f, "delivery_fee"),
     delivery_note: txt(f, "delivery_note", 200),
-  }).eq("id", negocio.id);
+  };
+  const { error } = await sb.from("businesses").update(datos).eq("id", negocio.id);
+  if (error) { // aún sin la columna horario: se guarda lo demás
+    const { horario: _, ...sinHorario } = datos;
+    await sb.from("businesses").update(sinHorario).eq("id", negocio.id);
+  }
   refrescar(negocio.slug);
   redirect("/panel/negocio?ok=1");
 }
@@ -109,7 +117,8 @@ export async function cambiarClave(_: ResultadoAlta | null, f: FormData): Promis
   const clave = String(f.get("clave") ?? "");
   if (clave.length < 8) return { ok: false, mensaje: "Usa al menos 8 letras o números." };
   if (clave !== String(f.get("clave2") ?? "")) return { ok: false, mensaje: "Las dos contraseñas no son iguales." };
-  const { error } = await sb.auth.updateUser({ password: clave });
+  const { error } = await sb.auth.updateUser({ password: clave, data: { clave_cambiada: true } });
   if (error) return { ok: false, mensaje: "No se pudo cambiar. Intenta con otra contraseña o escríbenos por WhatsApp." };
+  revalidatePath("/panel", "layout"); // quita el aviso de "cambia tu contraseña"
   return { ok: true, mensaje: "Listo, tu contraseña cambió. Úsala la próxima vez que entres." };
 }
