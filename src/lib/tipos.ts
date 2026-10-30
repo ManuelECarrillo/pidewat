@@ -1,3 +1,5 @@
+import type { Horario } from "./horario";
+
 export type Negocio = {
   id: string;
   slug: string;
@@ -6,6 +8,7 @@ export type Negocio = {
   description: string | null;
   address: string | null;
   hours: string | null;
+  horario: Horario | null;
   logo_url: string | null;
   cover_url: string | null;
   color: string;
@@ -46,4 +49,4 @@ export type Producto = {
 // Lo que sale en el menú público. Plan, prueba y pagos no: el público no tiene por qué saber quién paga.
 export type NegocioMenu = Omit<Negocio, "plan" | "trial_ends_at" | "paid_until" | "paused">;
 export const COLUMNAS_MENU =
-  "id, slug, name, whatsapp, description, address, hours, logo_url, cover_url, color, mode, accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note";
+  "id, slug, name, whatsapp, description, address, hours, logo_url, cover_url, color, mode, accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note, horario";

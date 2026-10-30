@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
 import { estadoNegocio } from "@/lib/estado";
+import { abiertoAhora, leerHorario } from "@/lib/horario";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -23,8 +24,10 @@ export async function POST(req: Request) {
     if (!UUID.test(String(b.business_id))) return NextResponse.json({ ok: false }, { status: 400 });
     const sb = supabaseAdmin();
 
-    const { data: n } = await sb.from("businesses").select("id, delivery_fee, accepts_table, accepts_pickup, accepts_delivery, trial_ends_at, paid_until, paused").eq("id", b.business_id).maybeSingle();
+    const { data: n } = await sb.from("businesses").select("*").eq("id", b.business_id).maybeSingle();
     if (!n || !estadoNegocio(n).activo) return NextResponse.json({ ok: true });
+    const horario = leerHorario(n.horario);
+    if (horario && !abiertoAhora(horario)) return NextResponse.json({ ok: true }); // fuera de horario no cuenta
 
     // Límite por negocio: más de 20 pedidos en un minuto no es un restaurante, es alguien inflando las estadísticas
     const haceUnMinuto = new Date(Date.now() - 60_000).toISOString();

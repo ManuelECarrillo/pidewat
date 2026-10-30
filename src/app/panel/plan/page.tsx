@@ -13,7 +13,9 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
   const estado = estadoNegocio(negocio);
   const { data: pagos } = await sb.from("payments").select("*").eq("business_id", negocio.id).order("created_at", { ascending: false }).limit(24);
   const ventas = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP;
-  const textoTransfer = encodeURIComponent(`Hola, quiero pagar Pidewat para ${negocio.name} por transferencia.`);
+  const precio = PLANES.base.mensual;
+  const textoTransfer = encodeURIComponent(`Hola, quiero pagar Pidewat (${dinero(precio)} al mes) para ${negocio.name} por transferencia.`);
+  const textoActivar = encodeURIComponent(`Hola, quiero activar Pidewat (${dinero(precio)} al mes) para ${negocio.name}. ¿Cómo pago?`);
 
   return (
     <div className="stack" style={{ maxWidth: 720 }}>
@@ -27,35 +29,33 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
       <AvisoEstado estado={estado} />
       {negocio.mp_preapproval_id && <div className="alerta alerta-ok">Tienes el cobro automático mensual activo con Mercado Pago.</div>}
 
-      {mpConfigurado() ? (
-        <div style={{ maxWidth: 420 }}>
-          {(["base"] as const).map((plan) => (
-            <div className="card" key={plan}>
-              <div className="row between"><strong>Plan {PLANES[plan].nombre}</strong><span className="pill">Tu plan</span></div>
-              <div className="kpi">{dinero(PLANES[plan].mensual)}<span className="small muted"> /mes</span></div>
-              <p className="small muted">Todo para recibir pedidos por WhatsApp, sin comisión.</p>
-              <form action={irAPagar}>
-                <input type="hidden" name="plan" value={plan} />
-                <label className="f small">Correo de tu cuenta de Mercado Pago
-                  <input className="i" type="email" name="correo" required defaultValue={user.email || ""} />
-                </label>
-                <div className="stack">
-                  <BotonEnviar className="btn btn-p btn-block">Pagar {dinero(PLANES[plan].mensual)} al mes (automático)</BotonEnviar>
-                </div>
-              </form>
-              <form action={irAPagar} style={{ marginTop: 8 }}>
-                <input type="hidden" name="plan" value={plan} />
-                <input type="hidden" name="ciclo" value="anual" />
-                <BotonEnviar className="btn btn-block">Pagar un año: {dinero(PLANES[plan].anual)}</BotonEnviar>
-              </form>
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <div className="card" style={{ maxWidth: 460 }}>
+        <div className="row between"><strong>Plan Pidewat</strong><span className="pill">Un solo plan</span></div>
+        <div className="kpi" style={{ margin: "6px 0 2px" }}>{dinero(precio)}<span className="small muted" style={{ fontWeight: 600 }}> MXN al mes</span></div>
+        <p className="small muted" style={{ marginTop: 0 }}>O {dinero(PLANES.base.anual)} por un año (te ahorras 2 meses). Menú ilimitado, pedidos sin comisión, QR y fotos.</p>
+        {mpConfigurado() ? (
+          <>
+            <form action={irAPagar}>
+              <input type="hidden" name="plan" value="base" />
+              <label className="f small">Correo de tu cuenta de Mercado Pago
+                <input className="i" type="email" name="correo" required defaultValue={user.email || ""} />
+              </label>
+              <BotonEnviar className="btn btn-p btn-block">Pagar {dinero(precio)} al mes (automático)</BotonEnviar>
+            </form>
+            <form action={irAPagar} style={{ marginTop: 8 }}>
+              <input type="hidden" name="plan" value="base" />
+              <input type="hidden" name="ciclo" value="anual" />
+              <BotonEnviar className="btn btn-block">Pagar un año: {dinero(PLANES.base.anual)}</BotonEnviar>
+            </form>
+          </>
+        ) : (
+          ventas && <a className="btn btn-p btn-block" href={`https://wa.me/${ventas}?text=${textoActivar}`}>Activar mi plan por {dinero(precio)} al mes</a>
+        )}
+      </div>
 
       <div className="card">
         <h3>¿Prefieres transferencia o efectivo?</h3>
-        <p className="small muted">Escríbenos y te pasamos los datos. Activamos tu plan en cuanto llegue el pago.</p>
+        <p className="small muted">Son {dinero(precio)} al mes. Escríbenos y te pasamos los datos; activamos tu plan en cuanto llegue el pago.</p>
         {ventas && <a className="btn btn-wa" href={`https://wa.me/${ventas}?text=${textoTransfer}`}>Pagar por transferencia</a>}
       </div>
 

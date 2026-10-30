@@ -30,14 +30,14 @@ export default function CompartirLink({ url, nombre, color }: { url: string; nom
       <div className="row wrap-flex">
         <button className="btn btn-sm" onClick={copiar}>{copiado ? "¡Copiado!" : "Copiar link"}</button>
         <button className="btn btn-sm btn-wa" onClick={compartir}>Compartir</button>
-        <a className="btn btn-sm" href={url} target="_blank">Ver mi menú</a>
+        <a className="btn btn-sm" href={`${new URL(url).pathname}?desde=panel`}>Ver mi menú</a>
       </div>
       {qr && (
         <div className="row wrap-flex" style={{ marginTop: 14, alignItems: "flex-start" }}>
           <img src={qr} alt="Código QR de tu menú" width={140} height={140} style={{ border: "1px solid var(--line)", borderRadius: 10 }} />
           <div className="stack grow">
             <a className="btn btn-sm" href={qr} download={`qr-${nombre}.png`}>Descargar QR</a>
-            <a className="btn btn-sm" href={`/panel/qr${mesas ? `?mesas=${mesas}` : ""}`} target="_blank">Imprimir tarjetas para mesas</a>
+            <a className="btn btn-sm" href={`/panel/qr${mesas ? `?mesas=${mesas}` : ""}`}>Imprimir tarjetas para mesas</a>
             <label className="small muted">Una tarjeta por mesa (número en el QR):
               <input className="i" type="number" min={0} max={60} value={mesas || ""} placeholder="0 = una sola tarjeta"
                 onChange={(e) => setMesas(Math.min(60, Math.max(0, Number(e.target.value) || 0)))} />

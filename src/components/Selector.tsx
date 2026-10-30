@@ -2,13 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 
+// Los campos propios guardan su valor en un <input type="hidden">, que no avisa cuando cambia.
+// Esto le avisa al formulario (ej. para saber si hay cambios sin guardar).
+export function avisarCambio(el: Element | null) {
+  el?.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 export type Opcion = { value: string; label: string; hint?: string };
 
 // Lista desplegable con el estilo de la app (reemplaza al <select> gris del sistema).
 export default function Selector({
-  name, opciones, valor, ariaLabel,
+  name, opciones, valor, ariaLabel, onCambio,
 }: {
-  name: string; opciones: Opcion[]; valor?: string; ariaLabel?: string;
+  name: string; opciones: Opcion[]; valor?: string; ariaLabel?: string; onCambio?: (v: string) => void;
 }) {
   const [actual, setActual] = useState(valor ?? opciones[0]?.value ?? "");
   const [abierto, setAbierto] = useState(false);
@@ -16,6 +22,7 @@ export default function Selector({
 
   useEffect(() => {
     if (!abierto) return;
+    caja.current?.querySelector(".sel-lista button.on")?.scrollIntoView({ block: "center" });
     const fuera = (e: PointerEvent) => { if (!caja.current?.contains(e.target as Node)) setAbierto(false); };
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setAbierto(false); };
     document.addEventListener("pointerdown", fuera);
@@ -37,7 +44,7 @@ export default function Selector({
         <ul className="sel-lista" role="listbox">
           {opciones.map((o) => (
             <li key={o.value} role="option" aria-selected={o.value === actual}>
-              <button type="button" className={o.value === actual ? "on" : ""} onClick={() => { setActual(o.value); setAbierto(false); }}>
+              <button type="button" className={o.value === actual ? "on" : ""} onClick={() => { setActual(o.value); setAbierto(false); onCambio?.(o.value); avisarCambio(caja.current); }}>
                 <span className="grow">
                   {o.label}
                   {o.hint && <span className="small muted" style={{ display: "block" }}>{o.hint}</span>}

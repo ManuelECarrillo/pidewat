@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Categoria, NegocioMenu, Producto } from "@/lib/tipos";
 import { dinero } from "@/lib/formato";
+import { abiertoAhora, proximaApertura } from "@/lib/horario";
 import { linkWhatsapp, mensajePedido, totalPedido, type LineaPedido } from "@/lib/whatsapp";
 
 type Carrito = Record<string, number>;
@@ -18,6 +19,16 @@ export default function Menu({
   const [abierto, setAbierto] = useState(false);
   const [buscar, setBuscar] = useState("");
   const [catActiva, setCatActiva] = useState<string | null>(null);
+  // Fuera del horario se puede ver el menú, pero no mandar pedidos. Se calcula en el celular y se revisa cada minuto.
+  const [cerrado, setCerrado] = useState<string | null>(null);
+  useEffect(() => {
+    const h = negocio.horario;
+    if (!h) return;
+    const revisar = () => setCerrado(abiertoAhora(h) ? null : proximaApertura(h) || "Por ahora no está recibiendo pedidos");
+    revisar();
+    const t = setInterval(revisar, 60_000);
+    return () => clearInterval(t);
+  }, [negocio.horario]);
 
   const tipos: Tipo[] = [
     ...(negocio.accepts_table ? (["mesa"] as Tipo[]) : []),
@@ -64,6 +75,7 @@ export default function Menu({
   const falta = tipo === "domicilio" && !direccion.trim() ? "Escribe tu dirección" : !nombre.trim() ? "Escribe tu nombre" : null;
 
   function enviar() {
+    if (negocio.horario && !abiertoAhora(negocio.horario)) { setCerrado(proximaApertura(negocio.horario) || "Por ahora no está recibiendo pedidos"); return; }
     const texto = mensajePedido({
       negocio: negocio.name, modo: negocio.mode, lineas, tipo, mesa, nombreCliente: nombre.trim(),
       direccion: direccion.trim(), notas: notas.trim(), envio, link,
@@ -83,6 +95,11 @@ export default function Menu({
   return (
     <>
       <div className="wrap" style={{ paddingBottom: 8 }}>
+        {cerrado && (
+          <div className="cerrado-aviso" role="status">
+            <strong>Cerrado en este momento.</strong> {cerrado}. Puedes ver el menú, pero los pedidos se reciben en horario.
+          </div>
+        )}
         {productos.length > 8 && (
           <input className="i" type="search" placeholder={negocio.mode === "menu" ? "Buscar platillo…" : "Buscar producto…"}
             value={buscar} onChange={(e) => setBuscar(e.target.value)} style={{ marginTop: 14 }} />
@@ -112,7 +129,7 @@ export default function Menu({
                       <span className="precio">{dinero(Number(p.price))}</span>
                       {!p.available ? (
                         <span className="pill">Agotado</span>
-                      ) : n === 0 ? (
+                      ) : cerrado ? null : n === 0 ? (
                         <button className="mas" aria-label={`Agregar ${p.name}`} onClick={() => cambiar(p.id, 1)}>+</button>
                       ) : (
                         <span className="cant">
@@ -131,7 +148,7 @@ export default function Menu({
         {!grupos.length && <p className="muted" style={{ padding: "24px 0" }}>{q ? "No encontramos nada con esa palabra." : "Pronto verás aquí el menú."}</p>}
       </div>
 
-      {piezas > 0 && !abierto && (
+      {piezas > 0 && !abierto && !cerrado && (
         <div className="barra">
           <button className="btn btn-p" onClick={() => setAbierto(true)}>
             <span>Ver pedido · {piezas} {piezas === 1 ? "artículo" : "artículos"}</span>
@@ -198,8 +215,8 @@ export default function Menu({
               <div className="row between" style={{ fontWeight: 800, fontSize: "1.15rem", margin: "2px 0 10px" }}>
                 <span>Total</span><span>{dinero(total)}</span>
               </div>
-              <button className="btn btn-wa btn-block" style={{ fontSize: "1.05rem", padding: 14 }} disabled={!lineas.length || Boolean(falta)} onClick={enviar}>
-                {falta || "Enviar pedido por WhatsApp"}
+              <button className="btn btn-wa btn-block" style={{ fontSize: "1.05rem", padding: 14 }} disabled={!lineas.length || Boolean(falta) || Boolean(cerrado)} onClick={enviar}>
+                {cerrado ? "Cerrado ahorita" : falta || "Enviar pedido por WhatsApp"}
               </button>
               <p className="small muted" style={{ textAlign: "center", margin: "8px 0 0" }}>
                 Se abre WhatsApp con tu pedido ya escrito. Solo dale enviar.
