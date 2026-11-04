@@ -32,36 +32,61 @@ export async function altaNegocio(_: ResultadoAlta | null, f: FormData): Promise
   const { data: existe } = await sb.from("businesses").select("id").eq("slug", slug).maybeSingle();
   if (existe) return { ok: false, mensaje: `El link /${slug} ya está ocupado.` };
 
-  const clave = claveNueva();
-  let ownerId: string;
-  const { data: creado, error } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true });
-  let claveTexto = clave;
-  if (error) {
-    // Si el dueño ya tenía cuenta (otro negocio), lo reutilizamos sin cambiarle la contraseña
-    const { data: lista } = await sb.auth.admin.listUsers({ perPage: 1000 });
-    const u = lista?.users.find((x) => x.email?.toLowerCase() === correo);
-    if (!u) return { ok: false, mensaje: `No se pudo crear la cuenta: ${error.message}` };
-    ownerId = u.id;
-    claveTexto = "(la misma que ya tienes)";
-  } else ownerId = creado.user.id;
+  const cuenta = await cuentaDueno(sb, correo);
+  if ("error" in cuenta) return { ok: false, mensaje: cuenta.error };
 
   const trial = new Date(Date.now() + DIAS_PRUEBA * 86_400_000).toISOString();
-  const { error: e2 } = await sb.from("businesses").insert({ name, slug, whatsapp, owner_id: ownerId, owner_email: correo, mode, trial_ends_at: trial });
+  const { error: e2 } = await sb.from("businesses").insert({ name, slug, whatsapp, owner_id: cuenta.id, owner_email: correo, mode, trial_ends_at: trial });
   if (e2) return { ok: false, mensaje: `No se pudo crear el negocio: ${e2.message}` };
 
   revalidatePath("/admin");
-  const texto = `¡Listo! Ya quedó tu menú de *${name}* 🎉
+  return { ok: true, mensaje: `Negocio creado: /${slug}`, whatsapp, texto: textoBienvenida(name, slug, correo, cuenta.clave, true) };
+}
+
+// Crea la cuenta del dueño con contraseña nueva; si ya tenía cuenta (otro negocio), la reutiliza sin cambiarle la contraseña.
+async function cuentaDueno(sb: ReturnType<typeof supabaseAdmin>, correo: string): Promise<{ id: string; clave: string } | { error: string }> {
+  const clave = claveNueva();
+  const { data: creado, error } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true });
+  if (!error) return { id: creado.user.id, clave };
+  const { data: lista } = await sb.auth.admin.listUsers({ perPage: 1000 });
+  const u = lista?.users.find((x) => x.email?.toLowerCase() === correo);
+  if (!u) return { error: `No se pudo crear la cuenta: ${error.message}` };
+  return { id: u.id, clave: "(la misma que ya tienes)" };
+}
+
+function textoBienvenida(name: string, slug: string, correo: string, clave: string, prueba: boolean) {
+  return `¡Listo! Ya quedó tu menú de *${name}* 🎉
 
 Tu link para clientes: ${siteUrl()}/${slug}
 
 Tu panel para cambiar precios y platillos:
 ${siteUrl()}/entrar
 Correo: ${correo}
-Contraseña: ${claveTexto}
+Contraseña: ${clave}
 (Al entrar, cámbiala en "Mi negocio" por una que solo tú sepas.)
+${prueba ? `\nTienes ${DIAS_PRUEBA} días gratis. ` : "\n"}Cualquier cosa me escribes por aquí.`;
+}
 
-Tienes ${DIAS_PRUEBA} días gratis. Cualquier cosa me escribes por aquí.`;
-  return { ok: true, mensaje: `Negocio creado: /${slug}`, whatsapp, texto };
+// Para un negocio que armamos nosotros antes de tener los datos del dueño: le crea su cuenta
+// y, si se escriben, corrige nombre y WhatsApp. Regresa el mensaje de bienvenida para mandárselo.
+export async function darCuenta(_: ResultadoAlta | null, f: FormData): Promise<ResultadoAlta> {
+  const { sb, id, n } = await negocio(f);
+  const correo = String(f.get("email") || "").trim().toLowerCase();
+  const name = String(f.get("name") || "").trim() || n.name;
+  const wa = String(f.get("whatsapp") || "").trim();
+  const whatsapp = wa ? normalizarWhatsapp(wa) : n.whatsapp;
+  if (!/^\S+@\S+\.\S+$/.test(correo)) return { ok: false, mensaje: "Escribe el correo del dueño." };
+  if (!/^[0-9]{12,13}$/.test(whatsapp)) return { ok: false, mensaje: "WhatsApp inválido: 10 dígitos." };
+
+  const cuenta = await cuentaDueno(sb, correo);
+  if ("error" in cuenta) return { ok: false, mensaje: cuenta.error };
+  const { error } = await sb.from("businesses").update({ owner_id: cuenta.id, owner_email: correo, name, whatsapp }).eq("id", id);
+  if (error) return { ok: false, mensaje: `No se pudo guardar: ${error.message}` };
+
+  revalidatePath(`/admin/${id}`);
+  revalidatePath(`/${n.slug}`);
+  const pagado = !!n.paid_until && new Date(n.paid_until) > new Date();
+  return { ok: true, mensaje: `Cuenta lista para ${correo}.`, whatsapp, texto: textoBienvenida(name, n.slug, correo, cuenta.clave, !pagado) };
 }
 
 async function negocio(f: FormData) {

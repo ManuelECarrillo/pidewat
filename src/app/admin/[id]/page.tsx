@@ -9,7 +9,7 @@ import { PLANES } from "@/lib/planes";
 import { requiereAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { NegocioCompleto } from "@/lib/tipos";
-import { alternarPausa, cancelarCobro, extenderPrueba, guardarInterno, importarMenu, nuevaClave, registrarPago } from "../acciones";
+import { alternarPausa, cancelarCobro, darCuenta, extenderPrueba, guardarInterno, importarMenu, nuevaClave, registrarPago } from "../acciones";
 import Selector from "@/components/Selector";
 
 const EJEMPLO = `# Gorditas
@@ -39,9 +39,24 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
         {pillEstado(e)}
       </div>
       <div className="small muted">
-        <a href={`/${n.slug}?desde=admin`}>{siteUrl()}/{n.slug}</a> · {n.owner_email} · WhatsApp {n.whatsapp} · {productos || 0} productos ·
+        <a href={`/${n.slug}?desde=admin`}>{siteUrl()}/{n.slug}</a> · {n.owner_email || "sin dueño"} · WhatsApp {n.whatsapp} · {productos || 0} productos ·
         prueba hasta {fecha(n.trial_ends_at)}{n.paid_until ? ` · pagado hasta ${fecha(n.paid_until)}` : ""}
       </div>
+
+      {!n.owner_id && (
+        <div className="card">
+          <h3>Darle su cuenta al dueño</h3>
+          <p className="small muted">Este negocio todavía no tiene dueño. Escribe su correo y, si cambian, su nombre y WhatsApp; te sale el mensaje con su contraseña para mandárselo.</p>
+          <FormConResultado action={darCuenta} boton="Crear su cuenta">
+            {oculto}
+            <label className="f">Correo del dueño<input className="i" name="email" type="email" inputMode="email" autoComplete="off" /></label>
+            <div className="row">
+              <label className="f grow">Nombre del negocio<input className="i" name="name" defaultValue={n.name} /></label>
+              <label className="f grow">WhatsApp (10 dígitos)<input className="i" name="whatsapp" inputMode="tel" placeholder={n.whatsapp.slice(-10)} /></label>
+            </div>
+          </FormConResultado>
+        </div>
+      )}
 
       <div className="grid2">
         <div className="card">
