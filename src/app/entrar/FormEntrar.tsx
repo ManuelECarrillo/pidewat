@@ -7,7 +7,10 @@ import { supabaseNavegador } from "@/lib/supabase/navegador";
 // UX-005: que "olvidé mi contraseña" sea un botón que abre WhatsApp, no solo un texto
 const ventas = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP || "";
 
-export default function FormEntrar() {
+// Solo rutas propias del panel o el admin, nunca otro sitio
+const destinoSeguro = (sig?: string) => (sig && /^\/(panel|admin)(\/|\?|$)/.test(sig) ? sig : "/panel");
+
+export default function FormEntrar({ sig }: { sig?: string }) {
   const router = useRouter();
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
@@ -21,7 +24,7 @@ export default function FormEntrar() {
     const { error } = await supabaseNavegador().auth.signInWithPassword({ email: correo.trim(), password: clave });
     setCargando(false);
     if (error) return setError("Correo o contraseña incorrectos.");
-    router.replace("/panel");
+    router.replace(destinoSeguro(sig));
     router.refresh();
   }
 

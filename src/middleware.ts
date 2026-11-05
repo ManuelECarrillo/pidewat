@@ -15,7 +15,15 @@ export async function middleware(req: NextRequest) {
       },
     },
   });
-  await sb.auth.getUser();
+  const { data } = await sb.auth.getUser();
+  // Sin sesión en /panel o /admin: a entrar, recordando a dónde iba para regresarlo después
+  const ruta = req.nextUrl.pathname;
+  if (!data.user && ruta !== "/entrar") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/entrar";
+    url.search = `?sig=${encodeURIComponent(ruta + req.nextUrl.search)}`;
+    return NextResponse.redirect(url);
+  }
   return res;
 }
 
