@@ -6,8 +6,24 @@ import { dinero } from "@/lib/formato";
 import { abiertoAhora, proximaApertura } from "@/lib/horario";
 import { linkWhatsapp, mensajePedido, totalPedido, type LineaPedido } from "@/lib/whatsapp";
 
+// La llave de cada línea del carrito es el id del producto, o "id~ing1|ing2" si le quitaron ingredientes.
+// Así "3 hot dogs normales" y "1 sin mayonesa" son líneas distintas con su propio contador.
 type Carrito = Record<string, number>;
 type Tipo = "mesa" | "recoger" | "domicilio";
+type Eleccion = { p: Producto; sin: string[]; cantidad: number };
+
+const claveLinea = (id: string, sin: string[]) => (sin.length ? `${id}~${[...sin].sort().join("|")}` : id);
+const leerClave = (k: string) => { const [id, s] = k.split("~"); return { id, sin: s ? s.split("|") : [] }; };
+const ingredientesDe = (p?: Producto) => (p?.ingredientes || []).filter(Boolean);
+// "Sin mostaza, mayonesa ni cátsup", en el orden en que el negocio escribió los ingredientes
+function textoSin(sin: string[], p?: Producto) {
+  if (!sin.length) return "";
+  const orden = ingredientesDe(p).map((x) => x.toLowerCase());
+  const l = sin.map((x) => x.toLowerCase()).sort((a, b) => orden.indexOf(a) - orden.indexOf(b));
+  return `Sin ${l.length === 1 ? l[0] : `${l.slice(0, -1).join(", ")} ni ${l[l.length - 1]}`}`;
+}
+// Para el que cocina: si el producto se puede personalizar, cada línea dice cómo va
+const notaLinea = (sin: string[], p?: Producto) => (ingredientesDe(p).length ? textoSin(sin, p) || "Con todo" : "");
 
 export default function Menu({
   negocio, categorias, productos, mesaInicial, link,
@@ -19,6 +35,7 @@ export default function Menu({
   const [abierto, setAbierto] = useState(false);
   const [buscar, setBuscar] = useState("");
   const [catActiva, setCatActiva] = useState<string | null>(null);
+  const [eleccion, setEleccion] = useState<Eleccion | null>(null);
   // Fuera del horario se puede ver el menú, pero no mandar pedidos. Se calcula en el celular y se revisa cada minuto.
   const [cerrado, setCerrado] = useState<string | null>(null);
   useEffect(() => {
@@ -55,15 +72,27 @@ export default function Menu({
   }, [clave, carrito, nombre, direccion]);
 
   const porId = useMemo(() => new Map(productos.map((p) => [p.id, p])), [productos]);
-  const lineas: LineaPedido[] = Object.entries(carrito)
-    .filter(([id, n]) => n > 0 && porId.get(id)?.available)
-    .map(([id, n]) => { const p = porId.get(id)!; return { nombre: p.name, cantidad: n, precio: Number(p.price) }; });
+  const entradas = Object.entries(carrito)
+    .map(([k, n]) => ({ k, n, ...leerClave(k) }))
+    .filter((e) => e.n > 0 && porId.get(e.id)?.available);
+  const lineas: LineaPedido[] = entradas.map((e) => {
+    const p = porId.get(e.id)!;
+    return { nombre: p.name, cantidad: e.n, precio: Number(p.price), nota: notaLinea(e.sin, p) || undefined };
+  });
+  const enCarrito = (id: string) => entradas.reduce((s, e) => s + (e.id === id ? e.n : 0), 0);
   const piezas = lineas.reduce((s, l) => s + l.cantidad, 0);
   const envio = tipo === "domicilio" ? Number(negocio.delivery_fee) || 0 : 0;
   const total = totalPedido(lineas, envio);
 
-  const cambiar = (id: string, d: number) =>
-    setCarrito((c) => { const n = Math.max(0, (c[id] || 0) + d); const x = { ...c, [id]: n }; if (!n) delete x[id]; return x; });
+  const cambiar = (k: string, d: number) =>
+    setCarrito((c) => { const n = Math.max(0, (c[k] || 0) + d); const x = { ...c, [k]: n }; if (!n) delete x[k]; return x; });
+  // Productos con ingredientes: el "+" abre una hojita para quitar lo que no quieren
+  const agregar = (p: Producto) => (ingredientesDe(p).length ? setEleccion({ p, sin: [], cantidad: 1 }) : cambiar(p.id, 1));
+  const confirmarEleccion = () => {
+    if (!eleccion) return;
+    cambiar(claveLinea(eleccion.p.id, eleccion.sin), eleccion.cantidad);
+    setEleccion(null);
+  };
 
   const q = buscar.trim().toLowerCase();
   const visibles = q ? productos.filter((p) => (p.name + " " + (p.description || "")).toLowerCase().includes(q)) : productos;
@@ -81,7 +110,7 @@ export default function Menu({
       direccion: direccion.trim(), notas: notas.trim(), envio, link,
     });
     if (negocio.id !== "demo") {
-      const items = Object.entries(carrito).filter(([id, n]) => n > 0 && porId.get(id)?.available).map(([id, cantidad]) => ({ id, cantidad }));
+      const items = entradas.map((e) => ({ id: e.id, cantidad: e.n }));
       const cuerpo = JSON.stringify({ business_id: negocio.id, order_type: tipo, items });
       try { navigator.sendBeacon("/api/pedido", new Blob([cuerpo], { type: "application/json" })); } catch {}
     }
@@ -118,7 +147,8 @@ export default function Menu({
           <section key={g.id} id={`c-${g.id}`} style={{ scrollMarginTop: 60, paddingTop: 18 }}>
             <h2 style={{ fontSize: "1.15rem" }}>{g.nombre}</h2>
             {g.items.map((p) => {
-              const n = carrito[p.id] || 0;
+              const n = enCarrito(p.id);
+              const conIngredientes = ingredientesDe(p).length > 0;
               return (
                 <div key={p.id} className={`prod ${p.available ? "" : "agotado"}`}>
                   {p.image_url && <div className="prod-img" style={{ backgroundImage: `url(${p.image_url})` }} role="img" aria-label={p.name} />}
@@ -129,7 +159,12 @@ export default function Menu({
                       <span className="precio">{dinero(Number(p.price))}</span>
                       {!p.available ? (
                         <span className="pill">Agotado</span>
-                      ) : cerrado ? null : n === 0 ? (
+                      ) : cerrado ? null : conIngredientes ? (
+                        <span className="row" style={{ gap: 8 }}>
+                          {n > 0 && <span className="pill">{n} en tu pedido</span>}
+                          <button className="mas" aria-label={`Agregar ${p.name}`} onClick={() => agregar(p)}>+</button>
+                        </span>
+                      ) : n === 0 ? (
                         <button className="mas" aria-label={`Agregar ${p.name}`} onClick={() => cambiar(p.id, 1)}>+</button>
                       ) : (
                         <span className="cant">
@@ -166,22 +201,26 @@ export default function Menu({
               <button className="btn btn-sm" onClick={() => setAbierto(false)}>Seguir viendo</button>
             </div>
 
-            {Object.entries(carrito).filter(([id]) => porId.get(id)?.available).map(([id, n]) => {
+            {entradas.map(({ k, n, id, sin }) => {
               const p = porId.get(id)!;
               return (
-                <div key={id} className="row between" style={{ padding: "10px 0", borderBottom: "1px solid var(--line)" }}>
+                <div key={k} className="row between" style={{ padding: "10px 0", borderBottom: "1px solid var(--line)" }}>
                   <div className="grow">
                     <div style={{ fontWeight: 600 }}>{p.name}</div>
+                    {notaLinea(sin, p) && <div className={`small ${sin.length ? "sin-txt" : "muted"}`}>{notaLinea(sin, p)}</div>}
                     <div className="small muted">{dinero(n * Number(p.price))}</div>
                   </div>
                   <span className="cant">
-                    <button aria-label="Quitar uno" onClick={() => cambiar(id, -1)}>−</button>
+                    <button aria-label="Quitar uno" onClick={() => cambiar(k, -1)}>−</button>
                     <span>{n}</span>
-                    <button aria-label="Agregar uno" onClick={() => cambiar(id, 1)}>+</button>
+                    <button aria-label="Agregar uno" onClick={() => cambiar(k, 1)}>+</button>
                   </span>
                 </div>
               );
             })}
+            {entradas.some((e) => ingredientesDe(porId.get(e.id)).length > 0) && (
+              <p className="small muted" style={{ margin: "8px 0 0" }}>¿Uno diferente? Toca “Seguir viendo” y agrégalo otra vez con el +.</p>
+            )}
 
             <div style={{ marginTop: 16 }}>
               {tipos.length > 1 && (
@@ -225,6 +264,50 @@ export default function Menu({
           </div>
         </>
       )}
+
+      {eleccion && (() => {
+        const ingr = ingredientesDe(eleccion.p);
+        const quitar = (x: string) => setEleccion((e) => e && ({ ...e, sin: e.sin.includes(x) ? e.sin.filter((y) => y !== x) : [...e.sin, x] }));
+        const cant = (d: number) => setEleccion((e) => e && ({ ...e, cantidad: Math.min(50, Math.max(1, e.cantidad + d)) }));
+        return (
+          <>
+            <div className="velo" onClick={() => setEleccion(null)} />
+            <div className="hoja" role="dialog" aria-label={`Arma tu ${eleccion.p.name}`}>
+              <div className="row between" style={{ marginBottom: 4 }}>
+                <h2 style={{ margin: 0, fontSize: "1.2rem" }}>{eleccion.p.name}</h2>
+                <button className="btn btn-sm" onClick={() => setEleccion(null)}>Cancelar</button>
+              </div>
+              <p className="small muted" style={{ marginTop: 4 }}>Toca lo que <b>no</b> quieres. Si lo quieres con todo, déjalo así.</p>
+              <div className="ingr">
+                {ingr.map((x) => {
+                  const fuera = eleccion.sin.includes(x);
+                  return (
+                    <button key={x} type="button" className={fuera ? "fuera" : ""} aria-pressed={!fuera} onClick={() => quitar(x)}>
+                      {fuera ? `Sin ${x.toLowerCase()}` : `✓ ${x}`}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="row between" style={{ marginTop: 18 }}>
+                <span style={{ fontWeight: 600 }}>¿Cuántos así?</span>
+                <span className="cant">
+                  <button aria-label="Uno menos" onClick={() => cant(-1)}>−</button>
+                  <span>{eleccion.cantidad}</span>
+                  <button aria-label="Uno más" onClick={() => cant(1)}>+</button>
+                </span>
+              </div>
+              <div className="hoja-pie">
+                <button className="btn btn-p btn-block" style={{ fontSize: "1.05rem", padding: 14 }} onClick={confirmarEleccion}>
+                  Agregar {eleccion.cantidad} · {dinero(eleccion.cantidad * Number(eleccion.p.price))}
+                </button>
+                <p className="small muted" style={{ textAlign: "center", margin: "8px 0 0" }}>
+                  ¿Unos con todo y otros sin algo? Agrega estos y vuelve a tocar + para armar los otros.
+                </p>
+              </div>
+            </div>
+          </>
+        );
+      })()}
     </>
   );
 }

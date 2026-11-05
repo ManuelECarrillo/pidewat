@@ -27,6 +27,17 @@ const imagen = (f: FormData, k: string) => {
   return url && /^https:\/\//i.test(url) ? url : null;
 };
 
+// "mostaza, mayonesa, cátsup" → ["Mostaza", "Mayonesa", "Cátsup"] (sin repetidos, máx. 12)
+const lista = (f: FormData, k: string) => {
+  const vistos = new Set<string>();
+  return String(f.get(k) ?? "").split(/[,\n;]/).map((x) => x.trim().slice(0, 30)).filter((x) => {
+    const l = x.toLowerCase();
+    if (!x || vistos.has(l)) return false;
+    vistos.add(l);
+    return true;
+  }).slice(0, 12).map((x) => x[0].toUpperCase() + x.slice(1));
+};
+
 export async function guardarProducto(f: FormData) {
   const { sb, negocio } = await requiereDueno();
   const id = txt(f, "id", 40);
@@ -44,6 +55,7 @@ export async function guardarProducto(f: FormData) {
     category_id,
     image_url: imagen(f, "image_url"),
     available: !f.has("available_present") || si(f, "available"),
+    ...(f.has("ingredientes") ? { ingredientes: lista(f, "ingredientes") } : {}),
   };
   if (id) await sb.from("products").update(datos).eq("id", id).eq("business_id", negocio.id);
   else await sb.from("products").insert({ ...datos, position: Date.now() % 1_000_000_000 });

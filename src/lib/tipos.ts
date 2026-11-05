@@ -44,6 +44,8 @@ export type Producto = {
   image_url: string | null;
   available: boolean;
   position: number;
+  // Lo que el cliente puede quitar al pedirlo (ej. mostaza, mayonesa). Vacío = se pide tal cual.
+  ingredientes?: string[] | null;
 };
 
 // Lo que sale en el menú público. Plan, prueba y pagos no: el público no tiene por qué saber quién paga.

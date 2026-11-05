@@ -37,8 +37,8 @@ const cats: [string, string][] = [
 
 export const categoriasDemo: Categoria[] = cats.map(([id, name], i) => ({ id, business_id: B, name, position: i }));
 
-const p = (category_id: string, name: string, price: number, description: string | null = null, available = true): Omit<Producto, "position" | "id"> => ({
-  business_id: B, category_id, name, price, description, image_url: null, available,
+const p = (category_id: string, name: string, price: number, description: string | null = null, available = true, ingredientes: string[] = []): Omit<Producto, "position" | "id"> => ({
+  business_id: B, category_id, name, price, description, image_url: null, available, ingredientes,
 });
 
 const lista = [
@@ -49,7 +49,7 @@ const lista = [
   p("gorditas", "Gordita de picadillo", 28, null, false),
   p("platillos", "Caldillo duranguense", 120, "Carne seca, chile pasado y papa. Con tortillas de harina."),
   p("platillos", "Asado rojo de puerco", 115, "Con arroz, frijoles y tortillas."),
-  p("platillos", "Enchiladas rojas (4)", 95, "Rellenas de queso, con lechuga y crema."),
+  p("platillos", "Enchiladas rojas (4)", 95, "Rellenas de queso, con lechuga y crema.", true, ["Lechuga", "Crema", "Cebolla"]),
   p("platillos", "Chile relleno", 105, "De queso, capeado, en caldillo de jitomate."),
   p("tacos", "Orden de tacos de barbacoa (5)", 90),
   p("tacos", "Orden de tacos de asada (5)", 95),

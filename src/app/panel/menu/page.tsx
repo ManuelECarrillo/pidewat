@@ -26,6 +26,9 @@ function FormProducto({ p, categorias, negocioId, catDefecto }: { p?: Producto; 
       <label className="f">Descripción <span className="h">Opcional</span>
         <input className="i" name="description" defaultValue={p?.description || ""} placeholder="Ingredientes, tamaño…" />
       </label>
+      <label className="f">Ingredientes que el cliente puede quitar <span className="h">Opcional. Separados por coma, ej. mostaza, mayonesa, cátsup. Al pedir, el cliente toca lo que no quiere.</span>
+        <input className="i" name="ingredientes" defaultValue={(p?.ingredientes || []).join(", ")} placeholder="Ej. mostaza, mayonesa, cátsup, chile" />
+      </label>
       <ImagenInput name="image_url" negocioId={negocioId} valor={p?.image_url} />
       <input type="hidden" name="available_present" value="1" />
       <label className="check"><input type="checkbox" name="available" defaultChecked={p ? p.available : true} /> Disponible</label>
