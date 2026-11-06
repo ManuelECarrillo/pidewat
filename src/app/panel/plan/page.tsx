@@ -3,7 +3,7 @@ import BotonEnviar from "@/components/BotonEnviar";
 import { estadoNegocio } from "@/lib/estado";
 import { dinero, fecha } from "@/lib/formato";
 import { mpConfigurado } from "@/lib/mercadopago";
-import { PLANES } from "@/lib/planes";
+import { precioDe } from "@/lib/planes";
 import { requiereDueno } from "@/lib/sesion";
 import { irAPagar } from "./acciones";
 
@@ -13,7 +13,7 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
   const estado = estadoNegocio(negocio);
   const { data: pagos } = await sb.from("payments").select("*").eq("business_id", negocio.id).order("created_at", { ascending: false }).limit(24);
   const ventas = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP;
-  const precio = PLANES.base.mensual;
+  const { mensual: precio, anual } = precioDe(negocio);
   const textoTransfer = encodeURIComponent(`Hola, quiero pagar Pidewat (${dinero(precio)} al mes) para ${negocio.name} por transferencia.`);
   const textoActivar = encodeURIComponent(`Hola, quiero activar Pidewat (${dinero(precio)} al mes) para ${negocio.name}. ¿Cómo pago?`);
 
@@ -26,13 +26,13 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
       {mp === "ok" && <div className="alerta alerta-ok">¡Gracias! En cuanto Mercado Pago confirme el pago, tu plan se actualiza solo (tarda unos minutos).</div>}
       {mp === "pendiente" && <div className="alerta">Tu pago está pendiente. Si pagaste en OXXO, se acredita en unas horas.</div>}
       {mp === "error" && <div className="alerta alerta-bad">No se pudo abrir Mercado Pago. Intenta de nuevo o escríbenos.</div>}
-      <AvisoEstado estado={estado} />
+      <AvisoEstado estado={estado} precio={precio} />
       {negocio.mp_preapproval_id && <div className="alerta alerta-ok">Tienes el cobro automático mensual activo con Mercado Pago.</div>}
 
       <div className="card" style={{ maxWidth: 460 }}>
         <div className="row between"><strong>Plan Pidewat</strong><span className="pill">Un solo plan</span></div>
         <div className="kpi" style={{ margin: "6px 0 2px" }}>{dinero(precio)}<span className="small muted" style={{ fontWeight: 600 }}> MXN al mes</span></div>
-        <p className="small muted" style={{ marginTop: 0 }}>O {dinero(PLANES.base.anual)} por un año (te ahorras 2 meses). Menú ilimitado, pedidos sin comisión, QR y fotos.</p>
+        <p className="small muted" style={{ marginTop: 0 }}>O {dinero(anual)} por un año (te ahorras 2 meses). Menú ilimitado, pedidos sin comisión, QR y fotos.</p>
         {mpConfigurado() ? (
           <>
             <form action={irAPagar}>
@@ -45,7 +45,7 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
             <form action={irAPagar} style={{ marginTop: 8 }}>
               <input type="hidden" name="plan" value="base" />
               <input type="hidden" name="ciclo" value="anual" />
-              <BotonEnviar className="btn btn-block">Pagar un año: {dinero(PLANES.base.anual)}</BotonEnviar>
+              <BotonEnviar className="btn btn-block">Pagar un año: {dinero(anual)}</BotonEnviar>
             </form>
           </>
         ) : (

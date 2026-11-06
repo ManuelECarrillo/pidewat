@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { crearPagoAnual, crearSuscripcion } from "@/lib/mercadopago";
+import { precioDe } from "@/lib/planes";
 import { requiereDueno } from "@/lib/sesion";
 
 export async function irAPagar(f: FormData) {
@@ -12,8 +13,8 @@ export async function irAPagar(f: FormData) {
   let destino: string;
   try {
     destino = ciclo === "anual"
-      ? await crearPagoAnual({ negocioId: negocio.id, nombre: negocio.name, plan, correo })
-      : await crearSuscripcion({ negocioId: negocio.id, nombre: negocio.name, plan, correo });
+      ? await crearPagoAnual({ negocioId: negocio.id, nombre: negocio.name, plan, correo, monto: precioDe(negocio).anual })
+      : await crearSuscripcion({ negocioId: negocio.id, nombre: negocio.name, plan, correo, monto: precioDe(negocio).mensual });
   } catch (e) {
     console.error(e);
     redirect("/panel/plan?mp=error");

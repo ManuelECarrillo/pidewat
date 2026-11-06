@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AvisoEstado, { pillEstado } from "@/components/AvisoEstado";
+import { precioDe } from "@/lib/planes";
 import InstalarApp from "@/components/InstalarApp";
 import CompartirLink from "@/components/CompartirLink";
 import { estadoNegocio } from "@/lib/estado";
@@ -30,7 +31,7 @@ export default async function Panel() {
         <h1 style={{ margin: 0, fontSize: "1.5rem" }}>{negocio.name}</h1>
         {pillEstado(estado)}
       </div>
-      <AvisoEstado estado={estado} />
+      <AvisoEstado estado={estado} precio={precioDe(negocio).mensual} />
       <InstalarApp />
 
       {!productos && (

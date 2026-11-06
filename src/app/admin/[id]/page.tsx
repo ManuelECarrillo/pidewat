@@ -5,7 +5,7 @@ import BotonEnviar from "@/components/BotonEnviar";
 import FormConResultado from "@/components/FormConResultado";
 import { estadoNegocio } from "@/lib/estado";
 import { dinero, fecha, siteUrl } from "@/lib/formato";
-import { PLANES } from "@/lib/planes";
+import { precioDe } from "@/lib/planes";
 import { requiereAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { NegocioCompleto } from "@/lib/tipos";
@@ -64,7 +64,7 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
           <form action={registrarPago}>
             {oculto}
             <div className="row">
-              <label className="f grow">Monto<input className="i" name="amount" inputMode="decimal" defaultValue={PLANES[n.plan].mensual} /></label>
+              <label className="f grow">Monto<input className="i" name="amount" inputMode="decimal" defaultValue={precioDe(n).mensual} /></label>
               <label className="f grow">Meses<input className="i" name="months" type="number" min={1} max={24} defaultValue={1} /></label>
             </div>
             <div className="row">
@@ -116,6 +116,9 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
           {oculto}
           <div className="row">
             <label className="f grow">Link<input className="i" name="slug" defaultValue={n.slug} /></label>
+            <label className="f grow">Precio al mes <span className="h">Vacío = precio de lista</span>
+              <input className="i" name="precio_mensual" inputMode="decimal" defaultValue={n.precio_mensual ?? ""} placeholder={String(precioDe(null).mensual)} />
+            </label>
           </div>
           <label className="f">Notas (solo las vemos nosotros)<textarea className="i" name="notes" defaultValue={n.notes || ""} /></label>
           <BotonEnviar>Guardar</BotonEnviar>

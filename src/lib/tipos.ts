@@ -29,6 +29,7 @@ export type NegocioCompleto = Negocio & {
   owner_email: string | null;
   mp_preapproval_id: string | null;
   notes: string | null;
+  precio_mensual?: number | null;
   created_at: string;
 };
 

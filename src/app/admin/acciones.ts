@@ -129,6 +129,10 @@ export async function guardarInterno(f: FormData) {
   const { sb, id, n } = await negocio(f);
   const slug = slugify(String(f.get("slug") || n.slug));
   const cambios: Record<string, unknown> = { notes: String(f.get("notes") || "") || null, plan: f.get("plan") === "plus" ? "plus" : "base" };
+  if (f.has("precio_mensual")) {
+    const t = String(f.get("precio_mensual") || "").replace(/[^0-9.]/g, "");
+    cambios.precio_mensual = t ? Math.max(0, Number(t) || 0) : null;
+  }
   if (slug !== n.slug && slug.length >= 3 && !SLUGS_RESERVADOS.has(slug)) cambios.slug = slug;
   await sb.from("businesses").update(cambios).eq("id", id);
   revalidatePath(`/admin/${id}`);
