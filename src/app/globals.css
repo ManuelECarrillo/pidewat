@@ -239,7 +239,7 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
 .paso > span { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--c); color: #fff; font-size: .9rem; }
 
 /* ---------- Landing ---------- */
-.hero { padding: 48px 0 32px; }
+.hero { padding-top: 48px; padding-bottom: 32px; }
 .hero h1 { font-size: clamp(2rem, 7vw, 3.2rem); letter-spacing: -.03em; }
 .hero h1 em { font-style: normal; color: #1f8a4c; }
 .burbuja { background: #dcf8c6; border-radius: 12px 12px 12px 2px; padding: 12px 14px; font-size: .9rem; white-space: pre-wrap; box-shadow: var(--shadow); font-family: inherit; margin: 0; }
