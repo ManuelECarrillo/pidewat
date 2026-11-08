@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+import { tarjetaPng, guardar } from "@/lib/tarjetaQr";
 
 export default function CompartirLink({ url, nombre, color }: { url: string; nombre: string; color: string }) {
   const [qr, setQr] = useState("");
   const [copiado, setCopiado] = useState(false);
   const [mesas, setMesas] = useState(0);
+  const [bajando, setBajando] = useState(false);
 
   useEffect(() => {
     QRCode.toDataURL(url, { width: 1024, margin: 2, color: { dark: "#111111", light: "#ffffff" } }).then(setQr);
@@ -14,6 +16,14 @@ export default function CompartirLink({ url, nombre, color }: { url: string; nom
 
   async function copiar() {
     try { await navigator.clipboard.writeText(url); setCopiado(true); setTimeout(() => setCopiado(false), 1500); } catch {}
+  }
+  async function descargarQr() {
+    setBajando(true);
+    try {
+      const u = new URL(url);
+      const png = await tarjetaPng({ url }, { nombre, color, dominio: u.host + u.pathname });
+      await guardar([png], `qr-${u.pathname.replace(/\W/g, "") || "menu"}`, `QR de ${nombre}`);
+    } finally { setBajando(false); }
   }
   const compartir = () => {
     const texto = `Ya puedes hacer tu pedido de ${nombre} desde aquí 👉 ${url}`;
@@ -36,7 +46,7 @@ export default function CompartirLink({ url, nombre, color }: { url: string; nom
         <div className="row wrap-flex" style={{ marginTop: 14, alignItems: "flex-start" }}>
           <img src={qr} alt="Código QR de tu menú" width={140} height={140} style={{ border: "1px solid var(--line)", borderRadius: 10 }} />
           <div className="stack grow">
-            <a className="btn btn-sm" href={qr} download={`qr-${nombre}.png`}>Descargar QR</a>
+            <button className="btn btn-sm" onClick={descargarQr} disabled={bajando}>{bajando ? "Preparando…" : "Descargar QR"}</button>
             <a className="btn btn-sm" href={`/panel/qr${mesas ? `?mesas=${mesas}` : ""}`}>Imprimir tarjetas para mesas</a>
             <label className="small muted">Una tarjeta por mesa (número en el QR):
               <input className="i" type="number" min={0} max={60} value={mesas || ""} placeholder="0 = una sola tarjeta"

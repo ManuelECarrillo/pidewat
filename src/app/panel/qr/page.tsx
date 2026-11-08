@@ -24,7 +24,7 @@ export default async function HojaQR({ searchParams }: { searchParams: Promise<{
       <div className="no-print row between wrap-flex" style={{ marginBottom: 16 }}>
         <Link href="/panel" className="btn btn-sm">← Volver</Link>
         <p className="muted grow" style={{ margin: 0 }}>Imprime en hojas tamaño carta y recorta por la línea punteada.</p>
-        <Imprimir />
+        <Imprimir tarjetas={tarjetas} nombre={negocio.name} color={negocio.color} dominio={base.replace(/^https?:\/\//, "")} />
       </div>
       <div className="hoja-qr">
         {tarjetas.map((t, i) => (
