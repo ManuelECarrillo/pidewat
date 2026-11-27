@@ -24,6 +24,12 @@ npx playwright test --config anuncios/grabar/playwright.config.ts
 
 La suite toma PNG a escala 3 por cada paso y compone pausas a 30 fps. Produce H.264 con WebCodecs y un muxer MP4 local para que no dependa del video comprimido de Playwright ni de una interfaz inventada.
 
+## Vuelta 9 · El Fogón
+
+Las capturas se regeneraron contra `/grabacion` con `PIDEWAT_GRABACION=1` y el negocio demo ahora se llama **El Fogón**. `c1-pedido-hamburguesa.mp4` muestra exactamente dos hamburguesas: una Doble carne + Queso extra y otra Clásica sin cebolla; termina en el mensaje de WhatsApp producido por la app. `c4-mesa-a-cocina.mp4` conserva Mesa 7 y recorre Nuevo → Preparando → Listo → Listos (1).
+
+Para montaje con acercamientos, `c1-pedido-hamburguesa-posiciones.json` y `c4-mesa-a-cocina-posiciones.json` guardan por paso la caja en píxeles del video (1080 × 2338) del control tocado y del total cuando está presente. Todos los MP4, PNG y estos JSON están duplicados en `anuncios/public/assets/grabaciones/`.
+
 ## Nota de rutas
 
 La ruta estática `/grabacion` tapa el slug `grabacion` si algún negocio lo usa. No se modificó `src/lib/planes.ts`; Claude o Eduardo deben decidir si agregan ese valor a `SLUGS_RESERVADOS`.

@@ -1,0 +1,14 @@
+{
+ "antes": [
+  "starter",
+  586,
+  74758
+ ],
+ "despues": [
+  "starter",
+  586,
+  74758
+ ],
+ "prompt": "Upbeat, warm and discreet background music for a short social media ad about a small Mexican street food business. Light acoustic guitar and soft percussion with a subtle modern Latin pop groove, friendly and optimistic, steady 105 BPM, no vocals, no build-ups or drops, consistent energy so a voice-over sits clearly on top.",
+ "modelo": "music_v1"
+}

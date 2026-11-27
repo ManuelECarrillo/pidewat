@@ -6,7 +6,7 @@ const B = "demo";
 export const negocioDemo: Negocio = {
   id: B,
   slug: "demo",
-  name: "El Fogón de Durango",
+  name: "El Fogón",
   whatsapp: process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP || "5216180000000",
   description: "Gorditas, caldillo y antojitos duranguenses hechos al momento.",
   address: "Av. 20 de Noviembre 123, Centro, Durango",

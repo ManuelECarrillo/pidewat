@@ -4,6 +4,7 @@ import {
   interpolate, spring, staticFile, useCurrentFrame,
 } from "remotion";
 import tiemposRaw from "../public/assets/tiempos.json";
+import { P1v2, R2v2, pilotDuration } from "./PilotosV2";
 
 const fps = 30;
 const tiempos = tiemposRaw as Array<{ id: string; archivo: string; duracion_s: number; subtitulo: string; palabras_voz: Array<{ p: string; ini: number; fin: number }> }>;
@@ -25,7 +26,9 @@ function Marca({ clara = false, tamano }: { clara?: boolean; tamano?: number }) 
 }
 
 function EtiquetaIA({ f, lado = "izquierda" }: { f: Formato; lado?: "izquierda" | "derecha" }) {
-  return <div style={{ position: "absolute", top: f === "9x16" ? 270 : 58, [lado === "izquierda" ? "left" : "right"]: f === "9x16" ? 65 : 55, padding: "9px 14px", borderRadius: 999, background: "rgba(18,19,18,.86)", color: "#fff", fontFamily: fuenteSubtitulo, fontSize: f === "9x16" ? 27 : 26, fontWeight: 800 }}>Dramatización</div>;
+  // Eduardo pidió que la declaración se gestione en Meta, no quemada en video.
+  void f; void lado;
+  return null;
 }
 
 function Fondo({ archivo, clip, oscurecer = .5 }: { archivo?: string; clip?: string; oscurecer?: number }) {
@@ -249,6 +252,8 @@ function Imagen({ tipo, formato: f }: { tipo: "P3" | "R3"; formato: Formato }) {
 }
 
 const specs = [
+  ["P1v2", P1v2, pilotDuration("P1v2")],
+  ["R2v2", R2v2, pilotDuration("R2v2")],
   ["P1", P1, frames(7 + duracion("P1-3") + .8 + cierre("P1-4"))],
   ["P2", P2, frames(duracion("P2-1") + duracion("P2-2") + cierre("P2-3"))],
   ["R1", R1, frames(duracion("R1-1") + duracion("R1-2") + cierre("R1-3"))],

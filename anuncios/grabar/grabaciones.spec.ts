@@ -8,6 +8,7 @@ const temporal = mkdtempSync(join(tmpdir(), "pidewat-grabar-"));
 mkdirSync(salida, { recursive: true });
 
 type Fotograma = { archivo: string; segundos: number };
+type Posicion = { paso: string; elemento: string; caja_px: { x: number; y: number; ancho: number; alto: number } | null; total_px: { x: number; y: number; ancho: number; alto: number } | null };
 
 async function preparar(page: Page, ruta: string) {
   await page.goto(ruta);
@@ -18,8 +19,20 @@ async function preparar(page: Page, ruta: string) {
   ` });
 }
 
-async function tocar(page: Page, objetivo: Locator) {
+async function cajaVideo(page: Page, objetivo: Locator) {
+  if (await objetivo.count() === 0) return null;
+  const caja = await objetivo.boundingBox();
+  if (!caja) return null;
+  const escala = await page.evaluate(() => devicePixelRatio);
+  return { x: Math.round(caja.x * escala), y: Math.round(caja.y * escala), ancho: Math.round(caja.width * escala), alto: Math.round(caja.height * escala) };
+}
+async function guardarPosicion(page: Page, lista: Posicion[], paso: string, elemento: string, objetivo: Locator) {
+  const total = page.getByText(/^Total:/).last();
+  lista.push({ paso, elemento, caja_px: await cajaVideo(page, objetivo), total_px: await cajaVideo(page, total) });
+}
+async function tocar(page: Page, objetivo: Locator, posiciones?: Posicion[], paso?: string) {
   await expect(objetivo).toBeVisible();
+  if (posiciones && paso) await guardarPosicion(page, posiciones, paso, await objetivo.getAttribute("aria-label") || await objetivo.textContent() || "toque", objetivo);
   const caja = await objetivo.boundingBox();
   if (!caja) throw new Error("No se pudo localizar el toque");
   await page.evaluate(({ x, y }) => {
@@ -28,6 +41,19 @@ async function tocar(page: Page, objetivo: Locator) {
     punto.style.left = `${x}px`; punto.style.top = `${y}px`; document.body.appendChild(punto);
   }, { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 });
   await objetivo.click();
+}
+
+async function pedidoP1(page: Page, lista: Fotograma[], posiciones: Posicion[]) {
+  const abrir = page.getByRole("button", { name: /Personalizar y agregar Hamburguesa de la casa/ });
+  await tocar(page, abrir, posiciones, "hamburguesa-1"); await foto(page, "hamburguesa-1", .6, lista);
+  await tocar(page, page.getByRole("button", { name: /Doble carne/ }), posiciones, "doble-carne"); await foto(page, "doble-carne", .6, lista);
+  await tocar(page, page.getByRole("button", { name: /Queso extra/ }), posiciones, "queso-extra"); await foto(page, "queso-extra", .6, lista);
+  await tocar(page, page.getByRole("button", { name: /Agregar 1/ }), posiciones, "agregar-primera"); await foto(page, "total-primera", .6, lista);
+  await tocar(page, abrir, posiciones, "hamburguesa-2"); await foto(page, "hamburguesa-2", .6, lista);
+  await tocar(page, page.getByRole("button", { name: /Clásica/ }), posiciones, "clasica"); await foto(page, "clasica", .6, lista);
+  await tocar(page, page.getByRole("button", { name: /Cebolla/ }), posiciones, "sin-cebolla"); await foto(page, "sin-cebolla", .6, lista);
+  await tocar(page, page.getByRole("button", { name: /Agregar 1/ }), posiciones, "agregar-segunda"); await foto(page, "total-segunda", .6, lista);
+  await tocar(page, page.getByRole("button", { name: /Ver pedido/ }), posiciones, "carrito"); await foto(page, "carrito", .6, lista);
 }
 
 async function foto(page: Page, nombre: string, segundos: number, lista: Fotograma[]) {
@@ -88,27 +114,27 @@ async function mp4(page: Page, nombre: string, lista: Fotograma[]) {
   writeFileSync(join(salida, `${nombre}.mp4`), Buffer.from(base64, "base64"));
 }
 
-async function hamburguesa(page: Page, lista: Fotograma[]) {
-  await tocar(page, page.getByRole("button", { name: /Personalizar y agregar Hamburguesa de la casa/ }));
+async function hamburguesa(page: Page, lista: Fotograma[], posiciones?: Posicion[]) {
+  await tocar(page, page.getByRole("button", { name: /Personalizar y agregar Hamburguesa de la casa/ }), posiciones, "abrir-hamburguesa");
   await foto(page, "hamburguesa", 1.2, lista);
-  await tocar(page, page.getByRole("button", { name: /Doble carne/ }));
+  await tocar(page, page.getByRole("button", { name: /Doble carne/ }), posiciones, "doble-carne");
   await foto(page, "tamano", 1, lista);
-  await tocar(page, page.getByRole("button", { name: /Queso extra/ }));
+  await tocar(page, page.getByRole("button", { name: /Queso extra/ }), posiciones, "queso-extra");
   await foto(page, "queso", 1, lista);
-  await tocar(page, page.getByRole("button", { name: /Cebolla/ }));
+  await tocar(page, page.getByRole("button", { name: /Cebolla/ }), posiciones, "sin-cebolla");
   await foto(page, "sin-cebolla", 1.2, lista);
-  await tocar(page, page.getByRole("button", { name: /Agregar 1/ }));
+  await tocar(page, page.getByRole("button", { name: /Agregar 1/ }), posiciones, "agregar-hamburguesa");
   await foto(page, "total", 1, lista);
-  await tocar(page, page.getByRole("button", { name: /Ver pedido/ }));
+  await tocar(page, page.getByRole("button", { name: /Ver pedido/ }), posiciones, "ver-pedido");
   await foto(page, "carrito", 1.4, lista);
 }
 
-async function finalizarWhatsapp(page: Page, lista: Fotograma[], mesa = false) {
-  if (!mesa) await tocar(page, page.getByRole("button", { name: "Recoger" }));
+async function finalizarWhatsapp(page: Page, lista: Fotograma[], mesa = false, posiciones?: Posicion[]) {
+  if (!mesa) await tocar(page, page.getByRole("button", { name: "Recoger" }), posiciones, "recoger");
   const nombre = page.getByLabel("Tu nombre");
   await nombre.fill("Ana demo");
   await foto(page, "datos", 1, lista);
-  await tocar(page, page.getByRole("button", { name: "Enviar pedido por WhatsApp" }));
+  await tocar(page, page.getByRole("button", { name: "Enviar pedido por WhatsApp" }), posiciones, "enviar-whatsapp");
   await expect(page.getByTestId("mensaje-whatsapp")).toBeVisible();
   await foto(page, "mensaje", 2.2, lista);
 }
@@ -116,12 +142,13 @@ async function finalizarWhatsapp(page: Page, lista: Fotograma[], mesa = false) {
 test.afterAll(() => { if (existsSync(temporal)) rmSync(temporal, { recursive: true, force: true }); });
 
 test("C1 pedido de hamburguesa y captura P3", async ({ page }) => {
-  const lista: Fotograma[] = [];
+  const lista: Fotograma[] = []; const posiciones: Posicion[] = [];
   await preparar(page, "/grabacion/pedido"); await foto(page, "menu", 1, lista);
-  await hamburguesa(page, lista); await finalizarWhatsapp(page, lista);
+  await pedidoP1(page, lista, posiciones); await finalizarWhatsapp(page, lista, false, posiciones);
   await quitarToque(page);
   await page.screenshot({ path: join(salida, "p3-mensaje-pedido.png"), animations: "disabled" });
   await mp4(page, "c1-pedido-hamburguesa", lista);
+  writeFileSync(join(salida, "c1-pedido-hamburguesa-posiciones.json"), JSON.stringify({ video_px: { ancho: 1080, alto: 2338 }, pasos: posiciones }, null, 2));
 });
 
 test("C2 menú, tarjeta QR y carrito", async ({ page }) => {
@@ -147,18 +174,19 @@ test("C3 pedido desde mesa y captura R3", async ({ page }) => {
 });
 
 test("C4 mesa a cocina", async ({ page }) => {
-  const lista: Fotograma[] = [];
+  const lista: Fotograma[] = []; const posiciones: Posicion[] = [];
   await preparar(page, "/grabacion/orden"); await foto(page, "qr-mesa-7", 1, lista);
-  await hamburguesa(page, lista);
+  await hamburguesa(page, lista, posiciones);
   await page.getByLabel("Tu nombre").fill("Ana demo"); await foto(page, "enviar-cocina", 1, lista);
-  await tocar(page, page.getByRole("button", { name: "Enviar pedido a la cocina" }));
+  await tocar(page, page.getByRole("button", { name: "Enviar pedido a la cocina" }), posiciones, "enviar-cocina");
   await page.waitForURL("**/grabacion/cocina"); await expect(page.getByText(/Mesa 7/)).toBeVisible(); await foto(page, "recibido", 1.4, lista);
-  await tocar(page, page.getByRole("button", { name: "Empezar a preparar" })); await foto(page, "preparando", 1.4, lista);
-  await tocar(page, page.getByRole("button", { name: "Ya está listo" }));
-  await tocar(page, page.getByRole("button", { name: /Listos \(1\)/ }));
+  await tocar(page, page.getByRole("button", { name: "Empezar a preparar" }), posiciones, "empezar-preparar"); await foto(page, "preparando", 1.4, lista);
+  await tocar(page, page.getByRole("button", { name: "Ya está listo" }), posiciones, "ya-listo");
+  await tocar(page, page.getByRole("button", { name: /Listos \(1\)/ }), posiciones, "pestana-listos");
   await expect(page.getByRole("heading", { name: "#7 · Mesa 7" })).toBeVisible();
   await foto(page, "listos-mesa-7", 1.5, lista);
   await mp4(page, "c4-mesa-a-cocina", lista);
+  writeFileSync(join(salida, "c4-mesa-a-cocina-posiciones.json"), JSON.stringify({ video_px: { ancho: 1080, alto: 2338 }, pasos: posiciones }, null, 2));
 });
 
 test("C5 dispositivos", async ({ page }) => {

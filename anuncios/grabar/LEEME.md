@@ -23,3 +23,5 @@ npx playwright test --config anuncios/grabar/playwright.config.ts
 ```
 
 La suite toma PNG a escala 3 por cada paso y compone pausas a 30 fps. Produce H.264 con WebCodecs y un muxer MP4 local para que no dependa del video comprimido de Playwright ni de una interfaz inventada.
+
+La C1 de vuelta 9 usa dos hamburguesas (Doble carne + Queso extra; Clásica sin cebolla) y escribe `c1-pedido-hamburguesa-posiciones.json`. C4 escribe su JSON equivalente para los cambios de estado de cocina. Las cajas están expresadas en píxeles de salida 1080 × 2338.
