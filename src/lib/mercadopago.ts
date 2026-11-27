@@ -62,6 +62,7 @@ export async function crearPagoAnual(o: { negocioId: string; nombre: string; pla
       auto_return: "approved",
       notification_url: urlWebhook(base),
       statement_descriptor: "PIDEWAT",
+      payment_methods: { installments: 1 }, // sin meses sin intereses: subirían la comisión (decisión de Eduardo si se activan)
     }),
   });
   return r.init_point;
