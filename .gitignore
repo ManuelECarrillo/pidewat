@@ -8,3 +8,4 @@ next-env.d.ts
 test-results/
 playwright-report/
 qa/.panel-state.json
+anuncios/revision/

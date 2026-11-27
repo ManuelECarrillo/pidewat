@@ -154,7 +154,10 @@ test("C4 mesa a cocina", async ({ page }) => {
   await tocar(page, page.getByRole("button", { name: "Enviar pedido a la cocina" }));
   await page.waitForURL("**/grabacion/cocina"); await expect(page.getByText(/Mesa 7/)).toBeVisible(); await foto(page, "recibido", 1.4, lista);
   await tocar(page, page.getByRole("button", { name: "Empezar a preparar" })); await foto(page, "preparando", 1.4, lista);
-  await tocar(page, page.getByRole("button", { name: "Ya está listo" })); await foto(page, "listo", 1.8, lista);
+  await tocar(page, page.getByRole("button", { name: "Ya está listo" }));
+  await tocar(page, page.getByRole("button", { name: /Listos \(1\)/ }));
+  await expect(page.getByRole("heading", { name: "#7 · Mesa 7" })).toBeVisible();
+  await foto(page, "listos-mesa-7", 1.5, lista);
   await mp4(page, "c4-mesa-a-cocina", lista);
 });
 
