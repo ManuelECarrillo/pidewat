@@ -1,5 +1,7 @@
 # Cambios UI/UX — Fase 2
 
+- Ajuste QA: áreas táctiles 44 px en chips y botón +. Archivos: `src/app/globals.css`, `docs/ui-ux/CAMBIOS.md`.
+
 - **UX-002:** La navegación móvil del panel ahora calcula sus columnas según las secciones visibles; con Cocina activa, los cinco destinos permanecen en una sola fila sin solaparse. Archivos: `src/components/NavPanel.tsx`, `src/app/globals.css`. Toques: no aplica (corrección de disposición).
 - **UX-001 + UX-003:** El inicio incorpora alta rápida de platillo sin categoría y atajos a precio/disponibilidad; el editor deja nombre y precio primero, conserva extras/foto en detalles opcionales y ofrece precio y agotado visibles por producto. Las estadísticas ahora distinguen «Pedidos enviados a tu WhatsApp (sin confirmar)» y eliminan importes presentados como actividad confirmada. Archivos: `src/app/panel/page.tsx`, `src/app/panel/menu/page.tsx`, `src/app/globals.css`. Toques: agregar 5/7 → 3; cambiar precio 4 → 3; marcar agotado 3 → 2.
 - **UX-004:** Quitar la última unidad de una línea del carrito abre un diálogo propio para conservarla o confirmarla; restar cantidades superiores a una sigue siendo inmediato. Archivo: `src/components/Menu.tsx`. Toques: quitar la última unidad 1 → 2 (con confirmación).

@@ -155,7 +155,7 @@ input.i[aria-invalid="true"], textarea.i[aria-invalid="true"] { border-color: va
   display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px; margin: 0 -16px;
   border-bottom: 1px solid var(--line);
 }
-.tab { position: relative; white-space: nowrap; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-weight: 600; font-size: .9rem; cursor: pointer; text-decoration: none; }
+.tab { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; white-space: nowrap; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-weight: 600; font-size: .9rem; cursor: pointer; text-decoration: none; }
 .tab.on { background: var(--c); color: #fff; border-color: var(--c); }
 .prod { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .prod-img { width: 84px; height: 84px; border-radius: 12px; flex: none; background: #eee center/cover no-repeat; }
@@ -166,8 +166,8 @@ input.i[aria-invalid="true"], textarea.i[aria-invalid="true"] { border-color: va
 .cant { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
 .cant button { position: relative; width: 36px; height: 36px; border: 0; background: none; font-size: 1.2rem; font-weight: 700; cursor: pointer; color: var(--c); }
 .cant span { min-width: 22px; text-align: center; font-weight: 700; }
-.mas { position: relative; width: 40px; height: 40px; border-radius: 999px; border: 0; background: var(--c); color: #fff; font-size: 1.4rem; font-weight: 700; cursor: pointer; line-height: 1; }
-/* UX-003: se ven igual, pero el área de toque mide al menos 44 px para dedos grandes */
+.mas { position: relative; flex: 0 0 44px; width: 44px; height: 44px; border-radius: 999px; border: 0; background: var(--c); color: #fff; font-size: 1.4rem; font-weight: 700; cursor: pointer; line-height: 1; }
+/* Chips y botones + tienen caja táctil física de 44 px; los controles de cantidad conservan su aspecto. */
 .tab::after, .cant button::after, .mas::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; transform: translate(-50%, -50%); }
 
 .barra {
