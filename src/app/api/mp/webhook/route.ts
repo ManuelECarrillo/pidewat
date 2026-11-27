@@ -15,7 +15,11 @@ export async function POST(req: Request) {
   const tipo = cuerpo.type || cuerpo.topic || url.searchParams.get("type") || url.searchParams.get("topic") || "";
   const id = String(cuerpo.data?.id ?? url.searchParams.get("data.id") ?? url.searchParams.get("id") ?? "");
   if (!id) return NextResponse.json({ ok: true });
-  if (!firmaValida(req, id)) return NextResponse.json({ ok: false }, { status: 401 });
+  if (!firmaValida(req, id)) {
+    console.error("webhook MP: firma inválida", tipo, id);
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
+  console.log("webhook MP recibido", tipo, id);
 
   try {
     if (tipo === "subscription_preapproval") await suscripcion(id);
