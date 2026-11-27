@@ -55,6 +55,6 @@ export async function POST(req: Request) {
   if (error || !orden) return no("guardar", 500);
 
   // También cuenta en las estadísticas del dueño, igual que un pedido por WhatsApp
-  await sb.from("order_events").insert({ business_id: n.id, total, items: items.map(({ nombre, cantidad, precio, nota }) => ({ nombre, cantidad, precio, ...(nota ? { nota } : {}) })), order_type: "mesa", ...(ip_hash ? { ip_hash } : {}) });
+  // Las estadísticas del dueño leen los pedidos de cocina de orders (sin cancelados), no de order_events
   return NextResponse.json({ ok: true, id: orden.id, numero: orden.numero });
 }
