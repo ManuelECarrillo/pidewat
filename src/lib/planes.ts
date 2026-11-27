@@ -4,7 +4,7 @@ export const DIAS_GRACIA = 7;
 // 2026-11-27: dos planes. En la base se siguen llamando "base" y "plus" para no tocar datos.
 // Los clientes fundadores conservan su precio en precio_mensual (ej. 149).
 export const PLANES = {
-  base: { nombre: "Esencial", mensual: 199, anual: 1990 },
+  base: { nombre: "Esencial", mensual: 249, anual: 2490 },
   plus: { nombre: "Restaurante", mensual: 499, anual: 4990 },
 } as const;
 
