@@ -79,6 +79,11 @@ export default function Cocina() {
           {sonido ? "🔔 Sonido prendido" : "🔕 Prender sonido"}
         </button>
       </div>
+      {!sonido && (
+        <button className="alerta" style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 10, cursor: "pointer", font: "inherit" }} onClick={() => { setSonido(true); pitido(); }}>
+          🔕 <strong>El sonido está apagado.</strong> Toca aquí para oír cuando llegue un pedido. (El navegador no deja prenderlo solo.)
+        </button>
+      )}
       {sinRed && <div className="alerta" style={{ marginBottom: 10 }}>Sin conexión. Reintentando…</div>}
       <div className="seg cocina-filtros">
         <button className={vista === "cocina" ? "on" : ""} onClick={() => setVista("cocina")}>Por preparar ({cuenta(["nuevo", "preparando"])})</button>
