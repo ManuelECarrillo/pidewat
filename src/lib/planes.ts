@@ -11,9 +11,15 @@ export const PLANES = {
 export type Plan = keyof typeof PLANES;
 
 // Lo que paga este negocio: su precio propio si lo tiene (clientes fundadores), si no el de lista. El año = 10 meses.
-export function precioDe(n?: { precio_mensual?: number | string | null; plan?: string | null } | null) {
+// Los negocios dados de alta antes de los planes nuevos conservan exactamente su condición anterior
+// (precio de lista 259) hasta que se decida otra cosa negocio por negocio. Nadie cambia de precio solo.
+export const PRECIOS_NUEVOS_DESDE = "2026-11-27T00:00:00Z";
+export const PRECIO_ANTERIOR = 259;
+
+export function precioDe(n?: { precio_mensual?: number | string | null; plan?: string | null; created_at?: string | null } | null) {
   const propio = n?.precio_mensual == null ? null : Number(n.precio_mensual);
-  const lista = n?.plan === "plus" ? PLANES.plus.mensual : PLANES.base.mensual;
+  const anterior = Boolean(n?.created_at && n.created_at < PRECIOS_NUEVOS_DESDE);
+  const lista = anterior ? PRECIO_ANTERIOR : n?.plan === "plus" ? PLANES.plus.mensual : PLANES.base.mensual;
   const mensual = propio != null && propio >= 0 ? propio : lista;
   return { mensual, anual: mensual * 10 };
 }
