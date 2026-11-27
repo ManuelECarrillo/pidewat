@@ -26,6 +26,7 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
       {mp === "ok" && <div className="alerta alerta-ok">¡Gracias! En cuanto Mercado Pago confirme el pago, tu plan se actualiza solo (tarda unos minutos).</div>}
       {mp === "pendiente" && <div className="alerta">Tu pago está pendiente. Si pagaste en OXXO, se acredita en unas horas.</div>}
       {mp === "error" && <div className="alerta alerta-bad">No se pudo completar con Mercado Pago. Intenta de nuevo o escríbenos.</div>}
+      {mp === "correo" && <div className="alerta alerta-bad">Mercado Pago no reconoció ese correo. Escribe el correo con el que entras a tu cuenta de Mercado Pago.</div>}
       {mp === "cancelado" && <div className="alerta">Cancelaste el cobro automático. Ya no se te cobrará; tu menú sigue activo hasta la fecha que ya pagaste.</div>}
       <AvisoEstado estado={estado} precio={precio} />
       {negocio.mp_preapproval_id && (
@@ -46,7 +47,8 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
             <form action={irAPagar}>
               <input type="hidden" name="plan" value="base" />
               <label className="f small">Correo de tu cuenta de Mercado Pago
-                <input className="i" type="email" name="correo" required defaultValue={user.email || ""} />
+                <input className="i" type="email" name="correo" required defaultValue={user.email || ""} aria-describedby="ayuda-correo-mp" />
+                <span id="ayuda-correo-mp" className="small muted">Debe ser el mismo con el que entras a Mercado Pago.</span>
               </label>
               <BotonEnviar className="btn btn-p btn-block">Pagar {dinero(precio)} al mes (automático)</BotonEnviar>
               <p className="small muted" style={{ margin: "8px 0 0" }}>Mercado Pago te pide autorizar el cobro mensual. Nada se cobra sin tu autorización y lo cancelas aquí cuando quieras. Tu prueba gratis no pidió tarjeta.</p>
