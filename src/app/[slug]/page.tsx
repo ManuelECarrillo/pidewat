@@ -5,6 +5,7 @@ import Menu from "@/components/Menu";
 import { categoriasDemo, negocioDemo, productosDemo } from "@/lib/demo";
 import { estadoNegocio } from "@/lib/estado";
 import { siteUrl } from "@/lib/formato";
+import { abiertoAhora, proximaApertura } from "@/lib/horario";
 import { SLUGS_RESERVADOS } from "@/lib/planes";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseConfigurado, supabasePublico } from "@/lib/supabase/publico";
@@ -56,16 +57,24 @@ export default async function PaginaNegocio({ params, searchParams }: Props) {
   const { negocio } = d;
   const link = `${siteUrl().replace(/^https?:\/\//, "")}/${negocio.slug}`;
   const inicial = negocio.name.trim().charAt(0).toUpperCase();
+  const cerrado = Boolean(negocio.horario && !abiertoAhora(negocio.horario));
+  const siguienteApertura = cerrado && negocio.horario ? proximaApertura(negocio.horario) : null;
 
   return (
-    <main style={{ ["--c" as string]: negocio.color }}>
+    <main className="menu-publico" style={{ ["--c" as string]: negocio.color }}>
       {(desde === "panel" || desde === "admin") && <BotonVolver a={desde === "admin" ? "/admin" : "/panel"} />}
       <div className="portada" style={negocio.cover_url ? { backgroundImage: `url(${negocio.cover_url})` } : undefined} />
       <div className="wrap cabecera">
         <div className="logo" style={negocio.logo_url ? { backgroundImage: `url(${negocio.logo_url})` } : undefined}>
           {!negocio.logo_url && inicial}
         </div>
-        <h1 style={{ marginTop: 12, fontSize: "1.6rem" }}>{negocio.name}</h1>
+        <div className="row wrap-flex" style={{ marginTop: 12, gap: 10 }}>
+          <h1 style={{ margin: 0, fontSize: "1.6rem" }}>{negocio.name}</h1>
+          <span className={`estado-menu ${cerrado ? "cerrado" : "abierto"}`} role="status">
+            {cerrado ? "Cerrado" : "Abierto ahora"}
+          </span>
+        </div>
+        {siguienteApertura && <p className="small muted" style={{ margin: "4px 0 0" }}>{siguienteApertura}</p>}
         {negocio.description && <p className="muted">{negocio.description}</p>}
         <div className="small muted">
           {negocio.hours && <div>🕒 {negocio.hours}</div>}
