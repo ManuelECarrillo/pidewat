@@ -288,3 +288,13 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
 .orden .lin { padding: 4px 0; border-bottom: 1px dashed var(--line); }
 .orden .lin b { font-size: 1.05rem; }
 .cocina-filtros { margin-bottom: 12px; }
+
+/* Solicitud de prueba (/empezar) */
+.trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.error-campo { display: block; color: var(--bad); font-weight: 500; font-size: .85rem; margin-top: 4px; }
+.i[aria-invalid="true"] { border-color: var(--bad); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chips button { min-height: 40px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font-weight: 500; cursor: pointer; }
+.chips button.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 10%, #fff); font-weight: 600; }
+.pasos-lista { padding-left: 20px; margin: 10px 0 16px; }
+.pasos-lista li { margin-bottom: 8px; }

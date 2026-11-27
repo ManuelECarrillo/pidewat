@@ -28,6 +28,7 @@ export default async function Admin() {
 
   return (
     <div className="stack">
+      <Link href="/admin/embudo" className="btn btn-sm" style={{ alignSelf: "flex-start" }}>Embudo de la landing y solicitudes de prueba</Link>
       <div className="grid2">
         <div className="card">
           <div className="small muted">Ingreso mensual (pagando)</div>
