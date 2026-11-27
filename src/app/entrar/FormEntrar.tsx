@@ -4,13 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 
-// UX-005: que "olvidé mi contraseña" sea un botón que abre WhatsApp, no solo un texto
-const ventas = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP || "";
-
 // Solo rutas propias del panel o el admin, nunca otro sitio
 const destinoSeguro = (sig?: string) => (sig && /^\/(panel|admin)(\/|\?|$)/.test(sig) ? sig : "/panel");
 
-export default function FormEntrar({ sig, correoActivo }: { sig?: string; correoActivo?: boolean }) {
+export default function FormEntrar({ sig }: { sig?: string }) {
   const router = useRouter();
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
@@ -44,10 +41,7 @@ export default function FormEntrar({ sig, correoActivo }: { sig?: string; correo
       {error && <p role="alert" style={{ color: "var(--bad)" }}>{error}</p>}
       <button className="btn btn-p btn-block" disabled={cargando}>{cargando ? "Entrando…" : "Entrar"}</button>
       <p className="small muted" style={{ marginTop: 12, marginBottom: 0 }}>
-        ¿Olvidaste tu contraseña?{" "}
-        {correoActivo ? <a href="/recuperar">Te mandamos un enlace a tu correo</a> : ventas ? (
-          <a href={`https://wa.me/${ventas}?text=${encodeURIComponent("Hola, olvidé mi contraseña de Pidewat.")}`}>Escríbenos por WhatsApp</a>
-        ) : "Escríbenos por WhatsApp"}{correoActivo ? "." : " y te mandamos una nueva."}
+        ¿Olvidaste tu contraseña? <a href="/recuperar">Te mandamos un enlace a tu correo</a>.
       </p>
     </form>
   );

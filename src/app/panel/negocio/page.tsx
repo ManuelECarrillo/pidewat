@@ -64,7 +64,7 @@ export default async function PanelNegocio({ searchParams }: { searchParams: Pro
 
     <div className="card" id="clave" style={{ maxWidth: 640, marginTop: 24, scrollMarginTop: 80 }}>
       <h3>Tu contraseña</h3>
-      <p className="small muted">Si te la mandamos por WhatsApp, cámbiala por una que solo tú sepas.</p>
+      <p className="small muted">Elige una contraseña que solo tú sepas.</p>
       <FormConResultado action={cambiarClave} boton="Cambiar contraseña">
         <label className="f">Contraseña nueva<input className="i" name="clave" type="password" autoComplete="new-password" minLength={8} required /></label>
         <label className="f">Escríbela otra vez<input className="i" name="clave2" type="password" autoComplete="new-password" minLength={8} required /></label>

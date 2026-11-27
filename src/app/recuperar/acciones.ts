@@ -10,7 +10,7 @@ export type Res = { ok: boolean; error?: string };
 
 // Siempre responde igual exista o no la cuenta (no revela qué correos están registrados).
 export async function pedirRecuperacion(_: Res | null, f: FormData): Promise<Res> {
-  if (!correoActivo()) return { ok: false, error: "La recuperación por correo aún no está activa. Escríbenos por WhatsApp." };
+  if (!correoActivo()) return { ok: false, error: "La recuperación por correo aún no está disponible. Intenta más tarde." };
   const correo = String(f.get("correo") ?? "").trim().toLowerCase().slice(0, 120);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)) return { ok: false, error: "Revisa tu correo." };
   const { ip, huella } = await ipYHuella();

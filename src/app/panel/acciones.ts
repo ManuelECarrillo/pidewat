@@ -128,14 +128,14 @@ export async function guardarNegocio(f: FormData) {
   redirect("/panel/negocio?ok=1");
 }
 
-// El dueño cambia la contraseña que le mandamos por WhatsApp (así deja de servir si alguien ve ese chat).
+// El dueño puede cambiar su contraseña desde su panel.
 export async function cambiarClave(_: ResultadoAlta | null, f: FormData): Promise<ResultadoAlta> {
   const { sb } = await requiereDueno();
   const clave = String(f.get("clave") ?? "");
   if (clave.length < 8) return { ok: false, mensaje: "Usa al menos 8 letras o números." };
   if (clave !== String(f.get("clave2") ?? "")) return { ok: false, mensaje: "Las dos contraseñas no son iguales." };
   const { error } = await sb.auth.updateUser({ password: clave, data: { clave_cambiada: true } });
-  if (error) return { ok: false, mensaje: "No se pudo cambiar. Intenta con otra contraseña o escríbenos por WhatsApp." };
+  if (error) return { ok: false, mensaje: "No se pudo cambiar. Intenta otra vez." };
   revalidatePath("/panel", "layout"); // quita el aviso de "cambia tu contraseña"
   return { ok: true, mensaje: "Listo, tu contraseña cambió. Úsala la próxima vez que entres." };
 }

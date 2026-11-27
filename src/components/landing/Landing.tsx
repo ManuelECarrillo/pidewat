@@ -3,10 +3,10 @@ import QRCode from "qrcode";
 import { PLANES, DIAS_PRUEBA } from "@/lib/planes";
 import { dinero } from "@/lib/formato";
 import { BotonProbar, BotonVerDemo, MedirVisita } from "./Medicion";
-import { BurbujaWhatsapp, Captura, ChatSuelto, MenuMini, Telefono } from "./Mockups";
+import { BurbujaWhatsapp, Captura, MenuMini, Telefono } from "./Mockups";
+import CtaMovil from "./CtaMovil";
 import DemoSeccion from "./DemoSeccion";
 import Revelar from "./Revelar";
-import { fuenteTexto, fuenteTitulos } from "./fuentes";
 import s from "./Landing.module.css";
 
 // Landing comercial de Pidewat: le habla al dueño de un negocio de comida.
@@ -33,15 +33,6 @@ const INCLUYE_RESTAURANTE = [
   "Seguimiento del pedido",
 ];
 
-const CONFIANZA = [
-  // Eduardo (2026-11-26): que funcione solo, sin depender de él. Alta y menú los hace el dueño.
-  { t: "Lo manejas tú, sin esperar a nadie", d: "Creas tu cuenta en un minuto y cambias precios, productos, extras y agotados desde tu celular, cuando quieras." },
-  { t: "Sin comisión por pedido", d: "Pagas tu mensualidad y ya. Lo que vendes es tuyo." },
-  { t: "Tu cliente no descarga nada", d: "Abre tu menú con un link o escaneando el QR, desde cualquier celular." },
-  { t: "Tu mismo WhatsApp", d: "El pedido te llega al número que ya usas. Contestas como siempre." },
-  { t: "Soporte directo por WhatsApp", d: "Hablas con quien hizo Pidewat, no con un robot." },
-];
-
 // Capturas tomadas del menú de demostración real (/demo), no de un diseño
 const CAPTURAS = [
   { src: "/landing/captura-menu.png", alt: "Menú digital de un negocio de antojitos en Pidewat", pie: "Tu menú, con tus categorías y precios" },
@@ -66,7 +57,7 @@ export default async function Landing() {
   const qr = await QRCode.toString("https://pidewat.vercel.app/demo", { type: "svg", margin: 0, color: { dark: "#1d1b19", light: "#ffffff" } });
 
   return (
-    <div className={`${s.lp} ${fuenteTitulos.variable} ${fuenteTexto.variable}`}>
+    <div className={s.lp}>
       <MedirVisita />
 
       <header className={s.barra}>
@@ -87,7 +78,7 @@ export default async function Landing() {
 
       <main>
         {/* 1 · Hero */}
-        <section className={s.hero}>
+        <section id="inicio" className={s.hero}>
           <div className={`${s.contenedor} ${s.heroGrid}`}>
             <div className={s.heroTexto}>
               <p className={s.etiqueta}>Para taquerías, hamburgueserías, puestos y fondas</p>
@@ -117,35 +108,11 @@ export default async function Landing() {
           </div>
         </section>
 
-        {/* 2 · El problema */}
-        <section className={s.seccion} aria-labelledby="t-problema">
-          <div className={s.contenedor}>
-            <Revelar>
-              <p className={s.numero}>01 · Del chat al pedido</p>
-              <h2 id="t-problema" className={s.titulo}>Menos mensajes sueltos. Más pedidos listos para preparar.</h2>
-              <p className={s.bajada}>
-                Cuando el pedido llega en pedacitos, hay que preguntar tamaños, sumar precios y confirmar a mano. Pidewat ordena esa conversación por ti.
-              </p>
-            </Revelar>
-            <div className={s.antesDespues}>
-              <Revelar className={s.adColumna}>
-                <span className={`${s.adEtiqueta} ${s.adAntes}`}>Antes</span>
-                <ChatSuelto />
-              </Revelar>
-              <div className={s.adFlecha} aria-hidden="true">→</div>
-              <Revelar className={s.adColumna} retraso={120}>
-                <span className={`${s.adEtiqueta} ${s.adDespues}`}>Con Pidewat</span>
-                <BurbujaWhatsapp className={s.burbujaGrande} />
-              </Revelar>
-            </div>
-          </div>
-        </section>
-
-        {/* 3 · Demo interactiva */}
+        {/* Demo interactiva: la evidencia aparece antes que la explicación. */}
         <section id="demo" className={`${s.seccion} ${s.seccionTinta}`} aria-labelledby="t-demo">
           <div className={s.contenedor}>
             <Revelar>
-              <p className={`${s.numero} ${s.numeroClaro}`}>02 · Pruébalo tú</p>
+              <p className={`${s.numero} ${s.numeroClaro}`}>01 · Pruébalo tú</p>
               <h2 id="t-demo" className={s.titulo}>Haz un pedido como lo haría tu cliente</h2>
               <p className={s.bajada}>Elige una hamburguesa, agrégale extras y toca «Pedir». Al final ves el mensaje exacto que le llega al negocio.</p>
             </Revelar>
@@ -173,11 +140,11 @@ export default async function Landing() {
           </div>
         </section>
 
-        {/* 4 · Cómo funciona */}
+        {/* Cómo funciona */}
         <section id="como-funciona" className={s.seccion} aria-labelledby="t-como">
           <div className={s.contenedor}>
             <Revelar>
-              <p className={s.numero}>03 · Cómo funciona</p>
+              <p className={s.numero}>02 · Cómo funciona</p>
               <h2 id="t-como" className={s.titulo}>Empiezas en tres pasos</h2>
             </Revelar>
             <ol className={s.pasos}>
@@ -216,11 +183,11 @@ export default async function Landing() {
           </div>
         </section>
 
-        {/* 5 · Precios */}
+        {/* Precios */}
         <section id="precios" className={`${s.seccion} ${s.seccionCrema}`} aria-labelledby="t-precios">
           <div className={s.contenedor}>
             <Revelar>
-              <p className={s.numero}>04 · Precios</p>
+              <p className={s.numero}>03 · Precios</p>
               <h2 id="t-precios" className={s.titulo}>Un precio claro al mes. Sin comisiones.</h2>
             </Revelar>
             <div className={s.planes}>
@@ -256,34 +223,11 @@ export default async function Landing() {
           </div>
         </section>
 
-        {/* 6 · Confianza (sin testimonios hasta tener uno real y autorizado) */}
-        <section className={s.seccion} aria-labelledby="t-confianza">
-          <div className={`${s.contenedor} ${s.confianzaGrid}`}>
-            <Revelar>
-              <p className={s.numero}>05 · Hecho en Durango</p>
-              <h2 id="t-confianza" className={s.titulo}>Un servicio cercano, no solo un programa</h2>
-              <p className={s.bajada}>Pidewat lo hacemos en Durango, México, para negocios de comida como el tuyo.</p>
-            </Revelar>
-            <ul className={s.confianzaLista}>
-              {CONFIANZA.map((c, i) => (
-                <Revelar como="li" key={c.t} retraso={i * 60} className={s.confianzaItem}>
-                    <span className={s.confianzaNum}>{String(i + 1).padStart(2, "0")}</span>
-                    <div>
-                      <h3>{c.t}</h3>
-                      <p>{c.d}</p>
-                    </div>
-                  </Revelar>
-              ))}
-            </ul>
-            {/* TestimonioReal: agregar aquí solo con una opinión real y su autorización por escrito. */}
-          </div>
-        </section>
-
-        {/* 7 · Preguntas frecuentes */}
+        {/* Preguntas frecuentes */}
         <section id="preguntas" className={`${s.seccion} ${s.seccionCrema}`} aria-labelledby="t-preguntas">
           <div className={`${s.contenedor} ${s.contenedorAngosto}`}>
             <Revelar>
-              <p className={s.numero}>06 · Preguntas</p>
+              <p className={s.numero}>04 · Preguntas</p>
               <h2 id="t-preguntas" className={s.titulo}>Lo que nos preguntan antes de empezar</h2>
             </Revelar>
             <div className={s.faq}>
@@ -297,8 +241,7 @@ export default async function Landing() {
           </div>
         </section>
 
-        {/* 8 · CTA final */}
-        <section className={s.final} aria-labelledby="t-final">
+        <section id="cta-final" className={s.final} aria-labelledby="t-final">
           <div className={`${s.contenedor} ${s.finalInterior}`}>
             <h2 id="t-final" className={s.finalTitulo}>Tu menú puede empezar a trabajar por ti</h2>
             <BotonProbar href={ESENCIAL} origen="final" className={s.botonBlanco}>Empezar prueba gratis</BotonProbar>
@@ -314,6 +257,7 @@ export default async function Landing() {
           <Link href="/entrar">Entrar</Link>
         </div>
       </footer>
+      <CtaMovil href={ESENCIAL}>Probar {DIAS_PRUEBA} días gratis</CtaMovil>
     </div>
   );
 }

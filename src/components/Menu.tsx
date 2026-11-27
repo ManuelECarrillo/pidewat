@@ -220,23 +220,42 @@ export default function Menu({
             {g.items.map((p) => {
               const n = enCarrito(p.id);
               const conIngredientes = personalizable(p);
+              const categoria = categorias.find((c) => c.id === p.category_id)?.name;
+              const inicialPlatillo = p.name.trim().charAt(0).toUpperCase() || "•";
               return (
-                <div key={p.id} className={`prod ${p.available ? "" : "agotado"}`}>
-                  {p.image_url && <div className="prod-img" style={{ backgroundImage: `url(${p.image_url})` }} role="img" aria-label={p.name} />}
-                  <div className="grow">
+                <article key={p.id} className={`prod ${p.available ? "" : "agotado"}`}>
+                  <div
+                    className={`prod-img ${p.image_url ? "prod-img-foto" : "prod-img-sello"}`}
+                    style={p.image_url ? { backgroundImage: `url(${p.image_url})` } : undefined}
+                    role="img"
+                    aria-label={p.image_url ? p.name : `Identificador de ${p.name}`}
+                  >
+                    {!p.image_url && <>
+                      <span aria-hidden="true">{inicialPlatillo}</span>
+                      {categoria && <small>{categoria}</small>}
+                    </>}
+                  </div>
+                  <div className="grow prod-contenido">
+                    {categoria && <span className="prod-categoria">{categoria}</span>}
                     <h3>{p.name}</h3>
                     {p.description && <p>{p.description}</p>}
-                    <div className="row between">
+                    <div className="prod-pie">
                       <span className="precio">{dinero(Number(p.price))}</span>
                       {!p.available ? (
-                        <span className="pill">Agotado</span>
-                      ) : cerrado ? null : conIngredientes ? (
-                        <span className="row" style={{ gap: 8 }}>
+                        <span className="pill pill-bad">Agotado</span>
+                      ) : cerrado ? (
+                        <span className="pill pill-warn">Pedidos cerrados</span>
+                      ) : conIngredientes ? (
+                        <span className="prod-accion">
                           {n > 0 && <span className="pill">{n} en tu pedido</span>}
-                          <button className="mas" aria-label={`Agregar ${p.name}`} onClick={() => agregar(p)}>+</button>
+                          <button className="prod-agregar" aria-label={`Personalizar y agregar ${p.name}`} onClick={() => agregar(p)}>
+                            <span aria-hidden="true">+</span> Agregar
+                          </button>
                         </span>
                       ) : n === 0 ? (
-                        <button className="mas" aria-label={`Agregar ${p.name}`} onClick={() => cambiar(p.id, 1)}>+</button>
+                        <button className="prod-agregar" aria-label={`Agregar ${p.name}`} onClick={() => cambiar(p.id, 1)}>
+                          <span aria-hidden="true">+</span> Agregar
+                        </button>
                       ) : (
                         <span className="cant">
                           <button aria-label="Quitar uno" onClick={() => quitarUno(p.id)}>−</button>
@@ -246,7 +265,7 @@ export default function Menu({
                       )}
                     </div>
                   </div>
-                </div>
+                </article>
               );
             })}
             </div>

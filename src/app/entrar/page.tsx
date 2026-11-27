@@ -1,7 +1,6 @@
 import Link from "next/link";
 import InstalarApp from "@/components/InstalarApp";
 import FormEntrar from "./FormEntrar";
-import { correoActivo } from "@/lib/correo";
 
 export const metadata = { title: "Entrar" };
 
@@ -15,7 +14,7 @@ export default async function Entrar({ searchParams }: { searchParams: Promise<{
         <div className="alerta" style={{ marginBottom: 12 }}>Tu cuenta todavía no tiene un negocio. <Link href="/empezar?plan=esencial">Crea tu menú gratis</Link>.</div>
       )}
       {error === "enlace" && <div className="alerta" style={{ marginBottom: 12 }}>Ese enlace ya venció o ya se usó. Entra con tu correo y contraseña.</div>}
-      <FormEntrar sig={sig} correoActivo={correoActivo()} />
+      <FormEntrar sig={sig} />
       <div style={{ marginTop: 14 }}><InstalarApp variante="boton" /></div>
     </main>
   );

@@ -3,6 +3,7 @@ import AvisoEstado, { pillEstado } from "@/components/AvisoEstado";
 import { precioDe } from "@/lib/planes";
 import InstalarApp from "@/components/InstalarApp";
 import CompartirLink from "@/components/CompartirLink";
+import OnboardingPanel from "@/components/OnboardingPanel";
 import BotonEnviar from "@/components/BotonEnviar";
 import FormularioConAviso from "@/components/FormularioConAviso";
 import { estadoNegocio } from "@/lib/estado";
@@ -10,7 +11,8 @@ import { siteUrl } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
 import { guardarProducto } from "./acciones";
 
-export default async function Panel() {
+export default async function Panel({ searchParams }: { searchParams: Promise<{ bienvenida?: string }> }) {
+  const { bienvenida } = await searchParams;
   const { sb, negocio } = await requiereDueno();
   const estado = estadoNegocio(negocio);
   const hace30 = new Date(Date.now() - 30 * 86_400_000).toISOString();
@@ -41,6 +43,12 @@ export default async function Panel() {
       </div>
       <AvisoEstado estado={estado} precio={precioDe(negocio).mensual} />
       <InstalarApp />
+      <OnboardingPanel
+        negocioId={negocio.id}
+        tieneProductos={productos !== 0} // solo con 0 confirmado; si la consulta falla (null) no se muestra
+        negocioConfigurado={Boolean(negocio.name?.trim() && negocio.whatsapp?.trim() && (negocio.horario || negocio.hours?.trim()))}
+        mostrarPorBienvenida={bienvenida === "1"}
+      />
 
       {!productos && (
         <div className="alerta">

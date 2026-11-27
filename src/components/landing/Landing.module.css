@@ -1,24 +1,24 @@
 /* Landing comercial de Pidewat. Todo vive bajo .lp para no tocar el menú, el panel ni el admin. */
 
 .lp {
-  --crema: #f7f5f2;
-  --crema-2: #efe9e1;
-  --tinta: #1d1b19;
-  --tinta-2: #2b2825;
-  --gris: #5f5953;
-  --linea: #e4ddd3;
-  --verde: #1f8a4c;
-  --verde-osc: #166b3a;
+  /* La landing consume los tokens de src/app/globals.css. */
+  --crema: var(--surface-canvas);
+  --crema-2: var(--surface-raised);
+  --tinta: var(--ink);
+  --tinta-2: var(--ink);
+  --gris: var(--ink-muted);
+  --linea: var(--border);
+  --verde: var(--brand);
+  --verde-osc: var(--brand-strong);
   --verde-claro: #e3f3e9;
-  --wa: #25d366;
   --wa-burbuja: #d9fdd3;
-  --tomate: #e4572e;
-  --blanco: #ffffff;
-  --radio: 18px;
-  --sombra: 0 1px 2px rgba(29, 27, 25, .06), 0 12px 32px -12px rgba(29, 27, 25, .18);
-  --sombra-alta: 0 30px 60px -24px rgba(29, 27, 25, .35);
-  --display: var(--lp-display), "Segoe UI", system-ui, sans-serif;
-  --texto: var(--lp-texto), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --tomate: var(--accent);
+  --blanco: var(--surface-card);
+  --radio: var(--radius-card);
+  --sombra: var(--elevation-card);
+  --sombra-alta: var(--elevation-float);
+  --display: var(--font-display);
+  --texto: var(--font-body);
 
   background: var(--crema);
   color: var(--tinta);
@@ -57,20 +57,27 @@
 /* ---------- Botones ---------- */
 .botonPrincipal, .botonSecundario, .botonChico, .botonBlanco {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 52px; padding: 0 24px; border-radius: 14px;
+  min-height: 52px; padding: 0 24px; border-radius: var(--radius-control);
   font-weight: 700; font-size: 1.02rem; text-decoration: none; white-space: nowrap;
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast), background var(--motion-fast);
 }
 .botonPrincipal { background: var(--verde); color: #fff; box-shadow: 0 10px 24px -10px rgba(31, 138, 76, .7); }
 .botonPrincipal:hover { background: var(--verde-osc); transform: translateY(-1px); }
 .botonPrincipal:active, .botonBlanco:active, .botonChico:active { transform: translateY(1px) scale(.99); }
 .botonSecundario { background: transparent; color: var(--tinta); border: 1.5px solid var(--tinta); }
 .botonSecundario:hover { background: var(--tinta); color: var(--crema); }
-.botonChico { min-height: 42px; padding: 0 16px; font-size: .92rem; background: var(--tinta); color: var(--crema); border-radius: 12px; }
+.botonChico { min-height: 42px; padding: 0 16px; font-size: .92rem; background: var(--tinta); color: var(--crema); border-radius: var(--radius-sm); }
 .botonChico:hover { background: var(--verde); }
 .botonBlanco { background: #fff; color: var(--verde-osc); min-height: 58px; padding: 0 32px; font-size: 1.1rem; box-shadow: 0 16px 34px -14px rgba(0, 0, 0, .45); }
 .botonBlanco:hover { transform: translateY(-2px); }
 .botonAncho { width: 100%; }
+.ctaMovil {
+  position: fixed; z-index: 40; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); left: 12px;
+}
+.ctaMovilBoton {
+  display: flex; min-height: 48px; align-items: center; justify-content: center; border-radius: var(--radius-control);
+  background: var(--tinta); box-shadow: var(--sombra-alta); color: #fff; font-weight: 800; text-decoration: none;
+}
 
 /* ---------- Hero ---------- */
 .hero { padding: 36px 0 56px; position: relative; }
@@ -261,7 +268,7 @@
 
 /* Cómo funciona */
 .pasos { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 18px; }
-.paso { background: #fff; border-radius: 24px; padding: 22px; box-shadow: var(--sombra); display: grid; gap: 10px; align-content: start; }
+.paso { background: #fff; border-radius: var(--radius-card); padding: 22px; box-shadow: var(--sombra); display: grid; gap: 10px; align-content: start; }
 .paso h3 { font-size: 1.3rem; }
 .paso p { color: var(--gris); }
 .pasoNum { font-family: var(--display); font-weight: 800; font-size: 2.6rem; line-height: 1; color: var(--tomate); }
@@ -280,7 +287,7 @@
 
 /* Precios */
 .planes { display: grid; gap: 18px; margin-top: 40px; }
-.plan { background: #fff; border-radius: 24px; padding: 26px; display: grid; gap: 14px; align-content: start; border: 1.5px solid var(--linea); }
+.plan { background: #fff; border-radius: var(--radius-card); padding: 26px; display: grid; gap: 14px; align-content: start; border: 1.5px solid var(--linea); }
 .planDestacado { border-color: var(--verde); box-shadow: 0 24px 50px -28px rgba(31, 138, 76, .55); }
 .planProximo { background: color-mix(in srgb, #fff 55%, var(--crema-2)); }
 .planCabeza { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
@@ -335,6 +342,7 @@
 
 /* ---------- Tableta y escritorio ---------- */
 @media (min-width: 720px) {
+  .ctaMovil { display: none; }
   .contenedor { padding: 0 32px; }
   .heroCtas > * { flex: 0 0 auto; }
   .antesDespues { grid-template-columns: 1fr auto 1fr; gap: 28px; align-items: center; }

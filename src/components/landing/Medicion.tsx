@@ -14,7 +14,7 @@ export function MedirVisita() {
   return null;
 }
 
-type Origen = "hero" | "planes" | "final" | "barra";
+type Origen = "hero" | "planes" | "final" | "barra" | "movil";
 
 // Botón de "Probar gratis": cuenta el clic y lleva a /empezar. Es un link normal,
 // así que funciona aunque la medición falle.
