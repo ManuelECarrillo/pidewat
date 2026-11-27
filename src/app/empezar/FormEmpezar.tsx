@@ -79,10 +79,15 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
         </>
       )}
       <div className="f">¿Cómo atiendes? <span className="h">Lo puedes cambiar después en «Mi negocio»</span>
-        <div className="chips" role="group" aria-label="Cómo atiendes">
-          {([["sin-mesas", "Puesto o local sin mesas"], ["con-mesas", "Restaurante con mesas"]] as const).map(([v, t]) => (
-            <button key={v} type="button" className={local === v ? "on" : ""} aria-pressed={local === v} onClick={() => setLocal(local === v ? "" : v)}>{t}</button>
-          ))}
+        <div className="chips chips-atencion" role="group" aria-label="Cómo atiendes">
+          <button type="button" className={`chip-atencion ${local === "sin-mesas" ? "on" : ""}`} aria-pressed={local === "sin-mesas"} onClick={() => setLocal(local === "sin-mesas" ? "" : "sin-mesas")}>
+            <svg className="chip-atencion-icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h16M6.5 20v-8h11v8M4 12h16M8 8h8l1.5 4h-11L8 8Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <span className="chip-atencion-texto"><strong>Puesto o local</strong><span>Sin mesas</span></span>
+          </button>
+          <button type="button" className={`chip-atencion ${local === "con-mesas" ? "on" : ""}`} aria-pressed={local === "con-mesas"} onClick={() => setLocal(local === "con-mesas" ? "" : "con-mesas")}>
+            <svg className="chip-atencion-icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11h16M6 11v9M18 11v9M8 7h8v4H8zM3 20h18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <span className="chip-atencion-texto"><strong>Restaurante</strong><span>Con mesas</span></span>
+          </button>
         </div>
       </div>
       <div className="f">¿Qué vendes? <span className="h">Opcional</span>

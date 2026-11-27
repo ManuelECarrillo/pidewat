@@ -348,6 +348,11 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
 .pedido-numero strong, .pedido-mesa strong { overflow-wrap: anywhere; color: var(--c); font-size: clamp(2.35rem, 11vw, 4.4rem); font-variant-numeric: tabular-nums; font-weight: 850; letter-spacing: -.06em; line-height: .94; }
 .pedido-mesa { background: color-mix(in srgb, var(--c) 12%, #fff); }
 .pedido-mesa strong { font-size: clamp(2.35rem, 10vw, 3.75rem); }
+.pedido-seguimiento.pedido-para-llevar .pedido-local { margin-bottom: 10px; }
+.estado-pedido.para-llevar .pedido-sobretitulo { color: var(--c); }
+.pedido-identidad.para-llevar { display: block; background: color-mix(in srgb, var(--c) 22%, var(--line)); }
+.pedido-identidad.para-llevar .pedido-numero { min-height: 176px; place-items: center; padding: 23px 18px 27px; background: linear-gradient(135deg, color-mix(in srgb, var(--c) 16%, #fff), color-mix(in srgb, var(--c) 4%, #fff)); text-align: center; }
+.pedido-identidad.para-llevar .pedido-numero strong { color: var(--c); font-size: clamp(5rem, 30vw, 8rem); line-height: .82; letter-spacing: -.08em; }
 .progreso-pedido { padding: 20px 18px 18px; }
 .pasos-pedido { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 0; padding: 0; list-style: none; }
 .pasos-pedido li { position: relative; z-index: 0; display: grid; justify-items: center; gap: 7px; min-width: 0; color: var(--muted); font-size: .78rem; font-weight: 700; text-align: center; }
@@ -396,6 +401,7 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
   .estado-pedido-cabecera { padding: 22px 24px 0; }
   .pedido-identidad { margin-top: 20px; }
   .pedido-numero, .pedido-mesa { padding: 20px 24px 22px; }
+  .pedido-identidad.para-llevar .pedido-numero { min-height: 210px; padding: 28px 24px 32px; }
   .progreso-pedido { padding: 24px; }
   .pedido-listo { margin: 20px 24px 0; }
   .pedido-final { margin: 20px 24px; }
@@ -431,5 +437,16 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .chips button { min-height: 40px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font-weight: 500; cursor: pointer; }
 .chips button.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 10%, #fff); font-weight: 600; }
+.chips-atencion { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.chips .chip-atencion { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 76px; padding: 10px; border-radius: 14px; color: var(--text); text-align: left; }
+.chip-atencion-icono { width: 40px; height: 40px; padding: 8px; border-radius: 12px; background: var(--bg); color: var(--muted); }
+.chip-atencion-texto { display: grid; gap: 2px; min-width: 0; }
+.chip-atencion-texto strong { overflow-wrap: anywhere; font-size: .9rem; line-height: 1.15; }
+.chip-atencion-texto span { color: var(--muted); font-size: .78rem; font-weight: 500; line-height: 1.2; }
+.chips .chip-atencion.on { border-color: var(--c); box-shadow: 0 0 0 1px var(--c); }
+.chips .chip-atencion.on .chip-atencion-icono { background: var(--c); color: #fff; }
+.chips .chip-atencion.on .chip-atencion-texto span { color: color-mix(in srgb, var(--c) 76%, var(--text)); }
+@media (hover: hover) { .chips .chip-atencion:hover:not(.on) { border-color: color-mix(in srgb, var(--c) 48%, var(--line)); background: color-mix(in srgb, var(--c) 4%, #fff); } }
+@media (max-width: 374px) { .chips-atencion { grid-template-columns: 1fr; } .chips .chip-atencion { min-height: 64px; } }
 .pasos-lista { padding-left: 20px; margin: 10px 0 16px; }
 .pasos-lista li { margin-bottom: 8px; }

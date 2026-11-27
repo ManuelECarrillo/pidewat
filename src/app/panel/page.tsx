@@ -83,7 +83,7 @@ export default async function Panel() {
             </section>
             {(negocio.cocina || pedidosMesa.length > 0) && (
               <section className="resumen-pedido" aria-label="Pedidos de mesa en cocina">
-                <p className="small"><strong>De mesa en cocina</strong></p>
+                <p className="small"><strong>En cocina</strong></p>
                 <div className="row resumen-pedido-cifras">
                   <div><div className="kpi">{semanaMesa.length}</div><div className="small muted">últimos 7 días</div></div>
                   <div><div className="kpi">{pedidosMesa.length}</div><div className="small muted">últimos 30 días</div></div>

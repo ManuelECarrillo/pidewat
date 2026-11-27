@@ -1,5 +1,8 @@
 # Cambios UI/UX — Fase 2
 
+- **UI-019:** La segunda línea de «Tus pedidos» ahora dice «En cocina», para abarcar pedidos de mesa y para recoger sin cambiar los conteos. Archivo: `src/app/panel/page.tsx`.
+- **UI-020:** «¿Cómo atiendes?» usa tarjetas táctiles de 44 px con iconos y estados claros; el seguimiento para recoger centra la jerarquía en el número de pedido, conserva «Recoger» y elimina la casilla de mesa. Archivos: `src/app/empezar/FormEmpezar.tsx`, `src/components/EstadoPedido.tsx`, `src/app/[slug]/pedido/[id]/page.tsx`, `src/app/globals.css`.
+
 - Seguimiento del pedido: número y mesa ahora se muestran como credencial para el mesero; el avance, aviso de listo, conexión recuperable, resumen y acciones se adaptan de móvil a escritorio. Archivos: `src/app/[slug]/pedido/[id]/page.tsx`, `src/components/EstadoPedido.tsx`, `src/app/globals.css`.
 
 - Ajuste QA: áreas táctiles 44 px en chips y botón +. Archivos: `src/app/globals.css`, `docs/ui-ux/CAMBIOS.md`.

@@ -20,7 +20,7 @@ export default async function PaginaPedido({ params }: { params: Promise<{ slug:
   const items = (o.items || []) as Linea[];
 
   return (
-    <main className="pedido-seguimiento" style={{ ["--c" as string]: n.color }}>
+    <main className={`pedido-seguimiento${o.tipo === "recoger" ? " pedido-para-llevar" : ""}`} style={{ ["--c" as string]: n.color }}>
       <div className="wrap pedido-wrap">
         <header className="pedido-local">
           <p>Seguimiento de tu pedido</p>

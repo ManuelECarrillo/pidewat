@@ -69,24 +69,24 @@ export default function EstadoPedido({ id, numero, mesa, paraLlevar = false, est
   const etiquetaConexion = conexion === "actualizando" ? "Actualizando…" : conexion === "sin-conexion" ? "Sin conexión" : "Al día";
 
   return (
-    <section className={`card estado-pedido estado-${estado}`} aria-labelledby="pedido-titulo">
+    <section className={`card estado-pedido estado-${estado}${paraLlevar ? " para-llevar" : ""}`} aria-labelledby="pedido-titulo">
       <div className="estado-pedido-cabecera">
         <div>
           <p className="pedido-sobretitulo">{paraLlevar ? "Tu número de pedido" : "Muestra esto al mesero"}</p>
-          <h1 id="pedido-titulo">Tu pedido</h1>
+          <h1 id="pedido-titulo">{paraLlevar ? "Recoger" : "Tu pedido"}</h1>
         </div>
         {!esFinal && <span className={`pedido-conexion ${conexion}`} aria-live="polite"><i aria-hidden="true" />{etiquetaConexion}</span>}
       </div>
 
-      <div className="pedido-identidad" aria-label={`Pedido número ${numero}${paraLlevar ? ", para recoger" : mesa ? `, mesa ${mesa}` : ""}`}>
+      <div className={`pedido-identidad${paraLlevar ? " para-llevar" : ""}`} aria-label={`Pedido número ${numero}${paraLlevar ? ", para recoger" : mesa ? `, mesa ${mesa}` : ""}`}>
         <div className="pedido-numero">
           <span>Pedido</span>
           <strong>#{numero}</strong>
         </div>
-        <div className="pedido-mesa">
-          <span>{paraLlevar ? "Entrega" : "Mesa"}</span>
-          <strong>{paraLlevar ? "Recoger" : mesa || "—"}</strong>
-        </div>
+        {!paraLlevar && <div className="pedido-mesa">
+          <span>Mesa</span>
+          <strong>{mesa || "—"}</strong>
+        </div>}
       </div>
 
       {estado === "listo" && (
