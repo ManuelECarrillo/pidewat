@@ -41,8 +41,12 @@ const p = (category_id: string, name: string, price: number, description: string
   business_id: B, category_id, name, price, description, image_url: null, available, ingredientes,
 });
 
+// Para enseñar tamaños y extras (plan Esencial)
+const conOpciones = (x: Omit<Producto, "position" | "id">, opciones: unknown) => ({ ...x, opciones });
+const extrasGordita = [{ nombre: "Extras", tipo: "varias", obligatorio: false, max: 2, opciones: [{ nombre: "Queso extra", precio: 8 }, { nombre: "Aguacate", precio: 10 }] }];
+
 const lista = [
-  p("gorditas", "Gordita de chicharrón prensado", 28, "De maíz, hecha a mano en comal."),
+  conOpciones(p("gorditas", "Gordita de chicharrón prensado", 28, "De maíz, hecha a mano en comal.", true, ["Salsa", "Cebolla"]), extrasGordita),
   p("gorditas", "Gordita de asado rojo", 28),
   p("gorditas", "Gordita de rajas con queso", 28),
   p("gorditas", "Gordita de frijoles con queso", 24),
@@ -54,8 +58,10 @@ const lista = [
   p("tacos", "Orden de tacos de barbacoa (5)", 90),
   p("tacos", "Orden de tacos de asada (5)", 95),
   p("tacos", "Taco de tripa", 22),
-  p("bebidas", "Agua fresca de horchata (1 L)", 35),
-  p("bebidas", "Agua fresca de jamaica (1 L)", 35),
+  conOpciones(p("bebidas", "Agua fresca", 25, "Hecha en casa."), [
+    { nombre: "Sabor", tipo: "una", obligatorio: true, opciones: [{ nombre: "Horchata", precio: 0 }, { nombre: "Jamaica", precio: 0 }, { nombre: "Limón con chía", precio: 0 }] },
+    { nombre: "Tamaño", tipo: "una", obligatorio: true, opciones: [{ nombre: "Medio litro", precio: 0 }, { nombre: "1 litro", precio: 10 }] },
+  ]),
   p("bebidas", "Refresco de vidrio", 25),
   p("bebidas", "Café de olla", 20),
   p("postres", "Flan napolitano", 40),

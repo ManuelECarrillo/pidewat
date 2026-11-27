@@ -1,20 +1,12 @@
-import { createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
 import { estadoNegocio } from "@/lib/estado";
 import { abiertoAhora, leerHorario } from "@/lib/horario";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { calcularLineas, huellaIp, leerItems } from "@/lib/lineasServidor";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_POR_MINUTO = 20;
 const MAX_POR_PERSONA = 5;
-
-// SEG-010: la IP se guarda revuelta (HMAC con una llave del servidor), nunca tal cual:
-// sirve para contar pedidos por persona sin guardar un dato personal.
-function huellaIp(req: Request) {
-  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || req.headers.get("x-real-ip") || "";
-  if (!ip) return null;
-  return createHmac("sha256", process.env.SUPABASE_SERVICE_ROLE_KEY || "pidewat").update(ip).digest("hex").slice(0, 32);
-}
 
 // Registra que un cliente mandó un pedido (para las estadísticas del dueño). Nunca bloquea el pedido.
 // No confiamos en lo que manda el navegador: los nombres, precios y el total salen de la base.
@@ -42,16 +34,9 @@ export async function POST(req: Request) {
       if (!error && (deEsaPersona ?? 0) >= MAX_POR_PERSONA) return NextResponse.json({ ok: true });
     }
 
-    const pedidos = new Map<string, number>();
-    for (const l of Array.isArray(b.items) ? b.items.slice(0, 60) : []) {
-      const id = String(l?.id ?? "");
-      const cantidad = Math.min(99, Math.max(0, Math.floor(Number(l?.cantidad) || 0)));
-      if (UUID.test(id) && cantidad > 0) pedidos.set(id, (pedidos.get(id) || 0) + cantidad);
-    }
-    if (!pedidos.size) return NextResponse.json({ ok: true });
-
-    const { data: productos } = await sb.from("products").select("id, name, price").eq("business_id", n.id).in("id", [...pedidos.keys()]);
-    const items = (productos || []).map((p) => ({ nombre: p.name, cantidad: pedidos.get(p.id)!, precio: Number(p.price) }));
+    const pedidos = leerItems(b.items);
+    if (!pedidos.length) return NextResponse.json({ ok: true });
+    const items = (await calcularLineas(sb, n.id, pedidos)).map(({ nombre, cantidad, precio, nota }) => ({ nombre, cantidad, precio, ...(nota ? { nota } : {}) }));
     if (!items.length) return NextResponse.json({ ok: true });
 
     // QA-001: solo las formas de pedir que el negocio tiene prendidas (si no da envío, no se suma envío)

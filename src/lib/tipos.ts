@@ -22,6 +22,8 @@ export type Negocio = {
   trial_ends_at: string;
   paid_until: string | null;
   paused: boolean;
+  // Plan Restaurante: los pedidos de mesa van a la pantalla de cocina en vez de WhatsApp
+  cocina?: boolean;
 };
 
 export type NegocioCompleto = Negocio & {
@@ -47,9 +49,11 @@ export type Producto = {
   position: number;
   // Lo que el cliente puede quitar al pedirlo (ej. mostaza, mayonesa). Vacío = se pide tal cual.
   ingredientes?: string[] | null;
+  // Tamaños, sabores y extras con precio (ver lib/opciones). Vacío = sin opciones.
+  opciones?: unknown;
 };
 
 // Lo que sale en el menú público. Plan, prueba y pagos no: el público no tiene por qué saber quién paga.
 export type NegocioMenu = Omit<Negocio, "plan" | "trial_ends_at" | "paid_until" | "paused">;
 export const COLUMNAS_MENU =
-  "id, slug, name, whatsapp, description, address, hours, logo_url, cover_url, color, mode, accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note, horario";
+  "id, slug, name, whatsapp, description, address, hours, logo_url, cover_url, color, mode, accepts_table, accepts_pickup, accepts_delivery, delivery_fee, delivery_note, horario, cocina";

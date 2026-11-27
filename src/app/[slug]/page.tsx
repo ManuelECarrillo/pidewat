@@ -21,7 +21,7 @@ async function cargar(slug: string) {
   const sb = supabasePublico();
   let { data: negocio, error } = await sb.from("businesses").select(COLUMNAS_MENU).eq("slug", slug).maybeSingle<NegocioMenu>();
   // Mientras no se corra la migración del horario (2026-10-30-horario.sql), el menú sigue funcionando sin él
-  if (error) ({ data: negocio } = await sb.from("businesses").select(COLUMNAS_MENU.replace(", horario", "")).eq("slug", slug).maybeSingle<NegocioMenu>());
+  if (error) ({ data: negocio } = await sb.from("businesses").select(COLUMNAS_MENU.replace(/, horario.*$/, "")).eq("slug", slug).maybeSingle<NegocioMenu>());
   if (!negocio) return null;
   const [{ data: cobro }, { data: categorias }, { data: productos }] = await Promise.all([
     // Si está en pausa se decide aquí en el servidor; esas fechas nunca llegan al navegador

@@ -258,4 +258,33 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
 .ingr { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .ingr button { position: relative; min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 2px solid var(--c); background: #fff; color: var(--text); font-weight: 600; font-size: .95rem; cursor: pointer; }
 .ingr button.fuera { border-color: var(--bad); background: #fde2e2; color: var(--bad); text-decoration: line-through; text-decoration-thickness: 1px; }
+/* Editor de opciones en el panel */
+.op-edit { margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fbfaf8; font-weight: 400; }
+/* Tamaños y extras en la hojita de elegir */
+.grupo-op { margin-top: 14px; }
+.grupo-op h3 { margin: 0; font-size: 1rem; }
+.op { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; margin-top: 8px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.op.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 10%, #fff); font-weight: 600; }
+.op:disabled { opacity: .45; cursor: default; }
+.marca-op { flex: none; width: 22px; height: 22px; display: grid; place-items: center; border: 2px solid var(--line); border-radius: 6px; font-size: .8rem; color: #fff; }
+.marca-op.redonda { border-radius: 50%; }
+.op.on .marca-op { border-color: var(--c); background: var(--c); }
 .sin-txt { color: var(--bad); font-weight: 600; }
+
+/* Estado del pedido (plan Restaurante) */
+.estado-pedido { margin-top: 10px; text-align: center; }
+.numero-pedido { font-size: 3rem; font-weight: 800; color: var(--c); line-height: 1.1; }
+.pasos { display: flex; gap: 6px; list-style: none; padding: 0; margin: 14px 0 0; }
+.pasos li { flex: 1; padding: 8px 4px; border-radius: 10px; background: #ebe6e0; font-size: .85rem; font-weight: 600; color: var(--muted); }
+.pasos li.on { background: var(--c); color: #fff; }
+
+/* Pantalla de cocina */
+.cocina { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.orden { border-left: 6px solid var(--line); }
+.orden.nuevo { border-left-color: var(--c); }
+.orden.preparando { border-left-color: var(--warn); }
+.orden.listo { border-left-color: var(--ok); }
+.orden h3 { margin: 0; font-size: 1.3rem; }
+.orden .lin { padding: 4px 0; border-bottom: 1px dashed var(--line); }
+.orden .lin b { font-size: 1.05rem; }
+.cocina-filtros { margin-bottom: 12px; }
