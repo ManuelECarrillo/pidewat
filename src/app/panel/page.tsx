@@ -78,7 +78,10 @@ export default async function Panel({ searchParams }: { searchParams: Promise<{ 
       </section>
 
       <div className="grid2">
-        <CompartirLink url={`${siteUrl()}/${negocio.slug}`} nombre={negocio.name} color={negocio.color} />
+        {/* id «compartir»: el paso 3 de primeros pasos trae aquí, donde están los botones de compartir */}
+        <div id="compartir" style={{ display: "grid", scrollMarginTop: 72 }}>
+          <CompartirLink url={`${siteUrl()}/${negocio.slug}`} nombre={negocio.name} color={negocio.color} />
+        </div>
         <div className="card">
           <h3>Tus pedidos</h3>
           <div className="resumen-pedidos">

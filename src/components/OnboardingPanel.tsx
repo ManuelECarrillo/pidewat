@@ -79,7 +79,8 @@ export default function OnboardingPanel({ negocioId, tieneProductos, negocioConf
             <strong>Comparte tu QR</strong>
             <p>{qrCompartido ? "Marcaste este paso como compartido." : "Imprímelo o compártelo desde tu panel cuando estés listo."}</p>
             <span className="onboarding-acciones">
-              <Link className="btn btn-sm" href="/panel/qr">Ver mi QR</Link>
+              {/* Claude (QA 2026-11-27): /panel/qr es la hoja para imprimir; compartir el link y el QR está en Inicio */}
+              <a className="btn btn-sm" href="#compartir">Compartir link y QR</a>
               {!qrCompartido && <button className="btn btn-sm btn-p" type="button" onClick={marcarQr}>Ya lo compartí</button>}
             </span>
           </div>
