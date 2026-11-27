@@ -27,6 +27,7 @@ export default async function Panel() {
   const pedidosMesa = mesa || [];
   const lista = [...pedidosWhatsapp, ...pedidosMesa];
   const semana = pedidosWhatsapp.filter((p) => new Date(p.created_at).getTime() > hace7);
+  const semanaMesa = pedidosMesa.filter((p) => new Date(p.created_at).getTime() > hace7);
 
   const conteo = new Map<string, number>();
   for (const p of lista) for (const l of (p.items as { nombre: string; cantidad: number }[]) || []) conteo.set(l.nombre, (conteo.get(l.nombre) || 0) + l.cantidad);
@@ -71,19 +72,32 @@ export default async function Panel() {
       <div className="grid2">
         <CompartirLink url={`${siteUrl()}/${negocio.slug}`} nombre={negocio.name} color={negocio.color} />
         <div className="card">
-          <h3>Pedidos enviados a tu WhatsApp <span className="small muted">(sin confirmar)</span></h3>
-          <div className="row" style={{ gap: 24 }}>
-            <div><div className="kpi">{semana.length}</div><div className="small muted">últimos 7 días</div></div>
-            <div><div className="kpi">{pedidosWhatsapp.length}</div><div className="small muted">últimos 30 días</div></div>
+          <h3>Tus pedidos</h3>
+          <div className="resumen-pedidos">
+            <section className="resumen-pedido" aria-label="Pedidos enviados a WhatsApp">
+              <p className="small"><strong>Enviados a tu WhatsApp</strong> <span className="muted">(sin confirmar)</span></p>
+              <div className="row resumen-pedido-cifras">
+                <div><div className="kpi">{semana.length}</div><div className="small muted">últimos 7 días</div></div>
+                <div><div className="kpi">{pedidosWhatsapp.length}</div><div className="small muted">últimos 30 días</div></div>
+              </div>
+            </section>
+            {(negocio.cocina || pedidosMesa.length > 0) && (
+              <section className="resumen-pedido" aria-label="Pedidos de mesa en cocina">
+                <p className="small"><strong>De mesa en cocina</strong></p>
+                <div className="row resumen-pedido-cifras">
+                  <div><div className="kpi">{semanaMesa.length}</div><div className="small muted">últimos 7 días</div></div>
+                  <div><div className="kpi">{pedidosMesa.length}</div><div className="small muted">últimos 30 días</div></div>
+                </div>
+              </section>
+            )}
           </div>
-          {negocio.cocina && <p className="small muted" style={{ marginTop: 8 }}>{pedidosMesa.length} pedidos de mesa no cancelados en los últimos 30 días.</p>}
           {top.length > 0 && (
             <>
-              <h4 style={{ margin: "12px 0 6px" }}>Lo que más aparece en pedidos</h4>
+              <h4 style={{ margin: "12px 0 6px" }}>Lo que más te piden</h4>
               <ol style={{ margin: 0, paddingLeft: 20 }}>{top.map(([n, c]) => <li key={n}>{n} <span className="muted">({c})</span></li>)}</ol>
             </>
           )}
-          <p className="small muted" style={{ marginBottom: 0 }}>Cada pedido por WhatsApp cuenta cuando el cliente toca “Enviar pedido por WhatsApp”; no confirma que lo haya enviado ni pagado.</p>
+          <p className="small muted" style={{ marginBottom: 0 }}>Cada pedido por WhatsApp cuenta cuando el cliente toca “Enviar pedido por WhatsApp”. Abrir WhatsApp no confirma que lo haya enviado ni pagado.</p>
         </div>
       </div>
     </div>

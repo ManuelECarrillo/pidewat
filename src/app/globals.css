@@ -231,6 +231,10 @@ input.i[aria-invalid="true"], textarea.i[aria-invalid="true"] { border-color: va
 }
 .grid2 { display: grid; gap: 12px; grid-template-columns: 1fr; }
 @media (min-width: 720px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.resumen-pedidos { display: grid; gap: 12px; }
+.resumen-pedido + .resumen-pedido { border-top: 1px solid var(--line); padding-top: 12px; }
+.resumen-pedido > p { margin-bottom: 6px; }
+.resumen-pedido-cifras { gap: 24px; }
 .kpi { font-size: 1.8rem; font-weight: 800; }
 table.t { width: 100%; border-collapse: collapse; font-size: .9rem; }
 table.t th, table.t td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
