@@ -13,7 +13,7 @@ export default async function PaginaPedido({ params }: { params: Promise<{ slug:
   const { slug, id } = await params;
   if (!UUID.test(id)) notFound();
   const sb = supabaseAdmin();
-  const { data: o } = await sb.from("orders").select("id, business_id, numero, mesa, nombre, notas, items, total, estado").eq("id", id).maybeSingle();
+  const { data: o } = await sb.from("orders").select("id, business_id, numero, tipo, mesa, nombre, notas, items, total, estado").eq("id", id).maybeSingle();
   if (!o) notFound();
   const { data: n } = await sb.from("businesses").select("slug, name, color, whatsapp").eq("id", o.business_id).maybeSingle();
   if (!n || n.slug !== slug) notFound();
@@ -27,7 +27,7 @@ export default async function PaginaPedido({ params }: { params: Promise<{ slug:
           <strong>{n.name}</strong>
         </header>
 
-        <EstadoPedido id={o.id} numero={o.numero} mesa={o.mesa} estadoInicial={o.estado} />
+        <EstadoPedido id={o.id} numero={o.numero} mesa={o.mesa} paraLlevar={o.tipo === "recoger"} estadoInicial={o.estado} />
 
         <section className="card pedido-detalle" aria-labelledby="detalle-titulo">
           <div className="pedido-detalle-cabecera">

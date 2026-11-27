@@ -124,7 +124,7 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
             <Selector name="plan" valor={n.plan} opciones={[{ value: "base", label: `${PLANES.base.nombre} · ${PLANES.base.mensual} al mes` }, { value: "plus", label: `${PLANES.plus.nombre} · ${PLANES.plus.mensual} al mes` }]} />
           </div>
           <input type="hidden" name="cocina_present" value="1" />
-          <label className="check"><input type="checkbox" name="cocina" defaultChecked={Boolean(n.cocina)} /> Pantalla de cocina (pedidos de mesa van a cocina, no a WhatsApp)</label>
+          <label className="check"><input type="checkbox" name="cocina" defaultChecked={Boolean(n.cocina)} /> Pantalla de cocina (pedidos de mesa y para recoger van a cocina, no a WhatsApp)</label>
           <label className="f">Notas (solo las vemos nosotros)<textarea className="i" name="notes" defaultValue={n.notes || ""} /></label>
           <BotonEnviar>Guardar</BotonEnviar>
         </form>

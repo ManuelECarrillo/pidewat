@@ -113,7 +113,7 @@ export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Pr
   }
   const trial = new Date(Date.now() + DIAS_PRUEBA * 86_400_000).toISOString();
   const { data: neg, error: e2 } = await sb.from("businesses")
-    .insert({ name: negocio, slug, whatsapp, owner_id: userId, owner_email: correo, mode: "menu", plan: "base", trial_ends_at: trial })
+    .insert({ name: negocio, slug, whatsapp, owner_id: userId, owner_email: correo, mode: "menu", plan: "base", trial_ends_at: trial, accepts_table: txt(f, "local", 12) !== "sin-mesas", accepts_pickup: true })
     .select("id").single();
   if (e2 || !neg) {
     await sb.auth.admin.deleteUser(userId); // no dejar cuentas sin negocio

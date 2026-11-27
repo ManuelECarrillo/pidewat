@@ -17,7 +17,7 @@ export async function GET() {
   const { sb, negocio } = await negocioDelDueno();
   if (!negocio?.cocina) return NextResponse.json({ ok: false }, { status: 403 });
   const desde = new Date(Date.now() - 16 * 3_600_000).toISOString();
-  const { data } = await sb.from("orders").select("id, numero, mesa, nombre, notas, items, total, estado, created_at, updated_at")
+  const { data } = await sb.from("orders").select("id, numero, tipo, mesa, nombre, notas, items, total, estado, created_at, updated_at")
     .eq("business_id", negocio.id).gte("created_at", desde).order("created_at", { ascending: true }).limit(200);
   return NextResponse.json({ ok: true, ordenes: data || [] }, { headers: { "Cache-Control": "no-store" } });
 }

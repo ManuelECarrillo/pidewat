@@ -9,7 +9,7 @@ const MAX_POR_PERSONA = 10; // en un restaurante varios clientes comparten el wi
 const txt = (x: unknown, max: number) => String(x ?? "").replace(/\s+/g, " ").trim().slice(0, max) || null;
 const no = (motivo: string, status = 400) => NextResponse.json({ ok: false, motivo }, { status });
 
-// Plan Restaurante: el cliente pide desde el QR de su mesa y el pedido cae en la pantalla de cocina.
+// Plan Restaurante: el cliente pide desde el QR (de su mesa, o del puesto para llevar) y el pedido cae en la pantalla de cocina.
 // Si algo falla, el menú le ofrece mandarlo por WhatsApp como siempre.
 export async function POST(req: Request) {
   let b: Record<string, unknown>;
@@ -17,7 +17,10 @@ export async function POST(req: Request) {
   if (!UUID.test(String(b.business_id))) return no("negocio");
   const sb = supabaseAdmin();
   const { data: n } = await sb.from("businesses").select("*").eq("id", b.business_id).maybeSingle();
-  if (!n || !n.cocina || !n.accepts_table || !estadoNegocio(n).activo) return no("sin-cocina");
+  // «recoger» = puesto sin mesas o para llevar: no lleva mesa, el cliente pasa por su pedido con su número
+  const tipo = b.tipo === "recoger" ? "recoger" : "mesa";
+  const acepta = n && (tipo === "recoger" ? n.accepts_pickup : n.accepts_table);
+  if (!n || !n.cocina || !acepta || !estadoNegocio(n).activo) return no("sin-cocina");
   const horario = leerHorario(n.horario);
   if (horario && !abiertoAhora(horario)) return no("cerrado");
 
@@ -27,9 +30,9 @@ export async function POST(req: Request) {
   const ya = await sb.from("orders").select("id, numero").eq("business_id", n.id).eq("clave", clave).maybeSingle();
   if (ya.data) return NextResponse.json({ ok: true, id: ya.data.id, numero: ya.data.numero, repetido: true });
 
-  const mesa = txt(b.mesa, 6);
+  const mesa = tipo === "mesa" ? txt(b.mesa, 6) : null;
   const nombre = txt(b.nombre, 60);
-  if (!mesa || !nombre) return no("faltan-datos");
+  if ((tipo === "mesa" && !mesa) || !nombre) return no("faltan-datos");
 
   const haceUnMinuto = new Date(Date.now() - 60_000).toISOString();
   const { count } = await sb.from("orders").select("id", { count: "exact", head: true }).eq("business_id", n.id).gte("created_at", haceUnMinuto);
@@ -45,7 +48,7 @@ export async function POST(req: Request) {
   const total = items.reduce((s, l) => s + l.cantidad * l.precio, 0);
 
   const { data: orden, error } = await sb.from("orders").insert({
-    business_id: n.id, clave, tipo: "mesa", mesa, nombre, notas: txt(b.notas, 200), items, total, ip_hash,
+    business_id: n.id, clave, tipo, mesa, nombre, notas: txt(b.notas, 200), items, total, ip_hash,
   }).select("id, numero").single();
   // El número del día lo pone la base (trigger con candado), así dos pedidos al mismo tiempo nunca se repiten
   if (error?.code === "23505") {

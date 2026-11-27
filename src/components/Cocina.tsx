@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { dinero } from "@/lib/formato";
 
 type Linea = { nombre: string; cantidad: number; precio: number; nota?: string };
-type Orden = { id: string; numero: number; mesa: string | null; nombre: string | null; notas: string | null; items: Linea[]; total: number; estado: string; created_at: string };
+type Orden = { id: string; numero: number; tipo?: string | null; mesa: string | null; nombre: string | null; notas: string | null; items: Linea[]; total: number; estado: string; created_at: string };
 type Vista = "cocina" | "listos" | "todos";
 
 const SIGUIENTE: Record<string, { estado: string; texto: string } | undefined> = {
@@ -111,7 +111,7 @@ export default function Cocina() {
         <button className={vista === "todos" ? "on" : ""} onClick={() => setVista("todos")}>Hoy ({(ordenes || []).length})</button>
       </div>
       {ordenes === null && <p className="muted">Cargando…</p>}
-      {ordenes && !lista.length && <p className="muted" style={{ padding: "24px 0" }}>{vista === "cocina" ? "No hay pedidos por preparar. Aquí aparecen en cuanto un cliente pida desde su mesa." : "Nada por aquí."}</p>}
+      {ordenes && !lista.length && <p className="muted" style={{ padding: "24px 0" }}>{vista === "cocina" ? "No hay pedidos por preparar. Aquí aparecen en cuanto un cliente pida desde el QR." : "Nada por aquí."}</p>}
       <div className="cocina">
         {lista.map((o) => {
           const sig = SIGUIENTE[o.estado];
@@ -119,7 +119,7 @@ export default function Cocina() {
           return (
             <article key={o.id} className={`card orden ${o.estado}`}>
               <div className="row between">
-                <h3>#{o.numero} · Mesa {o.mesa || "?"}</h3>
+                <h3>#{o.numero} · {o.tipo === "recoger" ? "Para llevar" : `Mesa ${o.mesa || "?"}`}</h3>
                 <span className="pill">{ETIQUETA[o.estado]}</span>
               </div>
               <div className="small muted" style={{ marginBottom: 6 }}>{o.nombre} · hace {minutos(o.created_at)} min</div>

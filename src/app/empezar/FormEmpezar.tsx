@@ -14,6 +14,7 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
   const [r, enviar, pendiente] = useActionState(alta ? crearPrueba : enviarSolicitud, null);
   const [ver, setVer] = useState(false);
   const [giro, setGiro] = useState("");
+  const [local, setLocal] = useState<"" | "sin-mesas" | "con-mesas">("");
   const [utm, setUtm] = useState("{}");
   useEffect(() => { guardarUtm(); setUtm(JSON.stringify(leerUtm())); medir("registro_inicio", { unaVez: true, detalle: plan }); }, [plan]);
 
@@ -48,6 +49,7 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
       <input type="hidden" name="plan" value={plan} />
       <input type="hidden" name="utm" value={utm} />
       <input type="hidden" name="giro" value={giro} />
+      <input type="hidden" name="local" value={local} />
       <Antirrobot />
       <label className="f">Nombre de tu negocio
         <input className="i" name="negocio" required maxLength={80} autoComplete="organization" placeholder="Ej. Tacos El Güero" aria-invalid={Boolean(err("negocio"))} />
@@ -76,6 +78,13 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
           </label>
         </>
       )}
+      <div className="f">¿Cómo atiendes? <span className="h">Lo puedes cambiar después en «Mi negocio»</span>
+        <div className="chips" role="group" aria-label="Cómo atiendes">
+          {([["sin-mesas", "Puesto o local sin mesas"], ["con-mesas", "Restaurante con mesas"]] as const).map(([v, t]) => (
+            <button key={v} type="button" className={local === v ? "on" : ""} aria-pressed={local === v} onClick={() => setLocal(local === v ? "" : v)}>{t}</button>
+          ))}
+        </div>
+      </div>
       <div className="f">¿Qué vendes? <span className="h">Opcional</span>
         <div className="chips" role="group" aria-label="Tipo de negocio">
           {GIROS.map((g) => (

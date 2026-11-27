@@ -124,13 +124,14 @@ export default function Menu({
     { id: "otros", nombre: "Otros", items: visibles.filter((p) => !p.category_id || !categorias.some((c) => c.id === p.category_id)) },
   ].filter((g) => g.items.length);
 
-  // Plan Restaurante: los pedidos para comer aquí van directo a la pantalla de cocina (necesita la mesa)
-  const aCocina = Boolean(negocio.cocina) && tipo === "mesa" && negocio.id !== "demo";
+  // Plan Restaurante: los pedidos para comer aquí (con mesa) y para recoger van directo a la pantalla de cocina.
+  // A domicilio sigue por WhatsApp, porque hay que acordar la dirección y el envío.
+  const aCocina = Boolean(negocio.cocina) && (tipo === "mesa" || tipo === "recoger") && negocio.id !== "demo";
   const [enviando, setEnviando] = useState(false);
   const [errorCocina, setErrorCocina] = useState(false);
   const [mostrarErrores, setMostrarErrores] = useState(false);
   const errorDireccion = tipo === "domicilio" && !direccion.trim();
-  const errorMesa = aCocina && !mesa.trim();
+  const errorMesa = aCocina && tipo === "mesa" && !mesa.trim();
   const errorNombre = !nombre.trim();
   const falta = errorDireccion ? "Escribe tu dirección"
     : errorMesa ? "Escribe tu número de mesa"
@@ -156,7 +157,7 @@ export default function Menu({
     try {
       const r = await fetch("/api/orden", {
         method: "POST", headers: { "Content-Type": "application/json" }, signal: corte.signal,
-        body: JSON.stringify({ business_id: negocio.id, clave: clavePedido(), mesa: mesa.trim(), nombre: nombre.trim(), notas: notas.trim(), items: itemsServidor() }),
+        body: JSON.stringify({ business_id: negocio.id, clave: clavePedido(), tipo, mesa: tipo === "mesa" ? mesa.trim() : "", nombre: nombre.trim(), notas: notas.trim(), items: itemsServidor() }),
       });
       const d = await r.json();
       if (!d.ok) throw new Error(d.motivo);

@@ -22,7 +22,7 @@ export type Negocio = {
   trial_ends_at: string;
   paid_until: string | null;
   paused: boolean;
-  // Plan Restaurante: los pedidos de mesa van a la pantalla de cocina en vez de WhatsApp
+  // Plan Restaurante: los pedidos de mesa y para recoger van a la pantalla de cocina en vez de WhatsApp
   cocina?: boolean;
 };
 

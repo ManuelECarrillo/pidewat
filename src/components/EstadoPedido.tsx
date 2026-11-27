@@ -26,7 +26,7 @@ function MarcaListo() {
 }
 
 // Se actualiza solo cada 5 segundos mientras la pantalla esté a la vista.
-export default function EstadoPedido({ id, numero, mesa, estadoInicial }: { id: string; numero: number; mesa: string | null; estadoInicial: string }) {
+export default function EstadoPedido({ id, numero, mesa, paraLlevar = false, estadoInicial }: { id: string; numero: number; mesa: string | null; paraLlevar?: boolean; estadoInicial: string }) {
   const [estado, setEstado] = useState(estadoInicial);
   const [conexion, setConexion] = useState<Conexion>("conectado");
   const [acabaDeQuedarListo, setAcabaDeQuedarListo] = useState(false);
@@ -72,27 +72,27 @@ export default function EstadoPedido({ id, numero, mesa, estadoInicial }: { id: 
     <section className={`card estado-pedido estado-${estado}`} aria-labelledby="pedido-titulo">
       <div className="estado-pedido-cabecera">
         <div>
-          <p className="pedido-sobretitulo">Muestra esto al mesero</p>
+          <p className="pedido-sobretitulo">{paraLlevar ? "Tu número de pedido" : "Muestra esto al mesero"}</p>
           <h1 id="pedido-titulo">Tu pedido</h1>
         </div>
         {!esFinal && <span className={`pedido-conexion ${conexion}`} aria-live="polite"><i aria-hidden="true" />{etiquetaConexion}</span>}
       </div>
 
-      <div className="pedido-identidad" aria-label={`Pedido número ${numero}${mesa ? `, mesa ${mesa}` : ""}`}>
+      <div className="pedido-identidad" aria-label={`Pedido número ${numero}${paraLlevar ? ", para recoger" : mesa ? `, mesa ${mesa}` : ""}`}>
         <div className="pedido-numero">
           <span>Pedido</span>
           <strong>#{numero}</strong>
         </div>
         <div className="pedido-mesa">
-          <span>Mesa</span>
-          <strong>{mesa || "—"}</strong>
+          <span>{paraLlevar ? "Entrega" : "Mesa"}</span>
+          <strong>{paraLlevar ? "Recoger" : mesa || "—"}</strong>
         </div>
       </div>
 
       {estado === "listo" && (
         <div className={`pedido-listo ${acabaDeQuedarListo ? "recien-listo" : ""}`} role="status" aria-live="assertive">
           <span className="pedido-listo-icono"><MarcaListo /></span>
-          <div><strong>¡Tu pedido está listo!</strong><span>Ya va camino a tu mesa.</span></div>
+          <div><strong>¡Tu pedido está listo!</strong><span>{paraLlevar ? `Pasa por él y di tu número: #${numero}.` : "Ya va camino a tu mesa."}</span></div>
         </div>
       )}
 
