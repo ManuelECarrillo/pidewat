@@ -60,7 +60,7 @@ export function MenuMini({ conCarrito = true }: { conCarrito?: boolean }) {
       </ul>
       {conCarrito && (
         <div className={s.appBarra}>
-          <span>4 productos · {dinero(255)}</span>
+          <span>{PIEZAS_EJEMPLO} productos · {dinero(TOTAL_EJEMPLO)}</span>
           <span className={s.appBarraBoton}>Pedir por WhatsApp</span>
         </div>
       )}
@@ -69,15 +69,20 @@ export function MenuMini({ conCarrito = true }: { conCarrito?: boolean }) {
 }
 
 // El pedido de ejemplo sale de la misma función que arma el mensaje real que recibe el negocio
+// La barra del celular y la burbuja salen de las mismas líneas, para que el total siempre cuadre
+const LINEAS_EJEMPLO = [
+  // 95 + doble 35 + queso 10, igual que en la demo
+  { nombre: "Hamburguesa clásica", cantidad: 2, precio: 140, nota: "Doble · Queso · Sin cebolla" },
+  { nombre: "Papas a la francesa", cantidad: 1, precio: 60, nota: "Grandes" },
+  { nombre: "Refresco 600 ml", cantidad: 2, precio: 25, nota: "Cola" },
+];
+const PIEZAS_EJEMPLO = LINEAS_EJEMPLO.reduce((s, l) => s + l.cantidad, 0);
+const TOTAL_EJEMPLO = LINEAS_EJEMPLO.reduce((s, l) => s + l.cantidad * l.precio, 0);
+
 export const PEDIDO_EJEMPLO = mensajePedido({
   negocio: "Burger Norte",
   modo: "menu",
-  lineas: [
-    // 95 + doble 35 + queso 10, igual que en la demo
-    { nombre: "Hamburguesa clásica", cantidad: 2, precio: 140, nota: "Doble · Queso · Sin cebolla" },
-    { nombre: "Papas a la francesa", cantidad: 1, precio: 60, nota: "Grandes" },
-    { nombre: "Refresco 600 ml", cantidad: 2, precio: 25, nota: "Cola" },
-  ],
+  lineas: LINEAS_EJEMPLO,
   tipo: "recoger",
   nombreCliente: "Mariana",
   link: "pidewat.vercel.app/demo",
