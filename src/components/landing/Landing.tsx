@@ -34,7 +34,8 @@ const INCLUYE_RESTAURANTE = [
 ];
 
 const CONFIANZA = [
-  { t: "Te lo dejamos funcionando", d: "Nos mandas foto de tu menú y lo configuramos contigo: en persona si estás en Durango, por videollamada en el resto de México." },
+  // La instalación a distancia todavía no está definida (Eduardo, 2026-11-26): no prometerla
+  { t: "Te lo dejamos funcionando", d: "En Durango te lo dejamos funcionando en persona. Si estás en otra ciudad, escríbenos por WhatsApp y te decimos cómo podemos ayudarte." },
   { t: "Sin comisión por pedido", d: "Pagas tu mensualidad y ya. Lo que vendes es tuyo." },
   { t: "Tu cliente no descarga nada", d: "Abre tu menú con un link o escaneando el QR, desde cualquier celular." },
   { t: "Tu mismo WhatsApp", d: "El pedido te llega al número que ya usas. Contestas como siempre." },
