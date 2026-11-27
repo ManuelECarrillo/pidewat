@@ -3,7 +3,6 @@ import Link from "next/link";
 
 export const metadata: Metadata = { title: "Aviso de privacidad", description: "Cómo usa Pidewat los datos que nos compartes." };
 
-// BORRADOR: falta que Eduardo confirme el nombre del responsable y un correo de contacto antes de publicar.
 export default function Privacidad() {
   const wa = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP;
   return (
