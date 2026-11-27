@@ -34,8 +34,8 @@ const INCLUYE_RESTAURANTE = [
 ];
 
 const CONFIANZA = [
-  // Eduardo (2026-11-27): nada que dependa de que él vaya en persona. Solo lo que el dueño ya puede hacer solo.
-  { t: "Lo manejas tú, sin esperar a nadie", d: "Cambias precios, productos, extras y agotados desde tu panel en el celular, cuando quieras." },
+  // Eduardo (2026-11-26): que funcione solo, sin depender de él. Alta y menú los hace el dueño.
+  { t: "Lo manejas tú, sin esperar a nadie", d: "Creas tu cuenta en un minuto y cambias precios, productos, extras y agotados desde tu celular, cuando quieras." },
   { t: "Sin comisión por pedido", d: "Pagas tu mensualidad y ya. Lo que vendes es tuyo." },
   { t: "Tu cliente no descarga nada", d: "Abre tu menú con un link o escaneando el QR, desde cualquier celular." },
   { t: "Tu mismo WhatsApp", d: "El pedido te llega al número que ya usas. Contestas como siempre." },
@@ -190,8 +190,8 @@ export default async function Landing() {
                     <div className={s.mini}><MenuMini conCarrito={false} /></div>
                   </div>
                   <span className={s.pasoNum}>1</span>
-                  <h3>Configuramos tu menú digital</h3>
-                  <p>Nos mandas una foto de tu menú y lo dejamos listo con tus productos, precios, tamaños y extras.</p>
+                  <h3>Armas tu menú en minutos</h3>
+                  <p>Creas tu cuenta y agregas tus productos, precios, tamaños y extras desde el celular. Sin esperar a nadie.</p>
                 </Revelar>
               <Revelar como="li" className={s.paso} retraso={100}>
                   <div className={s.pasoVisual} aria-hidden="true">
@@ -262,7 +262,7 @@ export default async function Landing() {
             <Revelar>
               <p className={s.numero}>05 · Hecho en Durango</p>
               <h2 id="t-confianza" className={s.titulo}>Un servicio cercano, no solo un programa</h2>
-              <p className={s.bajada}>Pidewat lo hacemos en Durango y te acompañamos desde el primer día.</p>
+              <p className={s.bajada}>Pidewat lo hacemos en Durango, México, para negocios de comida como el tuyo.</p>
             </Revelar>
             <ul className={s.confianzaLista}>
               {CONFIANZA.map((c, i) => (

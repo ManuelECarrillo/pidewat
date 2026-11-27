@@ -4,7 +4,7 @@ import FormEmpezar from "./FormEmpezar";
 
 export const metadata: Metadata = {
   title: "Prueba Pidewat 14 días gratis",
-  description: "Pide tu prueba gratis de Pidewat: menú digital con pedidos por WhatsApp para tu negocio de comida. Sin tarjeta.",
+  description: "Crea gratis tu menú de Pidewat: menú digital con pedidos por WhatsApp para tu negocio de comida. Sin tarjeta.",
   robots: { index: false },
 };
 
@@ -21,7 +21,7 @@ export default async function Empezar({ searchParams }: { searchParams: Promise<
         <p className="muted" style={{ marginTop: 0 }}>
           {restaurante
             ? "La pantalla de cocina está en pruebas con pocos negocios. Déjanos tus datos y te la mostramos."
-            : "Sin tarjeta. Nosotros configuramos tu menú contigo y tu prueba empieza cuando quede listo."}
+            : "Sin tarjeta. Creas tu cuenta en un minuto y armas tu menú tú mismo desde el celular."}
         </p>
         <FormEmpezar plan={restaurante ? "restaurante" : "esencial"} />
       </div>

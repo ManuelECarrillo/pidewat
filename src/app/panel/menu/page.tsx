@@ -39,7 +39,8 @@ function FormProducto({ p, categorias, negocioId, catDefecto }: { p?: Producto; 
   );
 }
 
-export default async function PanelMenu() {
+export default async function PanelMenu({ searchParams }: { searchParams: Promise<{ bienvenida?: string }> }) {
+  const { bienvenida } = await searchParams;
   const { sb, negocio } = await requiereDueno();
   const [{ data: c }, { data: p }] = await Promise.all([
     sb.from("categories").select("*").eq("business_id", negocio.id).order("position").order("name"),
@@ -58,6 +59,11 @@ export default async function PanelMenu() {
     <Acordeon>
     <div className="stack" style={{ maxWidth: 720 }}>
       <h1 style={{ fontSize: "1.5rem", marginBottom: 0 }}>Mi menú</h1>
+      {bienvenida && (
+        <div className="alerta alerta-ok" role="status">
+          <strong>¡Tu cuenta está lista!</strong> Tienes 14 días gratis, sin tarjeta. Tu menú ya tiene link: <a href={`/${negocio.slug}`}>pidewat.vercel.app/{negocio.slug}</a>. Agrega tus categorías y platillos aquí abajo; en cuanto guardes uno, ya se puede pedir.
+        </div>
+      )}
       <p className="muted" style={{ margin: 0 }}>Primero arma tus categorías y luego agrega tus {palabra}s dentro de cada una.</p>
 
       <section className="card">

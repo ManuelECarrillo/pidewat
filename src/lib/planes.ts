@@ -26,6 +26,6 @@ export function precioDe(n?: { precio_mensual?: number | string | null; plan?: s
 
 // Slugs que no se pueden usar porque chocan con rutas de la app
 export const SLUGS_RESERVADOS = new Set([
-  "admin", "panel", "entrar", "salir", "api", "demo", "precios", "ayuda", "terminos", "privacidad",
+  "admin", "panel", "entrar", "salir", "api", "demo", "empezar", "prueba", "cocina", "pedido", "precios", "ayuda", "terminos", "privacidad",
   "_next", "favicon.ico", "manifest.webmanifest", "robots.txt", "sitemap.xml",
 ]);
