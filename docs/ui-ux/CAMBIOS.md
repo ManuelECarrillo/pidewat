@@ -1,5 +1,7 @@
 # Cambios UI/UX — Fase 2
 
+- Seguimiento del pedido: número y mesa ahora se muestran como credencial para el mesero; el avance, aviso de listo, conexión recuperable, resumen y acciones se adaptan de móvil a escritorio. Archivos: `src/app/[slug]/pedido/[id]/page.tsx`, `src/components/EstadoPedido.tsx`, `src/app/globals.css`.
+
 - Ajuste QA: áreas táctiles 44 px en chips y botón +. Archivos: `src/app/globals.css`, `docs/ui-ux/CAMBIOS.md`.
 
 - **UX-002:** La navegación móvil del panel ahora calcula sus columnas según las secciones visibles; con Cocina activa, los cinco destinos permanecen en una sola fila sin solaparse. Archivos: `src/components/NavPanel.tsx`, `src/app/globals.css`. Toques: no aplica (corrección de disposición).
