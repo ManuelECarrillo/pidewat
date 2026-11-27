@@ -33,11 +33,12 @@ export function mensajePedido(p: DatosPedido) {
   if (envio > 0) r.push(`Envío: ${dinero(envio)}`);
   r.push(`*Total: ${dinero(totalPedido(p.lineas, envio))}*`);
   r.push("");
-  if (p.tipo === "mesa") r.push(`📍 Para comer aquí${p.mesa ? `, mesa ${p.mesa}` : ""}`);
-  if (p.tipo === "recoger") r.push(p.modo === "menu" ? "🥡 Paso a recoger" : "🛍️ Paso a recoger");
-  if (p.tipo === "domicilio") r.push(`🛵 A domicilio: ${p.direccion || ""}`);
-  if (p.nombreCliente) r.push(`👤 ${p.nombreCliente}`);
-  if (p.notas) r.push(`📝 ${p.notas}`);
+  // Etiquetas en texto: la página intermedia de WhatsApp en computadora rompe los emojis de 4 bytes
+  if (p.tipo === "mesa") r.push(`*Para comer aquí*${p.mesa ? `, mesa ${p.mesa}` : ""}`);
+  if (p.tipo === "recoger") r.push("*Paso a recoger*");
+  if (p.tipo === "domicilio") r.push(`*A domicilio:* ${p.direccion || ""}`);
+  if (p.nombreCliente) r.push(`*Nombre:* ${p.nombreCliente}`);
+  if (p.notas) r.push(`*Notas:* ${p.notas}`);
   r.push("");
   r.push(`_Pedido hecho en ${p.link}_`);
   return r.join("\n");
