@@ -1,5 +1,13 @@
 # Cambios de anuncios
 
+## Vuelta 8 (retoques P3 y R3)
+
+### Corregido
+
+- P3 en 4:5 y 9:16 incorpora la oferta obligatoria «14 días gratis · Sin tarjeta» junto al CTA «Crea tu menú», con tipografía de 40 px o mayor.
+- La comparación de P3 ahora muestra el mensaje de pedido como burbuja verde de WhatsApp: aplica negritas e itálicas igual que `src/components/landing/formatoWa.tsx` y no expone los marcadores `*` ni `_`. El contenido reproduce el pedido de la grabación: Hamburguesa de la casa, Doble carne · Queso extra · Sin cebolla, $132, recoger, Ana demo y el enlace de demo.
+- Se retiró la etiqueta «Dramatización» de las imágenes P3 y R3. No se modificaron P1, P2, R1 ni R2.
+
 ## Vuelta 7 (R2 y subtítulos)
 
 ### Corregido

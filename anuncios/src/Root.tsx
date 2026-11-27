@@ -194,16 +194,57 @@ function R2({ formato: f }: { formato: Formato }) {
 
 function ChatEjemplo({ f }: { f: Formato }) { return <div style={{ padding: f === "9x16" ? 25 : 20, borderRadius: 26, background: "#fff9f1", boxShadow: "0 12px 30px #0005", fontFamily: fuenteSubtitulo, color: "#2d2b28" }}><div style={{ fontSize: f === "9x16" ? 25 : 22, fontWeight: 800, color: "#8b4b2e", marginBottom: 12 }}>EJEMPLO · chat ficticio</div>{["Una sin cebolla", "La otra doble", "¿Papas?", "Y queso", "¿Cuánto es?", "Voy saliendo"].map((x, i) => <div key={x} style={{ margin: "9px 0", marginLeft: i % 2 ? 23 : 0, padding: "11px 13px", borderRadius: 14, background: i % 2 ? "#dbeee2" : "#eee8e1", fontSize: f === "9x16" ? 29 : 25, fontWeight: 700 }}>{x}</div>)}</div>; }
 
+// Copiada de src/components/landing/formatoWa.tsx para que Remotion no importe la app principal.
+function TextoWhatsapp({ texto }: { texto: string }) {
+  return <>{texto.split("\n").map((linea, i) => <span key={i} style={{ display: "block", minHeight: "1.25em" }}>{partesWhatsapp(linea)}</span>)}</>;
+}
+
+function partesWhatsapp(linea: string): React.ReactNode[] {
+  const nodos: React.ReactNode[] = [];
+  const re = /\*([^*]+)\*|_([^_]+)_/g;
+  let ultimo = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = re.exec(linea))) {
+    if (m.index > ultimo) nodos.push(linea.slice(ultimo, m.index));
+    nodos.push(m[1] != null ? <strong key={k++}>{m[1]}</strong> : <em key={k++}>{m[2]}</em>);
+    ultimo = m.index + m[0].length;
+  }
+  if (ultimo < linea.length) nodos.push(linea.slice(ultimo));
+  return nodos;
+}
+
+const mensajePedidoP3 = [
+  "Hola *El Fogón de Durango*, quiero hacer un pedido:",
+  "",
+  "• 1 x Hamburguesa de la casa — $132",
+  "   _Doble carne · Queso extra · Sin cebolla_",
+  "",
+  "*Total: $132*",
+  "",
+  "*Paso a recoger*",
+  "*Nombre:* Ana demo",
+  "",
+  "_Pedido hecho en https://pidewat.vercel.app/demo_",
+].join("\n");
+
+function PedidoWhatsapp({ f }: { f: Formato }) {
+  return <div style={{ height: "100%", boxSizing: "border-box", padding: f === "9x16" ? 23 : 18, borderRadius: 25, background: "#e8dfd3", boxShadow: "0 14px 32px #0006", fontFamily: fuenteSubtitulo }}>
+    <div style={{ marginBottom: 12, color: "#53645a", fontSize: f === "9x16" ? 23 : 20, fontWeight: 800 }}>Mensaje de pedido</div>
+    <div style={{ padding: f === "9x16" ? "17px 19px" : "14px 16px", borderRadius: "18px 18px 5px 18px", background: "#d9fdd3", color: "#17251b", fontSize: f === "9x16" ? 28 : 24, lineHeight: 1.28, boxShadow: "0 2px 4px #0002" }}><TextoWhatsapp texto={mensajePedidoP3} /></div>
+  </div>;
+}
+
 function Imagen({ tipo, formato: f }: { tipo: "P3" | "R3"; formato: Formato }) {
   const p3 = tipo === "P3";
   const fondo = p3 ? "puesto-4x5.jpg" : "fonda-qr-4x5.jpg";
-  const captura = p3 ? "p3-mensaje-pedido.png" : "r3-menu-pedido-mesa.png";
+  const captura = "r3-menu-pedido-mesa.png";
   const altoCapturas = f === "9x16" ? 655 : 475;
   const tarjeta = { flex: 1, overflow: "hidden", borderRadius: 25, border: "4px solid #fff", background: "#fff", boxShadow: "0 14px 32px #0006" } as const;
-  return <AbsoluteFill><Fondo archivo={fondo} oscurecer={.6} /><EtiquetaIA f={f} lado="derecha" /><div style={{ position: "absolute", ...seguro(f), display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+  return <AbsoluteFill><Fondo archivo={fondo} oscurecer={.6} /><div style={{ position: "absolute", ...seguro(f), display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
     <div><Marca clara tamano={f === "9x16" ? 94 : 78} /><div style={{ marginTop: 22, color: "#fff", fontFamily: fuenteTitulo, fontSize: f === "9x16" ? 64 : 57, fontWeight: 800, letterSpacing: -2.5, lineHeight: .94 }}>{p3 ? "DE 6 MENSAJES A UN PEDIDO CLARO" : "TU RESTAURANTE TIENE MENÚ. HAZLO MÁS FÁCIL DE PEDIR"}</div></div>
-    {p3 ? <div style={{ display: "flex", gap: 20, alignItems: "stretch", height: altoCapturas }}><div style={{ flex: 1 }}><ChatEjemplo f={f} /></div><div style={tarjeta}><Img src={staticFile(`assets/grabaciones/${captura}`)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center bottom" }} /></div></div> : <div style={{ display: "flex", gap: 20, alignItems: "stretch", height: altoCapturas }}><div style={tarjeta}><OffthreadVideo src={staticFile("assets/grabaciones/c3-mesa-qr.mp4")} volume={0} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} /></div><div style={tarjeta}><Img src={staticFile(`assets/grabaciones/${captura}`)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 72%" }} /></div></div>}
-    <div><div style={{ color: "#fff", fontFamily: fuenteSubtitulo, fontSize: f === "9x16" ? 42 : 36, fontWeight: 800, lineHeight: 1.08 }}>{p3 ? "Menú digital + extras + total + WhatsApp" : "Menú digital · QR · Pedidos por WhatsApp"}</div><div style={{ display: "inline-block", marginTop: 18, padding: "15px 21px", borderRadius: 15, background: "#35a65d", color: "#fff", fontFamily: fuenteSubtitulo, fontSize: f === "9x16" ? 45 : 40, fontWeight: 800 }}>{p3 ? "Crea tu menú" : "14 días gratis"}</div></div>
+    {p3 ? <div style={{ display: "flex", gap: 20, alignItems: "stretch", height: altoCapturas }}><div style={{ flex: 1 }}><ChatEjemplo f={f} /></div><div style={{ flex: 1 }}><PedidoWhatsapp f={f} /></div></div> : <div style={{ display: "flex", gap: 20, alignItems: "stretch", height: altoCapturas }}><div style={tarjeta}><OffthreadVideo src={staticFile("assets/grabaciones/c3-mesa-qr.mp4")} volume={0} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} /></div><div style={tarjeta}><Img src={staticFile(`assets/grabaciones/${captura}`)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 72%" }} /></div></div>}
+    <div><div style={{ color: "#fff", fontFamily: fuenteSubtitulo, fontSize: f === "9x16" ? 42 : 36, fontWeight: 800, lineHeight: 1.08 }}>{p3 ? "Menú digital + extras + total + WhatsApp" : "Menú digital · QR · Pedidos por WhatsApp"}</div>{p3 ? <div style={{ marginTop: 15, color: "#d9f2df", fontFamily: fuenteSubtitulo, fontSize: f === "9x16" ? 44 : 40, fontWeight: 800, lineHeight: 1.08 }}>14 días gratis · Sin tarjeta</div> : null}<div style={{ display: "inline-block", marginTop: 18, padding: "15px 21px", borderRadius: 15, background: "#35a65d", color: "#fff", fontFamily: fuenteSubtitulo, fontSize: f === "9x16" ? 45 : 40, fontWeight: 800 }}>{p3 ? "Crea tu menú" : "14 días gratis"}</div></div>
   </div></AbsoluteFill>;
 }
 
