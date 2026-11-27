@@ -54,3 +54,11 @@ export async function cambiarMiCorreo(_: { ok: boolean; mensaje: string } | null
   revalidatePath("/panel", "layout");
   return { ok: true, mensaje: `Listo, ahora tu correo es ${nuevo}. Te mandamos ahí el enlace para confirmarlo.` };
 }
+
+// Aviso de novedades: se enseña una sola vez por versión a los dueños que ya tenían cuenta antes del cambio.
+export async function cerrarNovedades(version: number): Promise<void> {
+  const { user } = await usuarioActual();
+  if (!user) return;
+  await supabaseAdmin().auth.admin.updateUserById(user.id, { user_metadata: { ...user.user_metadata, novedades_vistas: version } });
+  revalidatePath("/panel", "layout");
+}
