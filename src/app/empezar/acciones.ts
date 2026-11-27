@@ -99,10 +99,10 @@ export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Pr
   let tokenHash: string | undefined;
   let errAlta: string | undefined;
   if (verificar) {
-    const { data, error } = await sb.auth.admin.generateLink({ type: "signup", email: correo, password: clave, options: { data: { nombre } } });
+    const { data, error } = await sb.auth.admin.generateLink({ type: "signup", email: correo, password: clave, options: { data: { nombre, clave_cambiada: true } } }); // eligió su propia contraseña: sin aviso de cambiarla
     userId = data?.user?.id; tokenHash = data?.properties?.hashed_token; errAlta = error?.message;
   } else {
-    const { data, error } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true, user_metadata: { nombre } });
+    const { data, error } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true, user_metadata: { nombre, clave_cambiada: true } });
     userId = data?.user?.id; errAlta = error?.message;
   }
   if (!userId) {
