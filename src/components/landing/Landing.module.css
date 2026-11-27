@@ -248,6 +248,17 @@
 .dWaFondo .burbuja { max-width: 94%; animation: subir .35s ease both; }
 .dNotaWa { padding: 6px 14px 0; font-size: 12px; color: var(--gris); text-align: center; }
 
+/* Galería de capturas reales: 3 celulares en fila, sin desplazamiento horizontal */
+.seccionCorta { padding-bottom: 24px; }
+.tituloChico { font-size: clamp(1.5rem, 4.6vw, 2.2rem); line-height: 1.1; font-weight: 800; }
+.galeria { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; max-width: 900px; }
+.galeriaItem { display: grid; justify-items: center; gap: 10px; text-align: center; }
+.galeriaItem p { font-size: .85rem; color: var(--gris); line-height: 1.3; }
+.telefonoMini { width: 100%; max-width: 250px; }
+.telefonoMini .telefonoBisel { border-radius: 26px; padding: 5px; }
+.telefonoMini .telefonoPantalla { border-radius: 21px; }
+.telefonoMini .telefonoNotch { top: 9px; width: 40px; height: 10px; margin-left: -20px; border-radius: 0 0 8px 8px; }
+
 /* Cómo funciona */
 .pasos { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 18px; }
 .paso { background: #fff; border-radius: 24px; padding: 22px; box-shadow: var(--sombra); display: grid; gap: 10px; align-content: start; }
@@ -328,7 +339,11 @@
   .heroCtas > * { flex: 0 0 auto; }
   .antesDespues { grid-template-columns: 1fr auto 1fr; gap: 28px; align-items: center; }
   .adFlecha { transform: none; }
-  .pasos { grid-template-columns: repeat(3, 1fr); }
+  .pasos { grid-template-columns: 1fr 1fr; }
+  .galeria { gap: 32px; }
+  .galeriaItem p { font-size: .98rem; }
+  .telefonoMini .telefonoBisel { border-radius: 36px; padding: 8px; }
+  .telefonoMini .telefonoPantalla { border-radius: 29px; }
   .planes { grid-template-columns: 1fr 1fr; }
   .seccion { padding: 104px 0; }
 }
@@ -339,6 +354,7 @@
   .heroGrid { grid-template-columns: 1.08fr .92fr; align-items: center; gap: 56px; }
   .heroVisual { padding-bottom: 60px; }
   .heroBurbuja { right: -10px; bottom: 10px; width: 300px; }
+  .pasos { grid-template-columns: repeat(3, 1fr); }
   .demoGrid { grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
   .demoPasos { order: 1; gap: 6px; }
   .demoPasos li { font-size: 1.15rem; padding: 14px 18px; }

@@ -19,10 +19,9 @@ export function Telefono({ children, className = "", etiqueta, interactivo = fal
   );
 }
 
-// Para cambiar los mockups por capturas reales de public/landing/ cuando existan.
-// Hoy no se usa: solo se agrega cuando el archivo exista de verdad.
+// Capturas reales de public/landing/ (solo archivos que existen de verdad)
 export function Captura({ src, alt, ancho, alto }: { src: string; alt: string; ancho: number; alto: number }) {
-  return <Image src={src} alt={alt} width={ancho} height={alto} className={s.captura} sizes="(max-width: 768px) 80vw, 360px" />;
+  return <Image src={src} alt={alt} width={ancho} height={alto} className={s.captura} sizes="(max-width: 768px) 33vw, 250px" />;
 }
 
 // Así se ve el menú que abre el cliente (mismo estilo que el menú real de Pidewat)

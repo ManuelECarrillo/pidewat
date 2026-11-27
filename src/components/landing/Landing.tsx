@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import { PLANES, DIAS_PRUEBA } from "@/lib/planes";
 import { dinero } from "@/lib/formato";
 import { BotonProbar, BotonVerDemo, MedirVisita } from "./Medicion";
-import { BurbujaWhatsapp, ChatSuelto, MenuMini, Telefono } from "./Mockups";
+import { BurbujaWhatsapp, Captura, ChatSuelto, MenuMini, Telefono } from "./Mockups";
 import DemoSeccion from "./DemoSeccion";
 import Revelar from "./Revelar";
 import { fuenteTexto, fuenteTitulos } from "./fuentes";
@@ -39,6 +39,13 @@ const CONFIANZA = [
   { t: "Tu cliente no descarga nada", d: "Abre tu menú con un link o escaneando el QR, desde cualquier celular." },
   { t: "Tu mismo WhatsApp", d: "El pedido te llega al número que ya usas. Contestas como siempre." },
   { t: "Soporte directo por WhatsApp", d: "Hablas con quien hizo Pidewat, no con un robot." },
+];
+
+// Capturas tomadas del menú de demostración real (/demo), no de un diseño
+const CAPTURAS = [
+  { src: "/landing/captura-menu.png", alt: "Menú digital de un negocio de antojitos en Pidewat", pie: "Tu menú, con tus categorías y precios" },
+  { src: "/landing/captura-extras.png", alt: "Ficha de un platillo con extras y opción para quitar ingredientes", pie: "Extras y «sin cebolla» en un toque" },
+  { src: "/landing/captura-carrito.png", alt: "Carrito con el total del pedido listo para enviar por WhatsApp", pie: "El total listo antes de enviar" },
 ];
 
 const PREGUNTAS = [
@@ -142,6 +149,26 @@ export default async function Landing() {
               <p className={s.bajada}>Elige una hamburguesa, agrégale extras y toca «Pedir». Al final ves el mensaje exacto que le llega al negocio.</p>
             </Revelar>
             <DemoSeccion />
+          </div>
+        </section>
+
+        {/* Capturas reales del menú de demostración de Pidewat (/demo) */}
+        <section className={`${s.seccion} ${s.seccionCorta}`} aria-labelledby="t-real">
+          <div className={s.contenedor}>
+            <Revelar>
+              <p className={s.numero}>Capturas reales</p>
+              <h2 id="t-real" className={s.tituloChico}>Así se ve en el celular de tu cliente</h2>
+            </Revelar>
+            <div className={s.galeria}>
+              {CAPTURAS.map((c, i) => (
+                <Revelar key={c.src} retraso={i * 90} className={s.galeriaItem}>
+                  <Telefono className={s.telefonoMini} etiqueta={c.alt}>
+                    <Captura src={c.src} alt={c.alt} ancho={780} alto={1688} />
+                  </Telefono>
+                  <p>{c.pie}</p>
+                </Revelar>
+              ))}
+            </div>
           </div>
         </section>
 
