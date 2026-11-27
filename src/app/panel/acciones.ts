@@ -59,8 +59,11 @@ export async function guardarProducto(f: FormData) {
     ...(f.has("ingredientes") ? { ingredientes: lista(f, "ingredientes") } : {}),
     ...(f.has("opciones") ? { opciones: limpiarOpciones(String(f.get("opciones")).slice(0, 8000)) } : {}),
   };
-  if (id) await sb.from("products").update(datos).eq("id", id).eq("business_id", negocio.id);
-  else await sb.from("products").insert({ ...datos, position: Date.now() % 1_000_000_000 });
+  const { error } = id
+    ? await sb.from("products").update(datos).eq("id", id).eq("business_id", negocio.id)
+    : await sb.from("products").insert({ ...datos, position: Date.now() % 1_000_000_000 });
+  // Sin esto, el aviso «Platillo agregado» saldría aunque no se haya guardado
+  if (error) throw new Error("No se pudo guardar el platillo. Revisa tu conexión e inténtalo otra vez.");
   refrescar(negocio.slug);
 }
 
