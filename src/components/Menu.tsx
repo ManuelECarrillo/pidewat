@@ -29,9 +29,14 @@ function textoSin(sin: string[], p?: Producto) {
 const notaLinea = (sin: string[], p?: Producto) => (ingredientesDe(p).length ? textoSin(sin, p) || "Con todo" : "");
 
 export default function Menu({
-  negocio, categorias, productos, mesaInicial, link,
+  negocio, categorias, productos, mesaInicial, link, onMensajePedido, apiCocina, onCocinaEnviada,
 }: {
   negocio: NegocioMenu; categorias: Categoria[]; productos: Producto[]; mesaInicial?: string; link: string;
+  // Solo la ruta protegida de grabaci\u00f3n intercepta esto para mostrar el texto real de WhatsApp en pantalla.
+  onMensajePedido?: (texto: string) => void;
+  // El panel normal conserva /api/orden; la ruta protegida usa su almac\u00e9n ef\u00edmero, sin Supabase.
+  apiCocina?: string;
+  onCocinaEnviada?: () => void;
 }) {
   const clave = `pidewat:${negocio.slug}`;
   const [carrito, setCarrito] = useState<Carrito>({});
@@ -126,7 +131,7 @@ export default function Menu({
 
   // Plan Restaurante: los pedidos para comer aquí (con mesa) y para recoger van directo a la pantalla de cocina.
   // A domicilio sigue por WhatsApp, porque hay que acordar la dirección y el envío.
-  const aCocina = Boolean(negocio.cocina) && (tipo === "mesa" || tipo === "recoger") && negocio.id !== "demo";
+  const aCocina = Boolean(negocio.cocina) && (tipo === "mesa" || tipo === "recoger") && (negocio.id !== "demo" || Boolean(apiCocina));
   const [enviando, setEnviando] = useState(false);
   const [errorCocina, setErrorCocina] = useState(false);
   const [mostrarErrores, setMostrarErrores] = useState(false);
@@ -155,13 +160,14 @@ export default function Menu({
     const corte = new AbortController();
     const espera = setTimeout(() => corte.abort(), 12_000);
     try {
-      const r = await fetch("/api/orden", {
+      const r = await fetch(apiCocina || "/api/orden", {
         method: "POST", headers: { "Content-Type": "application/json" }, signal: corte.signal,
         body: JSON.stringify({ business_id: negocio.id, clave: clavePedido(), tipo, mesa: tipo === "mesa" ? mesa.trim() : "", nombre: nombre.trim(), notas: notas.trim(), items: itemsServidor() }),
       });
       const d = await r.json();
       if (!d.ok) throw new Error(d.motivo);
       setCarrito({});
+      if (onCocinaEnviada) { onCocinaEnviada(); return; }
       window.location.href = `/${negocio.slug}/pedido/${d.id}`;
     } catch {
       setErrorCocina(true);
@@ -179,13 +185,14 @@ export default function Menu({
       negocio: negocio.name, modo: negocio.mode, lineas, tipo, mesa, nombreCliente: nombre.trim(),
       direccion: direccion.trim(), notas: notas.trim(), envio, link,
     });
-    if (negocio.id !== "demo") {
+    if (negocio.id !== "demo" && !onMensajePedido) {
       const items = itemsServidor();
       const cuerpo = JSON.stringify({ business_id: negocio.id, order_type: tipo, items });
       try { navigator.sendBeacon("/api/pedido", new Blob([cuerpo], { type: "application/json" })); } catch {}
     }
     setCarrito({});
     setAbierto(false);
+    if (onMensajePedido) { onMensajePedido(texto); return; }
     window.location.href = linkWhatsapp(negocio.whatsapp, texto);
   }
 
