@@ -17,8 +17,14 @@ export default function OnboardingPanel({ negocioId, tieneProductos, negocioConf
   const clave = `pidewat:onboarding:${negocioId}`;
 
   useEffect(() => {
-    if (!debeMostrarse) return;
+    // Claude (QA 2026-11-27): sin esto la lista desaparecía al agregar el primer platillo, antes del paso 3 (QR).
+    // Si ya se mostró una vez en este celular, sigue hasta que el dueño la cierre. Un negocio con menú armado
+    // nunca la vio, así que nunca tiene la marca y no le aparece.
+    let yaActivo = false;
+    try { yaActivo = localStorage.getItem(`${clave}:activo`) === "1"; } catch {}
+    if (!debeMostrarse && !yaActivo) return;
     try {
+      localStorage.setItem(`${clave}:activo`, "1");
       setQrCompartido(localStorage.getItem(`${clave}:qr`) === "1");
       setVisible(localStorage.getItem(`${clave}:cerrado`) !== "1");
     } catch {
