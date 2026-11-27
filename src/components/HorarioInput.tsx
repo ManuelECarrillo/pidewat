@@ -20,6 +20,26 @@ export default function HorarioInput({ valor, textoLibre }: { valor: Horario | n
 
   const cambiar = (d: number, t: Turno | null) => { setDias((x) => x.map((v, i) => (i === d ? t : v))); avisarCambio(caja.current); };
   const copiarLunes = () => { setDias((x) => x.map((v) => (v ? { ...(x[1] || BASE) } : v))); avisarCambio(caja.current); };
+  const filaDia = (d: number) => {
+    const t = dias[d];
+    return (
+      <div key={d} className="horario-dia">
+        <label className="check" style={{ margin: 0 }}>
+          <input type="checkbox" checked={Boolean(t)} onChange={(e) => cambiar(d, e.target.checked ? { ...(dias[1] || BASE) } : null)} />
+          <span style={{ minWidth: 84 }}>{NOMBRES_DIA[d]}</span>
+        </label>
+        {t ? (
+          <div className="row horario-horas">
+            <Selector key={`a${d}${t.abre}`} name={`abre-${d}`} valor={t.abre} opciones={HORAS} ariaLabel={`${NOMBRES_DIA[d]} abre`} onCambio={(v) => cambiar(d, { ...t, abre: v })} />
+            <span className="small muted">a</span>
+            <Selector key={`c${d}${t.cierra}`} name={`cierra-${d}`} valor={t.cierra} opciones={HORAS} ariaLabel={`${NOMBRES_DIA[d]} cierra`} onCambio={(v) => cambiar(d, { ...t, cierra: v })} />
+          </div>
+        ) : (
+          <span className="small muted">Cerrado</span>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="f" ref={caja}>
@@ -33,27 +53,13 @@ export default function HorarioInput({ valor, textoLibre }: { valor: Horario | n
         </label>
       ) : (
         <div className="horario">
-          {ORDEN.map((d) => {
-            const t = dias[d];
-            return (
-              <div key={d} className="horario-dia">
-                <label className="check" style={{ margin: 0 }}>
-                  <input type="checkbox" checked={Boolean(t)} onChange={(e) => cambiar(d, e.target.checked ? { ...(dias[1] || BASE) } : null)} />
-                  <span style={{ minWidth: 84 }}>{NOMBRES_DIA[d]}</span>
-                </label>
-                {t ? (
-                  <div className="row horario-horas">
-                    <Selector key={`a${d}${t.abre}`} name={`abre-${d}`} valor={t.abre} opciones={HORAS} ariaLabel={`${NOMBRES_DIA[d]} abre`} onCambio={(v) => cambiar(d, { ...t, abre: v })} />
-                    <span className="small muted">a</span>
-                    <Selector key={`c${d}${t.cierra}`} name={`cierra-${d}`} valor={t.cierra} opciones={HORAS} ariaLabel={`${NOMBRES_DIA[d]} cierra`} onCambio={(v) => cambiar(d, { ...t, cierra: v })} />
-                  </div>
-                ) : (
-                  <span className="small muted">Cerrado</span>
-                )}
-              </div>
-            );
-          })}
-          <button type="button" className="btn btn-sm" onClick={copiarLunes}>Poner el horario del lunes a todos los días abiertos</button>
+          <p className="small muted" style={{ margin: 0 }}>Empieza con el lunes y cópialo a los días que ya están abiertos.</p>
+          {filaDia(1)}
+          <button type="button" className="btn" onClick={copiarLunes}>Usar el horario del lunes en todos los días abiertos</button>
+          <details className="horario-detalle">
+            <summary>Ajustar otros días</summary>
+            <div>{ORDEN.filter((d) => d !== 1).map(filaDia)}</div>
+          </details>
           <p className="small muted" style={{ margin: 0 }}>Fuera de este horario tus clientes ven tu menú, pero no pueden mandar pedidos. Hora del centro de México.</p>
         </div>
       )}
