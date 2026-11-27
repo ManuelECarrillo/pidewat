@@ -92,7 +92,10 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
       <button className="btn btn-p btn-block" disabled={pendiente} style={{ padding: 14, fontSize: "1.05rem" }}>
         {pendiente ? (alta ? "Creando tu cuenta…" : "Enviando…") : alta ? "Crear mi menú gratis" : "Solicitar demostración"}
       </button>
-      <p className="small muted" style={{ textAlign: "center", margin: "10px 0 0" }}>Sin tarjeta. 14 días gratis desde hoy. Si al terminar no quieres seguir, no pagas nada.</p>
+      {/* La solicitud de Restaurante no arranca ninguna prueba: no prometer los 14 días ahí */}
+      <p className="small muted" style={{ textAlign: "center", margin: "10px 0 0" }}>
+        {alta ? "Sin tarjeta. 14 días gratis desde hoy. Si al terminar no quieres seguir, no pagas nada." : "Sin tarjeta y sin compromiso. Solo es para mostrarte cómo funciona la pantalla de cocina."}
+      </p>
     </form>
   );
 }
