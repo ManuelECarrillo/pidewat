@@ -3,9 +3,9 @@ import BotonEnviar from "@/components/BotonEnviar";
 import { estadoNegocio } from "@/lib/estado";
 import { dinero, fecha } from "@/lib/formato";
 import { mpConfigurado } from "@/lib/mercadopago";
-import { precioDe } from "@/lib/planes";
+import { PLANES, precioDe } from "@/lib/planes";
 import { requiereDueno } from "@/lib/sesion";
-import { irAPagar } from "./acciones";
+import { cancelarMiCobro, irAPagar } from "./acciones";
 
 export default async function PanelPlan({ searchParams }: { searchParams: Promise<{ mp?: string }> }) {
   const { sb, negocio, user } = await requiereDueno();
@@ -25,12 +25,20 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
       </div>
       {mp === "ok" && <div className="alerta alerta-ok">¡Gracias! En cuanto Mercado Pago confirme el pago, tu plan se actualiza solo (tarda unos minutos).</div>}
       {mp === "pendiente" && <div className="alerta">Tu pago está pendiente. Si pagaste en OXXO, se acredita en unas horas.</div>}
-      {mp === "error" && <div className="alerta alerta-bad">No se pudo abrir Mercado Pago. Intenta de nuevo o escríbenos.</div>}
+      {mp === "error" && <div className="alerta alerta-bad">No se pudo completar con Mercado Pago. Intenta de nuevo o escríbenos.</div>}
+      {mp === "cancelado" && <div className="alerta">Cancelaste el cobro automático. Ya no se te cobrará; tu menú sigue activo hasta la fecha que ya pagaste.</div>}
       <AvisoEstado estado={estado} precio={precio} />
-      {negocio.mp_preapproval_id && <div className="alerta alerta-ok">Tienes el cobro automático mensual activo con Mercado Pago.</div>}
+      {negocio.mp_preapproval_id && (
+        <div className="alerta alerta-ok">
+          Tienes el cobro automático mensual activo con Mercado Pago.
+          <form action={cancelarMiCobro} style={{ marginTop: 8 }}>
+            <BotonEnviar className="btn btn-sm" confirmar="¿Cancelar el cobro automático? Tu menú sigue activo hasta la fecha que ya pagaste.">Cancelar cobro automático</BotonEnviar>
+          </form>
+        </div>
+      )}
 
       <div className="card" style={{ maxWidth: 460 }}>
-        <div className="row between"><strong>Plan Pidewat</strong><span className="pill">Un solo plan</span></div>
+        <div className="row between"><strong>Plan Pidewat</strong><span className="pill">{PLANES[negocio.plan === "plus" ? "plus" : "base"].nombre}</span></div>
         <div className="kpi" style={{ margin: "6px 0 2px" }}>{dinero(precio)}<span className="small muted" style={{ fontWeight: 600 }}> MXN al mes</span></div>
         <p className="small muted" style={{ marginTop: 0 }}>O {dinero(anual)} por un año (te ahorras 2 meses). Menú ilimitado, pedidos sin comisión, QR y fotos.</p>
         {mpConfigurado() ? (
@@ -41,6 +49,7 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
                 <input className="i" type="email" name="correo" required defaultValue={user.email || ""} />
               </label>
               <BotonEnviar className="btn btn-p btn-block">Pagar {dinero(precio)} al mes (automático)</BotonEnviar>
+              <p className="small muted" style={{ margin: "8px 0 0" }}>Mercado Pago te pide autorizar el cobro mensual. Nada se cobra sin tu autorización y lo cancelas aquí cuando quieras. Tu prueba gratis no pidió tarjeta.</p>
             </form>
             <form action={irAPagar} style={{ marginTop: 8 }}>
               <input type="hidden" name="plan" value="base" />

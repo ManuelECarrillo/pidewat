@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Categoria, NegocioMenu, Producto } from "@/lib/tipos";
 import { dinero } from "@/lib/formato";
 import { abiertoAhora, proximaApertura } from "@/lib/horario";
@@ -129,13 +129,25 @@ export default function Menu({
 
   const itemsServidor = () => entradas.map((e) => ({ id: e.id, cantidad: e.n, ...(e.o ? { o: e.o } : {}), ...(e.sin.length ? { sin: e.sin } : {}) }));
 
+  // Una clave por pedido: si se corta la conexión y el cliente vuelve a tocar, no se crea otro pedido.
+  // Cambia solo cuando cambia el carrito.
+  const claveEnvio = useRef<{ carrito: string; clave: string } | null>(null);
+  function clavePedido() {
+    const firma = JSON.stringify(carrito);
+    if (claveEnvio.current?.carrito !== firma) claveEnvio.current = { carrito: firma, clave: crypto.randomUUID() };
+    return claveEnvio.current.clave;
+  }
+
   async function enviarACocina() {
+    if (enviando) return;
     setEnviando(true);
     setErrorCocina(false);
+    const corte = new AbortController();
+    const espera = setTimeout(() => corte.abort(), 12_000);
     try {
       const r = await fetch("/api/orden", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ business_id: negocio.id, mesa: mesa.trim(), nombre: nombre.trim(), notas: notas.trim(), items: itemsServidor() }),
+        method: "POST", headers: { "Content-Type": "application/json" }, signal: corte.signal,
+        body: JSON.stringify({ business_id: negocio.id, clave: clavePedido(), mesa: mesa.trim(), nombre: nombre.trim(), notas: notas.trim(), items: itemsServidor() }),
       });
       const d = await r.json();
       if (!d.ok) throw new Error(d.motivo);
@@ -144,6 +156,8 @@ export default function Menu({
     } catch {
       setErrorCocina(true);
       setEnviando(false);
+    } finally {
+      clearTimeout(espera);
     }
   }
 
@@ -307,8 +321,8 @@ export default function Menu({
                   </button>
                   {errorCocina ? (
                     <div className="alerta" style={{ marginTop: 8 }}>
-                      No se pudo mandar a la cocina.{" "}
-                      <button className="btn btn-sm btn-wa" onClick={() => enviar(true)}>Mandarlo por WhatsApp</button>
+                      No se pudo mandar a la cocina. Revisa tu señal y vuelve a tocar el botón (no se duplica), o{" "}
+                      <button className="btn btn-sm btn-wa" onClick={() => enviar(true)}>mándalo por WhatsApp</button>
                     </div>
                   ) : (
                     <p className="small muted" style={{ textAlign: "center", margin: "8px 0 0" }}>

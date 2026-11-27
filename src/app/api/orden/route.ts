@@ -5,7 +5,7 @@ import { calcularLineas, huellaIp, leerItems, UUID } from "@/lib/lineasServidor"
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const MAX_POR_MINUTO = 20;
-const MAX_POR_PERSONA = 4;
+const MAX_POR_PERSONA = 10; // en un restaurante varios clientes comparten el wifi (misma IP)
 const txt = (x: unknown, max: number) => String(x ?? "").replace(/\s+/g, " ").trim().slice(0, max) || null;
 const no = (motivo: string, status = 400) => NextResponse.json({ ok: false, motivo }, { status });
 
@@ -20,6 +20,12 @@ export async function POST(req: Request) {
   if (!n || !n.cocina || !n.accepts_table || !estadoNegocio(n).activo) return no("sin-cocina");
   const horario = leerHorario(n.horario);
   if (horario && !abiertoAhora(horario)) return no("cerrado");
+
+  // Si el celular reintenta (se cortó la conexión), manda la misma clave y le regresamos el mismo pedido
+  const clave = String(b.clave ?? "");
+  if (!UUID.test(clave)) return no("clave");
+  const ya = await sb.from("orders").select("id, numero").eq("business_id", n.id).eq("clave", clave).maybeSingle();
+  if (ya.data) return NextResponse.json({ ok: true, id: ya.data.id, numero: ya.data.numero, repetido: true });
 
   const mesa = txt(b.mesa, 6);
   const nombre = txt(b.nombre, 60);
@@ -38,14 +44,14 @@ export async function POST(req: Request) {
   if (!items.length) return no("vacio");
   const total = items.reduce((s, l) => s + l.cantidad * l.precio, 0);
 
-  // Número corto para gritarlo en la cocina: se reinicia cada día. México centro es UTC-6 todo el año desde 2022.
-  const SEIS_H = 6 * 3_600_000;
-  const inicioDia = new Date(Math.floor((Date.now() - SEIS_H) / 86_400_000) * 86_400_000 + SEIS_H);
-  const { count: deHoy } = await sb.from("orders").select("id", { count: "exact", head: true }).eq("business_id", n.id).gte("created_at", inicioDia.toISOString());
-
   const { data: orden, error } = await sb.from("orders").insert({
-    business_id: n.id, numero: (deHoy ?? 0) + 1, tipo: "mesa", mesa, nombre, notas: txt(b.notas, 200), items, total, ip_hash,
+    business_id: n.id, clave, tipo: "mesa", mesa, nombre, notas: txt(b.notas, 200), items, total, ip_hash,
   }).select("id, numero").single();
+  // El número del día lo pone la base (trigger con candado), así dos pedidos al mismo tiempo nunca se repiten
+  if (error?.code === "23505") {
+    const { data: otro } = await sb.from("orders").select("id, numero").eq("business_id", n.id).eq("clave", clave).maybeSingle();
+    if (otro) return NextResponse.json({ ok: true, id: otro.id, numero: otro.numero, repetido: true });
+  }
   if (error || !orden) return no("guardar", 500);
 
   // También cuenta en las estadísticas del dueño, igual que un pedido por WhatsApp

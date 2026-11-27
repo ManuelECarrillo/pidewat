@@ -128,7 +128,10 @@ export async function alternarPausa(f: FormData) {
 export async function guardarInterno(f: FormData) {
   const { sb, id, n } = await negocio(f);
   const slug = slugify(String(f.get("slug") || n.slug));
-  const cambios: Record<string, unknown> = { notes: String(f.get("notes") || "") || null, plan: f.get("plan") === "plus" ? "plus" : "base" };
+  const cambios: Record<string, unknown> = { notes: String(f.get("notes") || "") || null };
+  if (f.has("plan")) cambios.plan = f.get("plan") === "plus" ? "plus" : "base";
+  // La pantalla de cocina solo se prende a mano, negocio por negocio
+  if (f.has("cocina_present")) cambios.cocina = f.get("cocina") === "on";
   if (f.has("precio_mensual")) {
     const t = String(f.get("precio_mensual") || "").replace(/[^0-9.]/g, "");
     cambios.precio_mensual = t ? Math.max(0, Number(t) || 0) : null;
