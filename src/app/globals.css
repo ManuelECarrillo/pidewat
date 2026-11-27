@@ -506,12 +506,14 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
 .chips .chip-atencion { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 76px; padding: 10px; border-radius: 14px; color: var(--text); text-align: left; }
 .chip-atencion-icono { width: 40px; height: 40px; padding: 8px; border-radius: 12px; background: var(--bg); color: var(--muted); }
 .chip-atencion-texto { display: grid; gap: 2px; min-width: 0; }
-.chip-atencion-texto strong { overflow-wrap: anywhere; font-size: .9rem; line-height: 1.15; }
+.chip-atencion-texto strong { overflow-wrap: normal; font-size: .9rem; line-height: 1.15; }
 .chip-atencion-texto span { color: var(--muted); font-size: .78rem; font-weight: 500; line-height: 1.2; }
 .chips .chip-atencion.on { border-color: var(--c); box-shadow: 0 0 0 1px var(--c); }
 .chips .chip-atencion.on .chip-atencion-icono { background: var(--c); color: #fff; }
 .chips .chip-atencion.on .chip-atencion-texto span { color: color-mix(in srgb, var(--c) 76%, var(--text)); }
 @media (hover: hover) { .chips .chip-atencion:hover:not(.on) { border-color: color-mix(in srgb, var(--c) 48%, var(--line)); background: color-mix(in srgb, var(--c) 4%, #fff); } }
 @media (max-width: 374px) { .chips-atencion { grid-template-columns: 1fr; } .chips .chip-atencion { min-height: 64px; } }
+/* Claude (QA 2026-11-27): con Inter, «Restaurante» no cabía junto al icono a 390 px y se partía. En celular el icono va arriba. */
+@media (min-width: 375px) and (max-width: 440px) { .chips .chip-atencion { grid-template-columns: 1fr; align-items: start; gap: 6px; } .chip-atencion-icono { width: 32px; height: 32px; padding: 6px; border-radius: 10px; } }
 .pasos-lista { padding-left: 20px; margin: 10px 0 16px; }
 .pasos-lista li { margin-bottom: 8px; }
