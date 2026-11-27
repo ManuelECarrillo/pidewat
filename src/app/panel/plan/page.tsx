@@ -69,17 +69,19 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
       </div>
 
       {pagos && pagos.length > 0 && (
-        <div className="card scroll-x">
+        <section className="card">
           <h3>Mis pagos</h3>
-          <table className="t">
-            <thead><tr><th>Fecha</th><th>Monto</th><th>Meses</th><th>Forma</th></tr></thead>
-            <tbody>
-              {pagos.map((p) => (
-                <tr key={p.id}><td>{fecha(p.created_at)}</td><td>{dinero(Number(p.amount))}</td><td>{p.months}</td><td>{p.method}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          <div className="historial-pagos">
+            {pagos.map((p) => (
+              <article className="pago-historial" key={p.id}>
+                <div><span className="small muted">Fecha</span><strong>{fecha(p.created_at)}</strong></div>
+                <div><span className="small muted">Monto</span><strong>{dinero(Number(p.amount))}</strong></div>
+                <div><span className="small muted">Meses</span><span>{p.months}</span></div>
+                <div><span className="small muted">Forma</span><span>{p.method}</span></div>
+              </article>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
