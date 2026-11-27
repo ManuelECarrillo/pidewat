@@ -13,11 +13,14 @@ export default async function Panel() {
   const hace30 = new Date(Date.now() - 30 * 86_400_000).toISOString();
   const hace7 = Date.now() - 7 * 86_400_000;
 
-  const [{ data: pedidos }, { count: productos }] = await Promise.all([
+  const [{ data: pedidos }, { count: productos }, { data: mesa }] = await Promise.all([
     sb.from("order_events").select("total, items, created_at").eq("business_id", negocio.id).gte("created_at", hace30).order("created_at", { ascending: false }).limit(2000),
     sb.from("products").select("id", { count: "exact", head: true }).eq("business_id", negocio.id),
+    negocio.cocina
+      ? sb.from("orders").select("total, items, created_at").eq("business_id", negocio.id).neq("estado", "cancelado").gte("created_at", hace30).limit(2000)
+      : Promise.resolve({ data: [] as { total: number; items: unknown; created_at: string }[] }),
   ]);
-  const lista = pedidos || [];
+  const lista = [...(pedidos || []), ...(mesa || [])];
   const semana = lista.filter((p) => new Date(p.created_at).getTime() > hace7);
   const suma = (xs: typeof lista) => xs.reduce((s, p) => s + Number(p.total), 0);
 
@@ -43,7 +46,7 @@ export default async function Panel() {
       <div className="grid2">
         <CompartirLink url={`${siteUrl()}/${negocio.slug}`} nombre={negocio.name} color={negocio.color} />
         <div className="card">
-          <h3>Pedidos por WhatsApp</h3>
+          <h3>{negocio.cocina ? "Pedidos" : "Pedidos por WhatsApp"}</h3>
           <div className="row" style={{ gap: 24 }}>
             <div><div className="kpi">{semana.length}</div><div className="small muted">últimos 7 días</div></div>
             <div><div className="kpi">{lista.length}</div><div className="small muted">últimos 30 días</div></div>
@@ -57,7 +60,7 @@ export default async function Panel() {
               <ol style={{ margin: 0, paddingLeft: 20 }}>{top.map(([n, c]) => <li key={n}>{n} <span className="muted">({c})</span></li>)}</ol>
             </>
           )}
-          <p className="small muted" style={{ marginBottom: 0 }}>Cuenta cada vez que un cliente toca “Enviar pedido por WhatsApp”.</p>
+          <p className="small muted" style={{ marginBottom: 0 }}>{negocio.cocina ? "Cuenta los pedidos enviados por WhatsApp y los de mesa que no se cancelaron." : "Cuenta cada vez que un cliente toca “Enviar pedido por WhatsApp”."}</p>
         </div>
       </div>
     </div>

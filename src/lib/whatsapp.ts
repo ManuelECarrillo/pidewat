@@ -43,5 +43,6 @@ export function mensajePedido(p: DatosPedido) {
   return r.join("\n");
 }
 
+// api.whatsapp.com directo: el salto de wa.me a api.whatsapp.com rompe los emojis de 4 bytes (🥡 👤 📝 → �)
 export const linkWhatsapp = (numero: string, texto: string) =>
-  `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
+  `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(texto)}`;
