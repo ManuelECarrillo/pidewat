@@ -8,7 +8,8 @@ export const turnstileActivo = () => Boolean(process.env.TURNSTILE_SECRET_KEY &&
 export async function pareceRobot(f: FormData, ip: string | null): Promise<boolean> {
   if (String(f.get("sitio_web") ?? "").trim()) return true;
   const t0 = Number(f.get("t0"));
-  if (Number.isFinite(t0) && t0 > 0 && Date.now() - t0 < 2500) return true; // nadie llena el formulario en 2.5 s
+  if (!Number.isFinite(t0) || t0 <= 0) return true; // el formulario real siempre manda t0
+  if (Date.now() - t0 < 2500) return true; // nadie llena el formulario en 2.5 s
   if (!turnstileActivo()) return false;
   const token = String(f.get("cf-turnstile-response") ?? "");
   if (!token) return true;
