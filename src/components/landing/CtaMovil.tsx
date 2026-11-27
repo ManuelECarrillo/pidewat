@@ -14,7 +14,10 @@ export default function CtaMovil({ href, children }: { href: string; children: R
       if (!hero || !final) return;
       const pasoHero = window.scrollY > hero.offsetHeight * .7;
       const cercaDelFinal = final.getBoundingClientRect().top < window.innerHeight * 1.15;
-      setVisible(pasoHero && !cercaDelFinal);
+      const ver = pasoHero && !cercaDelFinal;
+      setVisible(ver);
+      // Eduardo (2026-11-27): un solo «Probar gratis» en celular. Mientras se ve la barra de abajo, el de arriba se esconde (CSS).
+      document.documentElement.toggleAttribute("data-cta-movil", ver);
     };
     actualizar();
     window.addEventListener("scroll", actualizar, { passive: true });
@@ -22,6 +25,7 @@ export default function CtaMovil({ href, children }: { href: string; children: R
     return () => {
       window.removeEventListener("scroll", actualizar);
       window.removeEventListener("resize", actualizar);
+      document.documentElement.removeAttribute("data-cta-movil");
     };
   }, []);
 

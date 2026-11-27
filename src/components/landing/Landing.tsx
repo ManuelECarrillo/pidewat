@@ -71,7 +71,7 @@ export default async function Landing() {
           </nav>
           <div className={s.barraAcciones}>
             <Link href="/entrar" className={s.entrar}>Entrar</Link>
-            <BotonProbar href={ESENCIAL} origen="barra" className={s.botonChico}>Probar gratis</BotonProbar>
+            <BotonProbar href={ESENCIAL} origen="barra" className={`${s.botonChico} ${s.barraProbar}`}>Probar gratis</BotonProbar>
           </div>
         </div>
       </header>

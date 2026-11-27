@@ -74,6 +74,8 @@
 .ctaMovil {
   position: fixed; z-index: 40; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); left: 12px;
 }
+/* Un solo «Probar gratis» en celular: con la barra de abajo visible, el de arriba se oculta. */
+@media (max-width: 719px) { :global(html[data-cta-movil]) .barraProbar { display: none; } }
 .ctaMovilBoton {
   display: flex; min-height: 48px; align-items: center; justify-content: center; border-radius: var(--radius-control);
   /* Claude (QA 2026-11-27): verde como el botón principal del hero; en negro se perdía sobre la sección oscura de la demo. */
