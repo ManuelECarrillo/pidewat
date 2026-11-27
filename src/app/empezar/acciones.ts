@@ -1,7 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
-import { createHmac } from "node:crypto";
+import { cookies, headers } from "next/headers";
+import { after } from "next/server";
+import { createHmac, randomUUID } from "node:crypto";
 import { correoActivo, correoConfirmar, enlaceAuth } from "@/lib/correo";
 import { ipYHuella, origen } from "@/lib/ip";
 import { pareceRobot } from "@/lib/robots";
@@ -10,11 +11,32 @@ import { normalizarWhatsapp as normalizarWhatsapp, slugify } from "@/lib/formato
 import { DIAS_PRUEBA, SLUGS_RESERVADOS } from "@/lib/planes";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServidor } from "@/lib/supabase/servidor";
+import { enviarConversionMeta } from "@/lib/meta";
 
-export type ResultadoSolicitud = { ok: boolean; error?: string; campo?: string; plan?: "esencial" | "restaurante"; negocio?: string; entrar?: boolean; revisaCorreo?: string };
+export type ResultadoSolicitud = { ok: boolean; error?: string; campo?: string; plan?: "esencial" | "restaurante"; negocio?: string; entrar?: boolean; revisaCorreo?: string; eventoMeta?: string; nombreEventoMeta?: "CompleteRegistration" | "Lead"; contenidoMeta?: "esencial" | "restaurante_demo" };
 
 const txt = (f: FormData, k: string, max: number) => String(f.get(k) ?? "").replace(/\s+/g, " ").trim().slice(0, max);
 const GIROS = new Set(["Taquería", "Hamburguesas", "Hot dogs", "Food truck", "Fonda o cocina económica", "Antojitos", "Cafetería", "Otro"]);
+const idEventoMeta = (f: FormData) => {
+  const id = txt(f, "meta_event_id", 80);
+  return /^[a-z0-9-]{20,80}$/i.test(id) ? id : randomUUID();
+};
+
+// El envío corre después de persistir nuestro embudo y no cambia el resultado de la persona.
+async function medirConversionMeta(opciones: { evento: "CompleteRegistration" | "Lead"; id: string; contenido: "esencial" | "restaurante_demo"; correo?: string; whatsapp: string; utm: Record<string, string>; plan: "esencial" | "restaurante" }) {
+  const h = await headers();
+  const aceptoCookies = (await cookies()).get("pidewat_meta_consentimiento")?.value === "aceptar";
+  const ip = (h.get("x-forwarded-for") || "").split(",")[0].trim() || null;
+  const horaFbclid = Number(opciones.utm.fbclid_visto_ms);
+  const conversion = {
+    evento: opciones.evento, eventId: opciones.id, contenido: opciones.contenido,
+    ip, agente: h.get("user-agent"), fbclid: opciones.utm.fbclid,
+    fbclidVistoMs: Number.isSafeInteger(horaFbclid) && horaFbclid > 0 ? horaFbclid : undefined,
+    correo: opciones.correo, whatsapp: opciones.whatsapp, puedeUsarDatosDeContacto: aceptoCookies,
+    utmContent: opciones.utm.utm_content, url: `${await origen()}/empezar?plan=${opciones.plan}`,
+  };
+  after(() => enviarConversionMeta(conversion));
+}
 
 // Plan Restaurante (en pruebas): solo guarda la solicitud de demostración. Nunca pide tarjeta.
 export async function enviarSolicitud(_: ResultadoSolicitud | null, f: FormData): Promise<ResultadoSolicitud> {
@@ -33,7 +55,7 @@ export async function enviarSolicitud(_: ResultadoSolicitud | null, f: FormData)
   let utm: Record<string, string> = {};
   try {
     const u = JSON.parse(String(f.get("utm") || "{}"));
-    for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]) if (typeof u[k] === "string") utm[k] = u[k].slice(0, 100);
+    for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "fbclid_visto_ms"]) if (typeof u[k] === "string") utm[k] = u[k].slice(0, 100);
   } catch { utm = {}; }
 
   const h = await headers();
@@ -48,7 +70,9 @@ export async function enviarSolicitud(_: ResultadoSolicitud | null, f: FormData)
   const { error } = await sb.from("solicitudes").insert({ negocio, nombre, whatsapp, giro, ciudad, plan, utm, ip_hash, acepto_privacidad: true });
   if (error) { console.error("solicitud", error.message); return { ok: false, error: "No se pudo enviar. Intenta otra vez o escríbenos por WhatsApp." }; }
   await sb.from("eventos_landing").insert({ evento: "registro_enviado", pagina: "/empezar", detalle: plan, utm_source: utm.utm_source ?? null, utm_medium: utm.utm_medium ?? null, utm_campaign: utm.utm_campaign ?? null, utm_content: utm.utm_content ?? null });
-  return { ok: true, plan, negocio };
+  const eventoMeta = idEventoMeta(f);
+  await medirConversionMeta({ evento: "Lead", id: eventoMeta, contenido: "restaurante_demo", whatsapp, utm, plan: "restaurante" });
+  return { ok: true, plan, negocio, eventoMeta, nombreEventoMeta: "Lead", contenidoMeta: "restaurante_demo" };
 }
 
 // Plan Esencial: alta automática, sin intervención de nadie.
@@ -75,7 +99,7 @@ export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Pr
   let utm: Record<string, string> = {};
   try {
     const u = JSON.parse(String(f.get("utm") || "{}"));
-    for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]) if (typeof u[k] === "string") utm[k] = u[k].slice(0, 100);
+    for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "fbclid_visto_ms"]) if (typeof u[k] === "string") utm[k] = u[k].slice(0, 100);
   } catch { utm = {}; }
 
   const sb = supabaseAdmin();
@@ -118,11 +142,13 @@ export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Pr
   }
   await sb.from("solicitudes").insert({ negocio, nombre, whatsapp, giro, ciudad: null, plan: "esencial", estado: "prueba", business_id: neg.id, utm, ip_hash: huella, acepto_privacidad: true });
   await sb.from("eventos_landing").insert({ evento: "registro_enviado", pagina: "/empezar", detalle: "prueba_activada", utm_source: utm.utm_source ?? null, utm_medium: utm.utm_medium ?? null, utm_campaign: utm.utm_campaign ?? null, utm_content: utm.utm_content ?? null });
+  const eventoMeta = idEventoMeta(f);
+  await medirConversionMeta({ evento: "CompleteRegistration", id: eventoMeta, contenido: "esencial", correo, whatsapp, utm, plan: "esencial" });
 
   if (verificar) await mandarConfirmacion(sb, correo, negocio);
   const { error: e3 } = await (await supabaseServidor()).auth.signInWithPassword({ email: correo, password: clave });
   if (e3) return { ok: true, plan: "esencial", negocio, entrar: true };
-  redirect("/panel?bienvenida=1");
+  redirect(`/panel?bienvenida=1&meta_event=${encodeURIComponent(eventoMeta)}`);
 }
 
 // Enlace de un solo uso para confirmar el correo. Si falla el envío no se frena el alta: el aviso del panel deja reenviarlo.

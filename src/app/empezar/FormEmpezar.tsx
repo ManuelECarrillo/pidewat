@@ -16,7 +16,13 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
   const [giro, setGiro] = useState("");
   const [local, setLocal] = useState<"" | "sin-mesas" | "con-mesas">("");
   const [utm, setUtm] = useState("{}");
+  const [eventoMeta] = useState(() => crypto.randomUUID());
   useEffect(() => { guardarUtm(); setUtm(JSON.stringify(leerUtm())); medir("registro_inicio", { unaVez: true, detalle: plan }); }, [plan]);
+  useEffect(() => {
+    if (!r?.ok || !r.eventoMeta || !r.nombreEventoMeta || !r.contenidoMeta) return;
+    // El navegador y la API usan el mismo id para que Meta no cuente dos veces una conversión.
+    window.dispatchEvent(new CustomEvent("pidewat:conversion-meta", { detail: { eventId: r.eventoMeta, nombre: r.nombreEventoMeta, contenido: r.contenidoMeta } }));
+  }, [r]);
 
   if (r?.ok && r.revisaCorreo) {
     return <RevisaCorreo correo={r.revisaCorreo} fallo={r.error === "envio"} />;
@@ -48,6 +54,7 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
     <form action={enviar} className="card" style={{ marginTop: 18 }} noValidate>
       <input type="hidden" name="plan" value={plan} />
       <input type="hidden" name="utm" value={utm} />
+      <input type="hidden" name="meta_event_id" value={eventoMeta} />
       <input type="hidden" name="giro" value={giro} />
       <input type="hidden" name="local" value={local} />
       <Antirrobot />
@@ -104,7 +111,7 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
       )}
       <label className="check" style={{ alignItems: "flex-start" }}>
         <input type="checkbox" name="privacidad" />
-        <span className="small">{alta ? "Acepto el aviso de privacidad de Pidewat." : "Acepto que Pidewat use estos datos solo para contactarme por WhatsApp sobre mi demostración."} <a href="/privacidad">Aviso de privacidad</a></span>
+        <span className="small">{alta ? "Acepto el aviso de privacidad de Pidewat." : "Acepto que Pidewat use estos datos solo para contactarme por WhatsApp sobre mi demostración."} <a href="/privacidad">Aviso de privacidad</a> y <a href="/terminos">condiciones de contratación</a></span>
       </label>
       {err("privacidad") && <p className="error-campo">{err("privacidad")}</p>}
       {r && !r.ok && !r.campo && <div className="alerta alerta-bad" style={{ marginBottom: 12 }}>{r.error}</div>}

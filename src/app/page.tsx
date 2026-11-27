@@ -31,6 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Inicio() {
-  return <Landing />;
+export default async function Inicio({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
+  const { p } = await searchParams;
+  return <Landing publico={p === "puestos" || p === "restaurantes" ? p : undefined} />;
 }

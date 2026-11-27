@@ -5,3 +5,6 @@ node_modules
 next-env.d.ts
 *.tsbuildinfo
 .vercel
+test-results/
+playwright-report/
+qa/.panel-state.json

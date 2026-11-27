@@ -517,3 +517,10 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
 @media (min-width: 375px) and (max-width: 440px) { .chips .chip-atencion { grid-template-columns: 1fr; align-items: start; gap: 6px; } .chip-atencion-icono { width: 32px; height: 32px; padding: 6px; border-radius: 10px; } }
 .pasos-lista { padding-left: 20px; margin: 10px 0 16px; }
 .pasos-lista li { margin-bottom: 8px; }
+/* Aviso propio: no depende de un proveedor y deja visible el CTA móvil de la landing. */
+.aviso-cookies { position: fixed; z-index: 20; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); left: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; max-width: 680px; margin: 0 auto; padding: 10px 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-card); box-shadow: var(--elevation-float); color: var(--ink); font-size: .82rem; }
+.aviso-cookies > div { display: flex; gap: 6px; }
+.aviso-cookies button { min-height: 36px; padding: 0 12px; border: 0; border-radius: 9px; background: var(--brand); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.aviso-cookies .aviso-cookies-rechazar { background: var(--surface-raised); color: var(--ink); }
+@media (min-width: 720px) { .aviso-cookies { right: 20px; bottom: calc(76px + env(safe-area-inset-bottom)); left: auto; } }
+@media (prefers-reduced-motion: reduce) { .aviso-cookies, .aviso-cookies * { transition: none !important; animation: none !important; } }

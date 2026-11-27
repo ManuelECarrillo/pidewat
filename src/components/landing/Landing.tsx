@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import QRCode from "qrcode";
 import { PLANES, DIAS_PRUEBA } from "@/lib/planes";
 import { dinero } from "@/lib/formato";
@@ -14,6 +15,8 @@ import s from "./Landing.module.css";
 
 const ESENCIAL = "/empezar?plan=esencial";
 const RESTAURANTE = "/empezar?plan=restaurante";
+// Solo se activa cuando la matriz de QA confirma los cuatro dispositivos cubiertos.
+const COMPATIBILIDAD_VERIFICADA = true;
 
 const INCLUYE_ESENCIAL = [
   "Menú digital con tu logo y tus colores",
@@ -52,7 +55,7 @@ const PREGUNTAS = [
   { p: "¿Cómo se activa el plan Restaurante?", r: "Está en pruebas. Pide una demostración y te avisamos en cuanto esté listo para tu negocio." },
 ];
 
-export default async function Landing() {
+export default async function Landing({ publico }: { publico?: "puestos" | "restaurantes" }) {
   // QR real que abre el menú de demostración de Pidewat
   const qr = await QRCode.toString("https://pidewat.vercel.app/demo", { type: "svg", margin: 0, color: { dark: "#1d1b19", light: "#ffffff" } });
 
@@ -81,10 +84,10 @@ export default async function Landing() {
         <section id="inicio" className={s.hero}>
           <div className={`${s.contenedor} ${s.heroGrid}`}>
             <div className={s.heroTexto}>
-              <p className={s.etiqueta}>Para taquerías, hamburgueserías, puestos y fondas</p>
+              <p className={s.etiqueta}>{publico === "puestos" ? "Para taquerías, hamburguesas, hot dogs y food trucks" : publico === "restaurantes" ? "Para fondas y restaurantes con mesas" : "Para taquerías, hamburgueserías, puestos y fondas"}</p>
               <h1 className={s.heroTitulo}>Deja de tomar pedidos <em>a medias</em> por WhatsApp</h1>
               <p className={s.heroSub}>
-                Tus clientes eligen productos, tamaños y extras desde un menú digital. Tú recibes el pedido completo, con su total y listo para atender.
+                {publico === "restaurantes" ? "Tu menú con QR en cada mesa. Tus clientes eligen y te mandan el pedido completo por WhatsApp." : "Tus clientes eligen productos, tamaños y extras desde un menú digital. Tú recibes el pedido completo, con su total y listo para atender."}
               </p>
               <div className={s.heroCtas}>
                 <BotonProbar href={ESENCIAL} origen="hero" className={s.botonPrincipal}>Probar {DIAS_PRUEBA} días gratis</BotonProbar>
@@ -95,6 +98,12 @@ export default async function Landing() {
                 <li>Sin tarjeta</li>
                 <li>Sin comisión por pedido</li>
               </ul>
+              {COMPATIBILIDAD_VERIFICADA && <p className={s.confianzaDispositivos}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M10 19h4" /></svg>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M10 18h4" /></svg>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1" /><path d="M8 20h8M12 16v4" /></svg>
+                Funciona en Android, iPhone, tablets y computadoras. Sin instalar nada.
+              </p>}
             </div>
             <div className={s.heroVisual}>
               <Telefono className={s.telefonoHero} etiqueta="Menú digital de una hamburguesería en Pidewat">
@@ -137,6 +146,10 @@ export default async function Landing() {
                 </Revelar>
               ))}
             </div>
+            <div className={s.fotoProblema}>
+              <Image src="/landing/puesto-4x5.webp" alt="Dueño de un puesto de comida atendiendo pedidos" width={1080} height={1350} sizes="(max-width: 719px) 100vw, 460px" loading="lazy" />
+              <p>Tu menú convierte los mensajes sueltos en un pedido claro.</p>
+            </div>
           </div>
         </section>
 
@@ -158,7 +171,7 @@ export default async function Landing() {
                   </div>
                   <span className={s.pasoNum}>1</span>
                   <h3>Armas tu menú en minutos</h3>
-                  <p>Creas tu cuenta y agregas tus productos, precios, tamaños y extras desde el celular. Sin esperar a nadie.</p>
+                  <p>Creas tu cuenta y agregas tus productos, precios, tamaños y extras desde tu celular, tablet o computadora. Sin esperar a nadie.</p>
                 </Revelar>
               <Revelar como="li" className={s.paso} retraso={100}>
                   <div className={s.pasoVisual} aria-hidden="true">
@@ -169,7 +182,8 @@ export default async function Landing() {
                   </div>
                   <span className={s.pasoNum}>2</span>
                   <h3>Compartes tu link o tu QR</h3>
-                  <p>En el mostrador, en tus mesas, en tu estado de WhatsApp y en tus redes. Este QR abre un menú de ejemplo.</p>
+                  <p>En el mostrador, en tus mesas, en tu estado de WhatsApp y en tus redes. El cliente abre el menú desde el navegador de su celular, sin descargar una app.</p>
+                  <Image className={s.fotoQr} src="/landing/fonda-cliente-qr-4x5.webp" alt="Cliente escaneando un código QR en la mesa de una fonda" width={1080} height={1350} sizes="(max-width: 719px) 100vw, 340px" loading="lazy" />
                 </Revelar>
               <Revelar como="li" className={s.paso} retraso={200}>
                   <div className={s.pasoVisual} aria-hidden="true">
@@ -255,6 +269,8 @@ export default async function Landing() {
           <span className={s.marca}>Pide<span>wat</span></span>
           <span>Hecho en Durango, México</span>
           <Link href="/entrar">Entrar</Link>
+          <Link href="/terminos">Términos</Link>
+          <Link href="/privacidad">Privacidad</Link>
         </div>
       </footer>
       <CtaMovil href={ESENCIAL}>Probar {DIAS_PRUEBA} días gratis</CtaMovil>

@@ -5,17 +5,21 @@
 // Un registro gratis NO es una compra: las suscripciones pagadas se cuentan aparte, en el servidor.
 export type EventoLanding =
   | "landing_visita" | "ver_demo" | "demo_interaccion" | "probar_click"
-  | "registro_inicio" | "registro_enviado";
+  | "registro_inicio" | "registro_enviado" | "cookies_aceptar" | "cookies_rechazar";
 
 const LLAVE = "pidewat:utm";
-const CAMPOS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid"] as const;
+const CAMPOS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "p"] as const;
+const HORA_FBCLID = "fbclid_visto_ms";
 
 // Guarda las UTM de la primera página que abre la persona (así no se pierden al ir a /empezar)
 export function guardarUtm() {
   try {
     const q = new URLSearchParams(window.location.search);
+    const previo = leerUtm();
     const utm: Record<string, string> = {};
     for (const c of CAMPOS) { const v = q.get(c); if (v) utm[c] = v.slice(0, 100); }
+    // El identificador de clic conserva la hora de su primera apariciÃ³n en esta pestaÃ±a.
+    if (utm.fbclid) utm[HORA_FBCLID] = previo.fbclid === utm.fbclid && previo[HORA_FBCLID] ? previo[HORA_FBCLID] : String(Date.now());
     if (Object.keys(utm).length) sessionStorage.setItem(LLAVE, JSON.stringify(utm));
   } catch {}
 }
