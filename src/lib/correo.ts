@@ -43,13 +43,20 @@ export const enlaceAuth = (tokenHash: string, tipo: "signup" | "magiclink" | "re
   `${base}/auth/confirmar?token_hash=${encodeURIComponent(tokenHash)}&type=${tipo}`;
 
 export function correoConfirmar(para: string, negocio: string, url: string) {
-  return enviar(para, "Confirma tu correo para entrar a Pidewat",
-    plantilla("Confirma tu correo", `Tu menú de ${negocio} ya está creado y tus 14 días gratis empezaron. Confirma tu correo para entrar a tu panel.`, "Confirmar y entrar", url),
-    `Confirma tu correo para entrar a Pidewat: ${url}`);
+  return enviar(para, "Confirma tu correo de Pidewat",
+    plantilla("Confirma tu correo", `Tu menú de ${negocio} ya está creado y tus 14 días gratis empezaron. Confirma tu correo para poder recuperar tu contraseña si un día la olvidas.`, "Confirmar mi correo", url),
+    `Confirma tu correo de Pidewat: ${url}`);
 }
 
 export function correoRecuperar(para: string, url: string) {
   return enviar(para, "Cambia tu contraseña de Pidewat",
     plantilla("Cambia tu contraseña", "Pediste cambiar tu contraseña. Toca el botón y escribe una nueva.", "Poner contraseña nueva", url),
     `Cambia tu contraseña de Pidewat: ${url}`);
+}
+
+// Alta desde el admin o «no puedo entrar»: enlace de un solo uso que deja al dueño en su panel, donde elige su contraseña.
+export function correoAcceso(para: string, negocio: string, url: string) {
+  return enviar(para, `Entra a tu panel de ${negocio} en Pidewat`,
+    plantilla("Tu panel de Pidewat está listo", `Toca el botón para entrar al panel de ${negocio}. Ahí eliges tu contraseña y configuras tu menú. El botón sirve una sola vez.`, "Entrar a mi panel", url),
+    `Entra a tu panel de Pidewat (sirve una sola vez y vence en 1 hora): ${url}`);
 }

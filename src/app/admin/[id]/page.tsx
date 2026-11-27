@@ -46,7 +46,7 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
       {!n.owner_id && (
         <div className="card">
           <h3>Darle su cuenta al dueño</h3>
-          <p className="small muted">Este negocio todavía no tiene dueño. Escribe su correo y, si cambian, su nombre y WhatsApp; te sale el mensaje con su contraseña para mandárselo.</p>
+          <p className="small muted">Este negocio todavía no tiene dueño. Escribe su correo y, si cambian, su nombre y WhatsApp; le llega a su correo un enlace para entrar a su panel y elegir su contraseña (también sale un QR por si estás con él).</p>
           <FormConResultado action={darCuenta} boton="Crear su cuenta">
             {oculto}
             <label className="f">Correo del dueño<input className="i" name="email" type="email" inputMode="email" autoComplete="off" /></label>
@@ -96,7 +96,7 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
               <BotonEnviar className="btn btn-sm btn-bad" confirmar="¿Cancelar el cobro automático en Mercado Pago?">Cancelar cobro automático</BotonEnviar>
             </form>
           )}
-          <FormConResultado action={nuevaClave} boton="Crear contraseña nueva">{oculto}</FormConResultado>
+          <FormConResultado action={nuevaClave} boton="Mandarle enlace de acceso">{oculto}</FormConResultado>
         </div>
       </div>
 
