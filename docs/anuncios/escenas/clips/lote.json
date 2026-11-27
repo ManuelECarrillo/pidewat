@@ -1,0 +1,12 @@
+[
+ {"salida":"p1-gancho-dueno.mp4","imagen":"../p1-gancho-dueno-9x16.jpg","segundos":5,"audio":"../../voz/rapida/P1-1.mp3",
+  "prompt":"The man speaks directly to the camera with natural, relaxed gestures and a slight smile, as if recording a selfie video for friends; subtle handheld camera; mouth movement matches the speech; no text, no logos, no screens visible."},
+ {"salida":"p1-problema-celular.mp4","imagen":"../p1-problema-celular-9x16.jpg","segundos":5,
+  "prompt":"He scrolls his phone, frowns slightly, glances at the grill and back to the phone; burgers sizzling, steam rising; subtle handheld camera. The phone screen stays facing away from the camera. No text, no logos."},
+ {"salida":"puesto.mp4","imagen":"puesto-9x16-recorte.jpg","segundos":5,
+  "prompt":"The owner flips a burger on the grill, the customer waits calmly, warm evening street life in the background; slow push-in camera. No text, no logos."},
+ {"salida":"fonda-cliente-qr.mp4","imagen":"../fonda-cliente-qr-9x16.jpg","segundos":5,
+  "prompt":"She raises the phone toward the table stand and holds it still for a second, then looks at her phone; diners move softly in the background; static camera. The phone screen is never visible to the camera. No text, no logos."},
+ {"salida":"cocina-tablet.mp4","imagen":"../cocina-tablet-9x16.jpg","segundos":5,
+  "prompt":"The cook plates food, steam rises from the pot, she glances at the tablet on its stand; static camera. The tablet screen stays completely black and turned off the whole time. No text, no logos."}
+]

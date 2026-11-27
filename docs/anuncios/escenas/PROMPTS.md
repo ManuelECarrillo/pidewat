@@ -18,3 +18,10 @@ Imagen → video, 9:16, 4-5 s, sin audio salvo P1-gancho. Movimiento de cámara 
 4. `fonda-cliente-qr-9x16` → «she raises the phone toward the table stand and holds it still for a second, then looks at the screen; diners move softly in background; static camera».
 5. `cocina-tablet-9x16` → «cook plates food, steam from the pot, she glances at the tablet; static camera». La tablet debe seguir apagada (encima va la grabación real).
 Guardar los clips en `docs/anuncios/escenas/clips/` y anotar aquí modelo, costo y saldo antes/después.
+
+### Resultado (2026-11-27, sesión de Claude en la PC)
+- **Modelo:** `wan2.6-i2v-flash`, 720p (722×1276 / 720×1280), 5 s, 30 fps aprox. Script: `clips/generar.py` + `clips/lote.json` (prompts exactos ahí). Precio de lista consultado: 0,0336 USD/s.
+- **Saldo APIMart antes: 4,4625 USD · después: 3,9585 USD · gastado: 0,504 USD** (tope 1,50). Sin compras ni cambios de plan.
+- Costo por clip: `p1-gancho-dueno.mp4` 0,168 (lipsync con `voz/rapida/P1-1.mp3`, trae ese audio; en el montaje se usa la voz de `voz/rapida/` encima) · `p1-problema-celular.mp4` 0,084 · `puesto.mp4` 0,084 (desde `clips/puesto-9x16-recorte.jpg`, recorte izquierdo 9:16 de `puesto-4x5.jpg`) · `fonda-cliente-qr.mp4` 0,084 · `cocina-tablet.mp4` 0,084. Los mudos cobraron la mitad que el de voz.
+- Revisión de cuadros (1 por segundo): los 5 sin texto legible nuevo ni logos; la tablet de cocina sigue apagada los 5 s; la pantalla del celular no se ve en P1-problema. En `p1-gancho-dueno` sigue el letrero de menú con letras falsas arriba a la derecha: **difuminarlo en el montaje**.
+- Están en `clips/`. Pesan 3-7 MB cada uno.
