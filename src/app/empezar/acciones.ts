@@ -2,20 +2,23 @@
 
 import { headers } from "next/headers";
 import { createHmac } from "node:crypto";
+import { correoActivo, correoConfirmar, enlaceAuth } from "@/lib/correo";
+import { ipYHuella, origen } from "@/lib/ip";
+import { pareceRobot } from "@/lib/robots";
 import { redirect } from "next/navigation";
 import { normalizarWhatsapp as normalizarWhatsapp, slugify } from "@/lib/formato";
 import { DIAS_PRUEBA, SLUGS_RESERVADOS } from "@/lib/planes";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServidor } from "@/lib/supabase/servidor";
 
-export type ResultadoSolicitud = { ok: boolean; error?: string; campo?: string; plan?: "esencial" | "restaurante"; negocio?: string; entrar?: boolean };
+export type ResultadoSolicitud = { ok: boolean; error?: string; campo?: string; plan?: "esencial" | "restaurante"; negocio?: string; entrar?: boolean; revisaCorreo?: string };
 
 const txt = (f: FormData, k: string, max: number) => String(f.get(k) ?? "").replace(/\s+/g, " ").trim().slice(0, max);
 const GIROS = new Set(["Taquería", "Hamburguesas", "Hot dogs", "Food truck", "Fonda o cocina económica", "Antojitos", "Cafetería", "Otro"]);
 
 // Plan Restaurante (en pruebas): solo guarda la solicitud de demostración. Nunca pide tarjeta.
 export async function enviarSolicitud(_: ResultadoSolicitud | null, f: FormData): Promise<ResultadoSolicitud> {
-  if (txt(f, "sitio_web", 100)) return { ok: true }; // campo trampa: solo lo llenan los robots
+  if (await pareceRobot(f, (await ipYHuella()).ip)) return { ok: true }; // a un robot no se le dice que lo detectamos
   const negocio = txt(f, "negocio", 80);
   const nombre = txt(f, "nombre", 60);
   const whatsapp = normalizarWhatsapp(txt(f, "whatsapp", 20));
@@ -48,16 +51,12 @@ export async function enviarSolicitud(_: ResultadoSolicitud | null, f: FormData)
   return { ok: true, plan, negocio };
 }
 
-const huella = async () => {
-  const h = await headers();
-  const ip = (h.get("x-forwarded-for") || "").split(",")[0].trim();
-  return ip ? createHmac("sha256", process.env.SUPABASE_SERVICE_ROLE_KEY || "pidewat").update(ip).digest("hex").slice(0, 32) : null;
-};
-
-// Plan Esencial: alta automática. Crea la cuenta del dueño con la contraseña que él escribe, su negocio con
-// 14 días de prueba (sin tarjeta) y lo deja dentro de su panel para armar su menú solo. No depende de nadie.
+// Plan Esencial: alta automática, sin intervención de nadie.
+// Con correo configurado: crea la cuenta SIN confirmar + su negocio con 14 días y manda el enlace de confirmación;
+// al tocarlo entra directo a «Mi menú». Sin correo configurado: entra al momento (comportamiento anterior).
 export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Promise<ResultadoSolicitud> {
-  if (txt(f, "sitio_web", 100)) return { ok: false, error: "No se pudo crear la cuenta." }; // campo trampa
+  const { ip, huella } = await ipYHuella();
+  if (await pareceRobot(f, ip)) return { ok: false, error: "No se pudo crear la cuenta. Intenta otra vez en un momento." };
   const negocio = txt(f, "negocio", 80);
   const nombre = txt(f, "nombre", 60);
   const whatsapp = normalizarWhatsapp(txt(f, "whatsapp", 20));
@@ -78,11 +77,13 @@ export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Pr
   } catch { utm = {}; }
 
   const sb = supabaseAdmin();
-  const ip_hash = await huella();
-  if (ip_hash) {
-    const { count } = await sb.from("solicitudes").select("id", { count: "exact", head: true }).eq("ip_hash", ip_hash).gte("creado", new Date(Date.now() - 3_600_000).toISOString());
-    if ((count ?? 0) >= 5) return { ok: false, error: "Se crearon varias cuentas desde aquí. Intenta más tarde." };
+  if (huella) {
+    const { count } = await sb.from("solicitudes").select("id", { count: "exact", head: true }).eq("ip_hash", huella).gte("creado", new Date(Date.now() - 3_600_000).toISOString());
+    if ((count ?? 0) >= 3) return { ok: false, error: "Se crearon varias cuentas desde aquí. Intenta más tarde." };
   }
+  // Freno global: si de pronto llegan demasiados registros (ataque), pausa el alta automática
+  const { count: ultimaHora } = await sb.from("solicitudes").select("id", { count: "exact", head: true }).eq("estado", "prueba").gte("creado", new Date(Date.now() - 3_600_000).toISOString());
+  if ((ultimaHora ?? 0) >= 40) return { ok: false, error: "Estamos recibiendo muchos registros. Intenta en unos minutos." };
 
   // Link libre: tacos-el-guero, tacos-el-guero-2, …
   const base = slugify(negocio).slice(0, 34) || "mi-negocio";
@@ -93,26 +94,64 @@ export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Pr
     slug = `${base}-${i}`;
   }
 
-  const { data: creado, error: e1 } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true, user_metadata: { nombre } });
-  if (e1 || !creado?.user) {
-    const ya = /already|registered|exists/i.test(e1?.message || "");
+  const verificar = correoActivo();
+  let userId: string | undefined;
+  let tokenHash: string | undefined;
+  let errAlta: string | undefined;
+  if (verificar) {
+    const { data, error } = await sb.auth.admin.generateLink({ type: "signup", email: correo, password: clave, options: { data: { nombre, clave_cambiada: true } } }); // eligió su propia contraseña: sin aviso de cambiarla
+    userId = data?.user?.id; tokenHash = data?.properties?.hashed_token; errAlta = error?.message;
+  } else {
+    const { data, error } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true, user_metadata: { nombre, clave_cambiada: true } });
+    userId = data?.user?.id; errAlta = error?.message;
+  }
+  if (!userId) {
+    const ya = /already|registered|exists/i.test(errAlta || "");
     return ya
-      ? { ok: false, campo: "correo", error: "Ese correo ya tiene cuenta. Entra desde «Entrar»." }
+      ? { ok: false, campo: "correo", error: "Ese correo ya tiene cuenta. Entra desde «Entrar» o recupera tu contraseña." }
       : { ok: false, error: "No se pudo crear la cuenta. Intenta otra vez." };
   }
   const trial = new Date(Date.now() + DIAS_PRUEBA * 86_400_000).toISOString();
   const { data: neg, error: e2 } = await sb.from("businesses")
-    .insert({ name: negocio, slug, whatsapp, owner_id: creado.user.id, owner_email: correo, mode: "menu", plan: "base", trial_ends_at: trial })
+    .insert({ name: negocio, slug, whatsapp, owner_id: userId, owner_email: correo, mode: "menu", plan: "base", trial_ends_at: trial })
     .select("id").single();
   if (e2 || !neg) {
-    await sb.auth.admin.deleteUser(creado.user.id); // no dejar cuentas sin negocio
+    await sb.auth.admin.deleteUser(userId); // no dejar cuentas sin negocio
     console.error("alta negocio", e2?.message);
     return { ok: false, error: "No se pudo crear tu negocio. Intenta otra vez." };
   }
-  await sb.from("solicitudes").insert({ negocio, nombre, whatsapp, giro, ciudad: null, plan: "esencial", estado: "prueba", business_id: neg.id, utm, ip_hash, acepto_privacidad: true });
+  await sb.from("solicitudes").insert({ negocio, nombre, whatsapp, giro, ciudad: null, plan: "esencial", estado: "prueba", business_id: neg.id, utm, ip_hash: huella, acepto_privacidad: true });
   await sb.from("eventos_landing").insert({ evento: "registro_enviado", pagina: "/empezar", detalle: "prueba_activada", utm_source: utm.utm_source ?? null, utm_medium: utm.utm_medium ?? null, utm_campaign: utm.utm_campaign ?? null, utm_content: utm.utm_content ?? null });
 
+  if (verificar && tokenHash) {
+    try {
+      await correoConfirmar(correo, negocio, enlaceAuth(tokenHash, "signup", await origen()));
+    } catch (e) {
+      console.error("correo confirmar", (e as Error).message);
+      return { ok: true, plan: "esencial", negocio, revisaCorreo: correo, error: "envio" };
+    }
+    return { ok: true, plan: "esencial", negocio, revisaCorreo: correo };
+  }
   const { error: e3 } = await (await supabaseServidor()).auth.signInWithPassword({ email: correo, password: clave });
   if (e3) return { ok: true, plan: "esencial", negocio, entrar: true };
   redirect("/panel/menu?bienvenida=1");
+}
+
+// Reenviar el enlace de confirmación (cuenta creada pero sin confirmar). Siempre responde lo mismo.
+export async function reenviarConfirmacion(_: { ok: boolean } | null, f: FormData): Promise<{ ok: boolean }> {
+  const correo = txt(f, "correo", 120).toLowerCase();
+  if (!correoActivo() || !correo) return { ok: true };
+  const { huella } = await ipYHuella();
+  const sb = supabaseAdmin();
+  if (huella) {
+    const { count } = await sb.from("eventos_landing").select("id", { count: "exact", head: true }).eq("evento", "registro_enviado").eq("detalle", `reenvio:${huella}`).gte("creado", new Date(Date.now() - 3_600_000).toISOString());
+    if ((count ?? 0) >= 3) return { ok: true };
+    await sb.from("eventos_landing").insert({ evento: "registro_enviado", pagina: "/empezar", detalle: `reenvio:${huella}` });
+  }
+  const { data: neg } = await sb.from("businesses").select("name").eq("owner_email", correo).limit(1).maybeSingle();
+  const { data } = await sb.auth.admin.generateLink({ type: "magiclink", email: correo });
+  if (data?.properties?.hashed_token && data.user && !data.user.email_confirmed_at) {
+    try { await correoConfirmar(correo, neg?.name || "tu negocio", enlaceAuth(data.properties.hashed_token, "magiclink", await origen())); } catch (e) { console.error("reenvio", (e as Error).message); }
+  }
+  return { ok: true };
 }

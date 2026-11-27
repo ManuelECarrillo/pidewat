@@ -3,7 +3,8 @@
 import { useActionState, useEffect, useState } from "react";
 import { guardarUtm, leerUtm, medir } from "@/lib/medicion";
 import Link from "next/link";
-import { crearPrueba, enviarSolicitud } from "./acciones";
+import Antirrobot from "@/components/Antirrobot";
+import { crearPrueba, enviarSolicitud, reenviarConfirmacion } from "./acciones";
 
 const GIROS = ["Taquería", "Hamburguesas", "Hot dogs", "Food truck", "Fonda o cocina económica", "Antojitos", "Cafetería", "Otro"];
 const VENTAS = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP;
@@ -15,6 +16,10 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
   const [giro, setGiro] = useState("");
   const [utm, setUtm] = useState("{}");
   useEffect(() => { guardarUtm(); setUtm(JSON.stringify(leerUtm())); medir("registro_inicio", { unaVez: true, detalle: plan }); }, [plan]);
+
+  if (r?.ok && r.revisaCorreo) {
+    return <RevisaCorreo correo={r.revisaCorreo} fallo={r.error === "envio"} />;
+  }
 
   if (r?.ok && r.entrar) {
     return (
@@ -43,7 +48,7 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
       <input type="hidden" name="plan" value={plan} />
       <input type="hidden" name="utm" value={utm} />
       <input type="hidden" name="giro" value={giro} />
-      <div className="trampa" aria-hidden="true"><label>Sitio web<input name="sitio_web" tabIndex={-1} autoComplete="off" /></label></div>
+      <Antirrobot />
       <label className="f">Nombre de tu negocio
         <input className="i" name="negocio" required maxLength={80} autoComplete="organization" placeholder="Ej. Tacos El Güero" aria-invalid={Boolean(err("negocio"))} />
         {err("negocio") && <span className="error-campo">{err("negocio")}</span>}
@@ -97,5 +102,20 @@ export default function FormEmpezar({ plan }: { plan: "esencial" | "restaurante"
         {alta ? "Sin tarjeta. 14 días gratis desde hoy. Si al terminar no quieres seguir, no pagas nada." : "Sin tarjeta y sin compromiso. Solo es para mostrarte cómo funciona la pantalla de cocina."}
       </p>
     </form>
+  );
+}
+
+function RevisaCorreo({ correo, fallo }: { correo: string; fallo: boolean }) {
+  const [r, reenviar, pendiente] = useActionState(reenviarConfirmacion, null);
+  return (
+    <div className="card" role="status" style={{ marginTop: 18 }}>
+      <h2 style={{ fontSize: "1.25rem" }}>¡Tu menú ya está creado! Confirma tu correo</h2>
+      <p>{fallo ? "No pudimos mandar el correo en este momento. Toca «Reenviar» en un minuto." : <>Te mandamos un enlace a <strong>{correo}</strong>. Tócalo para entrar a tu panel y armar tu menú. Tus 14 días gratis ya empezaron.</>}</p>
+      <p className="small muted">¿No lo ves? Revisa «Spam» o «Promociones».</p>
+      <form action={reenviar}>
+        <input type="hidden" name="correo" value={correo} />
+        <button className="btn btn-block" disabled={pendiente || Boolean(r?.ok)}>{r?.ok ? "Listo, te lo reenviamos" : pendiente ? "Reenviando…" : "Reenviar el correo"}</button>
+      </form>
+    </div>
   );
 }

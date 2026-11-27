@@ -32,23 +32,42 @@ export default async function Embudo({ searchParams }: { searchParams: Promise<{
   ]);
   const solicitudes = ((sols || []) as Solicitud[]).filter((s) => !campana || s.utm?.utm_campaign === campana);
   const cuenta = (e: string) => (eventos || []).filter((x) => x.evento === e).length;
-  const ligados = solicitudes.map((s) => s.business_id).filter(Boolean) as string[];
-  const [{ data: productos }, { data: pagos }] = await Promise.all([
-    ligados.length ? sb.from("products").select("business_id").in("business_id", ligados) : Promise.resolve({ data: [] as { business_id: string }[] }),
-    ligados.length ? sb.from("payments").select("business_id").in("business_id", ligados) : Promise.resolve({ data: [] as { business_id: string }[] }),
+  const pruebas = solicitudes.filter((s) => s.estado === "prueba" && s.business_id);
+  const ligados = pruebas.map((s) => s.business_id) as string[];
+  const vacio = Promise.resolve({ data: [] as never[] });
+  const [{ data: negocios }, { data: productos }, { data: wa }, { data: mesa }, { data: pagos }] = await Promise.all([
+    ligados.length ? sb.from("businesses").select("id, owner_id, trial_ends_at, paid_until").in("id", ligados) : vacio,
+    ligados.length ? sb.from("products").select("business_id").in("business_id", ligados) : vacio,
+    ligados.length ? sb.from("order_events").select("business_id").in("business_id", ligados) : vacio,
+    ligados.length ? sb.from("orders").select("business_id").in("business_id", ligados).neq("estado", "cancelado") : vacio,
+    ligados.length ? sb.from("payments").select("business_id").in("business_id", ligados) : vacio,
   ]);
-  const porNegocio = new Map<string, number>();
-  for (const p of productos || []) porNegocio.set(p.business_id, (porNegocio.get(p.business_id) || 0) + 1);
-  const configurados = ligados.filter((id) => (porNegocio.get(id) || 0) >= 5).length;
-  const pagaron = new Set((pagos || []).map((p) => p.business_id)).size;
+  const ns = (negocios || []) as { id: string; owner_id: string; trial_ends_at: string; paid_until: string | null }[];
+  // Correo confirmado: se lee de Auth (solo dueños de estas pruebas)
+  const confirmados = new Set<string>();
+  await Promise.all(ns.map(async (n) => {
+    const { data } = await sb.auth.admin.getUserById(n.owner_id);
+    if (data?.user?.email_confirmed_at) confirmados.add(n.id);
+  }));
+  const contar = (xs: { business_id: string }[] | null) => { const m = new Map<string, number>(); for (const x of xs || []) m.set(x.business_id, (m.get(x.business_id) || 0) + 1); return m; };
+  const porProductos = contar(productos as { business_id: string }[]);
+  const porPedidos = contar([...((wa || []) as { business_id: string }[]), ...((mesa || []) as { business_id: string }[])]);
+  const ahora = Date.now();
+  const activos = ns.filter((n) => new Date(n.trial_ends_at).getTime() > ahora).length;
+  const configurados = ligados.filter((id) => (porProductos.get(id) || 0) >= 3).length;
+  const usoReal = ligados.filter((id) => (porPedidos.get(id) || 0) >= 1).length;
+  const pagaron = new Set(((pagos || []) as { business_id: string }[]).map((p) => p.business_id)).size;
   const campanas = [...new Set((eventos || []).map((e) => e.utm_campaign).filter(Boolean))] as string[];
 
   const filas: [string, number][] = [
     ...ETAPAS.map(([k, t]) => [t, cuenta(k)] as [string, number]),
-    ["Solicitudes enviadas (registro gratis)", solicitudes.length],
-    ["Pruebas activadas", solicitudes.filter((s) => s.estado === "prueba").length],
-    ["Menús configurados (5+ platillos)", configurados],
+    ["Se registraron (cuenta + negocio creados)", pruebas.length],
+    ["Confirmaron su correo", confirmados.size],
+    ["Prueba vigente hoy", activos],
+    ["Menú configurado (3+ platillos)", configurados],
+    ["Uso real (recibieron al menos 1 pedido)", usoReal],
     ["Pagaron una mensualidad", pagaron],
+    ["Solicitudes de demostración (Restaurante)", solicitudes.filter((s) => s.plan === "restaurante").length],
   ];
   const base = filas[0][1] || 1;
 
@@ -70,7 +89,7 @@ export default async function Embudo({ searchParams }: { searchParams: Promise<{
           <thead><tr><th>Paso</th><th>Total</th><th>% de visitas</th></tr></thead>
           <tbody>{filas.map(([t, n]) => <tr key={t}><td>{t}</td><td>{n}</td><td>{((n / base) * 100).toFixed(1)} %</td></tr>)}</tbody>
         </table>
-        <p className="small muted" style={{ margin: "8px 0 0" }}>Visitas y clics se cuentan sin cookies. Una solicitud es un registro gratis, no una venta.</p>
+        <p className="small muted" style={{ margin: "8px 0 0" }}>Visitas y clics se cuentan sin cookies. Registrarse es gratis: no es una venta. «Uso real» cuenta pedidos enviados a WhatsApp o de mesa, no dinero cobrado.</p>
       </div>
       <div className="card scroll-x">
         <h3>Solicitudes</h3>
