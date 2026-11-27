@@ -3,7 +3,6 @@ import Link from "next/link";
 
 export const metadata: Metadata = { title: "Aviso de privacidad", description: "Cómo usa Pidewat los datos que nos compartes." };
 
-// BORRADOR: falta que Eduardo confirme el nombre del responsable y un correo de contacto antes de publicar.
 export default function Privacidad() {
   const wa = process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP;
   return (
@@ -22,7 +21,7 @@ export default function Privacidad() {
       <p>Si aceptas el aviso de cookies, usamos el píxel y la API de conversiones de Meta para medir visitas, pruebas activadas y solicitudes de demostración de nuestros anuncios. Meta recibe datos técnicos de la visita; tu correo y WhatsApp se envían cifrados con hash solo si aceptaste. Puedes rechazarlo en el aviso de cookies y Pidewat seguirá funcionando igual.</p>
       <h2 style={{ fontSize: "1.1rem" }}>Tus derechos</h2>
       <p>Puedes pedirnos ver, corregir o borrar tus datos, o dejar de recibir mensajes, escribiéndonos{wa ? <> por <a href={`https://wa.me/${wa}`}>WhatsApp</a></> : ""}.</p>
-      <p>Responsable: {"{{RESPONSABLE}}"}. Correo de contacto: {"{{CORREO}}"}.</p>
+      <p>Responsable: Eduardo Carrillo Arévalo. Correo de contacto: <a href="mailto:pidewat.soporte@gmail.com">pidewat.soporte@gmail.com</a>.</p>
     </main>
   );
 }

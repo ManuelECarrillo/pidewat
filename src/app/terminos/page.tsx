@@ -19,7 +19,7 @@ export default function Terminos() {
       <h2>Plan Restaurante</h2>
       <p>El plan Restaurante está en pruebas y no se puede contratar todavía. Solo puedes solicitar una demostración.</p>
       <h2>Contacto</h2>
-      <p>Responsable: {"{{RESPONSABLE}}"}. Correo de contacto: {"{{CORREO}}"}.</p>
+      <p>Responsable: Eduardo Carrillo Arévalo. Correo de contacto: <a href="mailto:pidewat.soporte@gmail.com">pidewat.soporte@gmail.com</a>.</p>
       <p><Link href="/privacidad">Consulta también el aviso de privacidad.</Link></p>
     </main>
   );
