@@ -33,9 +33,12 @@ export default function Cocina() {
   const [sonido, setSonido] = useState(false);
   const [sinRed, setSinRed] = useState(false);
   const [seguro, setSeguro] = useState<string | null>(null);
+  const [actualizando, setActualizando] = useState<Set<string>>(() => new Set());
+  const [fallos, setFallos] = useState<Record<string, { mensaje: string; estado: string }>>({});
   const [, setReloj] = useState(0);
   const vistos = useRef<Set<string> | null>(null);
   const sonidoRef = useRef(false);
+  const moviendo = useRef(new Set<string>());
   sonidoRef.current = sonido;
 
   const cargar = useCallback(async () => {
@@ -60,10 +63,27 @@ export default function Cocina() {
   }, [cargar]);
 
   async function mover(id: string, estado: string) {
+    if (moviendo.current.has(id)) return;
+    const anterior = ordenes?.find((o) => o.id === id)?.estado;
+    if (!anterior) return;
+    moviendo.current.add(id);
     setSeguro(null);
+    setActualizando((ids) => new Set(ids).add(id));
+    setFallos((x) => { const { [id]: _, ...resto } = x; return resto; });
     setOrdenes((l) => l && l.map((o) => (o.id === id ? { ...o, estado } : o)));
-    try { await fetch("/api/cocina", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, estado }) }); } catch {}
-    cargar();
+    try {
+      const r = await fetch("/api/cocina", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, estado }) });
+      const d = await r.json().catch(() => null);
+      if (!r.ok || !d?.ok) throw new Error();
+      setSinRed(false);
+      cargar();
+    } catch {
+      setOrdenes((l) => l && l.map((o) => (o.id === id && o.estado === estado ? { ...o, estado: anterior } : o)));
+      setFallos((x) => ({ ...x, [id]: { mensaje: "No se pudo guardar el cambio. Revisa la conexión y vuelve a intentarlo.", estado } }));
+    } finally {
+      moviendo.current.delete(id);
+      setActualizando((ids) => { const siguiente = new Set(ids); siguiente.delete(id); return siguiente; });
+    }
   }
 
   const lista = (ordenes || []).filter((o) =>
@@ -95,6 +115,7 @@ export default function Cocina() {
       <div className="cocina">
         {lista.map((o) => {
           const sig = SIGUIENTE[o.estado];
+          const actualizandoOrden = actualizando.has(o.id);
           return (
             <article key={o.id} className={`card orden ${o.estado}`}>
               <div className="row between">
@@ -110,12 +131,17 @@ export default function Cocina() {
               ))}
               {o.notas && <div className="small" style={{ marginTop: 6 }}>📝 {o.notas}</div>}
               <div className="small muted" style={{ marginTop: 6 }}>Total {dinero(Number(o.total))}</div>
+              {fallos[o.id] && (
+                <div className="alerta alerta-bad small" role="status" style={{ marginTop: 10 }}>
+                  {fallos[o.id].mensaje} <button className="btn" disabled={actualizandoOrden} onClick={() => mover(o.id, fallos[o.id].estado)}>Reintentar</button>
+                </div>
+              )}
               <div className="row" style={{ marginTop: 10 }}>
-                {sig && <button className="btn btn-p grow" onClick={() => mover(o.id, sig.estado)}>{sig.texto}</button>}
+                {sig && <button className="btn btn-p grow" disabled={actualizandoOrden} onClick={() => mover(o.id, sig.estado)}>{actualizandoOrden ? "Guardando…" : sig.texto}</button>}
                 {(o.estado === "nuevo" || o.estado === "preparando") && (
                   seguro === o.id
-                    ? <button className="btn btn-bad" onClick={() => mover(o.id, "cancelado")}>¿Seguro? Cancelar</button>
-                    : <button className="btn" onClick={() => setSeguro(o.id)}>Cancelar</button>
+                    ? <button className="btn btn-bad" disabled={actualizandoOrden} onClick={() => mover(o.id, "cancelado")}>{actualizandoOrden ? "Guardando…" : "¿Seguro? Cancelar"}</button>
+                    : <button className="btn" disabled={actualizandoOrden} onClick={() => setSeguro(o.id)}>Cancelar</button>
                 )}
               </div>
             </article>
