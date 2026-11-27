@@ -11,7 +11,6 @@ const PASOS = [
 const MENSAJE: Record<string, string> = {
   nuevo: "La cocina ya tiene tu pedido",
   preparando: "Lo están preparando",
-  listo: "¡Listo! Ya te lo llevan a tu mesa",
   entregado: "Ya te entregaron el pedido. ¡Buen provecho!",
   cancelado: "El negocio canceló este pedido. Pregunta en el mostrador.",
 };
@@ -111,7 +110,9 @@ export default function EstadoPedido({ id, numero, mesa, estadoInicial }: { id: 
               );
             })}
           </ol>
-          <p className="pedido-mensaje" aria-live="polite">{MENSAJE[estado] || "Estamos consultando el estado de tu pedido."}</p>
+          {!esFinal && estado !== "listo" && (
+            <p className="pedido-mensaje" aria-live="polite">{MENSAJE[estado] || "Estamos consultando el estado de tu pedido."}</p>
+          )}
         </div>
       )}
 

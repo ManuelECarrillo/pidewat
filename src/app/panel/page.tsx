@@ -4,6 +4,7 @@ import { precioDe } from "@/lib/planes";
 import InstalarApp from "@/components/InstalarApp";
 import CompartirLink from "@/components/CompartirLink";
 import BotonEnviar from "@/components/BotonEnviar";
+import FormularioConAviso from "@/components/FormularioConAviso";
 import { estadoNegocio } from "@/lib/estado";
 import { siteUrl } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
@@ -51,7 +52,7 @@ export default async function Panel() {
           <h2 id="acciones-diarias">Acciones diarias</h2>
           <p className="small muted">Agrega un platillo sin crear una categoría primero.</p>
         </div>
-        <form action={guardarProducto} className="alta-rapida">
+        <FormularioConAviso accion={guardarProducto} className="alta-rapida" exito="Platillo agregado.">
           <label className="f">Nombre del platillo
             <input className="i" name="name" required placeholder="Ej. Hamburguesa clásica" />
           </label>
@@ -59,7 +60,7 @@ export default async function Panel() {
             <input className="i" name="price" inputMode="decimal" required placeholder="0" />
           </label>
           <BotonEnviar>Agregar platillo</BotonEnviar>
-        </form>
+        </FormularioConAviso>
         <div className="acciones-diarias-enlaces">
           <Link className="btn" href="/panel/menu#precios">Cambiar precio</Link>
           <Link className="btn" href="/panel/menu#disponibilidad">Marcar agotado</Link>

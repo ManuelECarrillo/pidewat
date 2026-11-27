@@ -1,5 +1,6 @@
 import { Acordeon, Desplegable } from "@/components/Acordeon";
 import BotonEnviar from "@/components/BotonEnviar";
+import FormularioConAviso from "@/components/FormularioConAviso";
 import Selector from "@/components/Selector";
 import ImagenInput from "@/components/ImagenInput";
 import OpcionesInput from "@/components/OpcionesInput";
@@ -101,13 +102,13 @@ export default async function PanelMenu({ searchParams }: { searchParams: Promis
                   <span className={`pill ${x.available ? "pill-ok" : "pill-warn"}`}>{x.available ? "Disponible" : "Agotado"}</span>
                 </div>
                 <div className="producto-rapido-acciones">
-                  <form action={guardarProducto} className="precio-rapido">
+                  <FormularioConAviso accion={guardarProducto} className="precio-rapido" exito="Precio guardado.">
                     <ValoresProducto p={x} />
                     <input type="hidden" name="id" value={x.id} />
                     <label className="small muted" htmlFor={`precio-${x.id}`}>Precio</label>
                     <input id={`precio-${x.id}`} className="i" name="price" inputMode="decimal" defaultValue={String(x.price)} aria-label={`Precio de ${x.name}`} />
                     <BotonEnviar className="btn">Guardar precio</BotonEnviar>
-                  </form>
+                  </FormularioConAviso>
                   <form action={alternarAgotado}>
                     <input type="hidden" name="id" value={x.id} />
                     <input type="hidden" name="available" value={String(!x.available)} />
