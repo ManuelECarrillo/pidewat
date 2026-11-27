@@ -24,3 +24,9 @@ Pasos 1-6, 8 y 9 (trampa) aprobados en la vista previa. Paso 7 dependía de What
 - `MP_ACCESS_TOKEN` de prueba solo en Preview. Production sigue sin token: ahí no se puede cobrar todavía.
 - Probar: negocio ficticio con prueba vencida → /panel/plan → «Activar mi plan» → autorizar con usuario comprador de prueba → regresa a /panel/plan?mp=ok de la vista previa.
 - Avisos (webhook) a la vista previa requieren la llave de paso de Vercel para automatizaciones; sin ella el aviso no llega y `paid_until` no se mueve.
+
+### Lecciones del modo prueba de Mercado Pago (27/11)
+- Pagar con la sesión real de Mercado Pago abierta falla: «Una de las partes… es de prueba». Usar incógnito.
+- Como invitado con correo @testuser.com falla: «e-mail corporativo». Iniciar sesión como comprador de prueba.
+- Suscripciones (/preapproval) con el token TEST- de la app → 400 «User bad request». Se usan las credenciales de producción (APP_USR-) del vendedor de prueba.
+- Anual: sin meses sin intereses (decisión de Eduardo).

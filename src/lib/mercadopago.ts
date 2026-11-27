@@ -25,13 +25,6 @@ export function leerReferencia(ref: string | null | undefined) {
   return { id, ciclo, plan } as { id: string; ciclo: "mensual" | "anual"; plan: Plan };
 }
 
-// En vista previa (protegida por Vercel) el aviso necesita la llave de paso para automatizaciones
-function urlWebhook(base: string) {
-  const paso = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
-  const vista = process.env.VERCEL_ENV === "preview";
-  return `${base}/api/mp/webhook${vista && paso ? `?x-vercel-protection-bypass=${encodeURIComponent(paso)}` : ""}`;
-}
-
 // Cobro automático cada mes (Mercado Pago Suscripciones). Devuelve el link de pago.
 export async function crearSuscripcion(o: { negocioId: string; nombre: string; plan: Plan; correo: string; monto?: number }) {
   const base = await origen(); // en vista previa regresa a la vista previa, nunca a producción
@@ -60,8 +53,8 @@ export async function crearPagoAnual(o: { negocioId: string; nombre: string; pla
       payer: o.correo ? { email: o.correo } : undefined,
       back_urls: { success: `${base}/panel/plan?mp=ok`, pending: `${base}/panel/plan?mp=pendiente`, failure: `${base}/panel/plan?mp=error` },
       auto_return: "approved",
-      notification_url: urlWebhook(base),
       statement_descriptor: "PIDEWAT",
+      payment_methods: { installments: 1 }, // sin meses sin intereses: subirían la comisión (decisión de Eduardo si se activan)
     }),
   });
   return r.init_point;
