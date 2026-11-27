@@ -1,7 +1,7 @@
 import "server-only";
 import crypto from "node:crypto";
 import { PLANES, type Plan } from "./planes";
-import { siteUrl } from "./formato";
+import { origen } from "./ip";
 
 const API = "https://api.mercadopago.com";
 
@@ -27,13 +27,14 @@ export function leerReferencia(ref: string | null | undefined) {
 
 // Cobro automático cada mes (Mercado Pago Suscripciones). Devuelve el link de pago.
 export async function crearSuscripcion(o: { negocioId: string; nombre: string; plan: Plan; correo: string; monto?: number }) {
+  const base = await origen(); // en vista previa regresa a la vista previa, nunca a producción
   const r = await mp<{ id: string; init_point: string }>("/preapproval", {
     method: "POST",
     body: JSON.stringify({
       reason: `Pidewat ${PLANES[o.plan].nombre} · ${o.nombre}`,
       external_reference: referencia(o.negocioId, "mensual", o.plan),
       payer_email: o.correo,
-      back_url: `${siteUrl()}/panel/plan?mp=ok`,
+      back_url: `${base}/panel/plan?mp=ok`,
       auto_recurring: { frequency: 1, frequency_type: "months", transaction_amount: o.monto ?? PLANES[o.plan].mensual, currency_id: "MXN" },
       status: "pending",
     }),
@@ -43,16 +44,17 @@ export async function crearSuscripcion(o: { negocioId: string; nombre: string; p
 
 // Pago único de un año (Checkout Pro). Acepta tarjeta, OXXO y transferencia.
 export async function crearPagoAnual(o: { negocioId: string; nombre: string; plan: Plan; correo?: string; monto?: number }) {
+  const base = await origen();
   const r = await mp<{ init_point: string }>("/checkout/preferences", {
     method: "POST",
     body: JSON.stringify({
       items: [{ title: `Pidewat ${PLANES[o.plan].nombre} anual · ${o.nombre}`, quantity: 1, unit_price: o.monto ?? PLANES[o.plan].anual, currency_id: "MXN" }],
       external_reference: referencia(o.negocioId, "anual", o.plan),
       payer: o.correo ? { email: o.correo } : undefined,
-      back_urls: { success: `${siteUrl()}/panel/plan?mp=ok`, pending: `${siteUrl()}/panel/plan?mp=pendiente`, failure: `${siteUrl()}/panel/plan?mp=error` },
+      back_urls: { success: `${base}/panel/plan?mp=ok`, pending: `${base}/panel/plan?mp=pendiente`, failure: `${base}/panel/plan?mp=error` },
       auto_return: "approved",
-      notification_url: `${siteUrl()}/api/mp/webhook`,
       statement_descriptor: "PIDEWAT",
+      payment_methods: { installments: 1 }, // sin meses sin intereses: subirían la comisión (decisión de Eduardo si se activan)
     }),
   });
   return r.init_point;

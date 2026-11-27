@@ -1,0 +1,2 @@
+# Pedidos a Claude
+- **F3-05 · Recuperación automática para altas administradas:** `src/app/admin/acciones.ts` todavía genera contraseñas temporales y `src/components/FormConResultado.tsx` permite enviarlas por WhatsApp. Retirar ese flujo requiere cambiar la lógica de autenticación/administración: sustituirlo por un enlace de recuperación por correo o una invitación segura, sin exponer una contraseña en el cliente.

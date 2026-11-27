@@ -59,8 +59,11 @@ export async function guardarProducto(f: FormData) {
     ...(f.has("ingredientes") ? { ingredientes: lista(f, "ingredientes") } : {}),
     ...(f.has("opciones") ? { opciones: limpiarOpciones(String(f.get("opciones")).slice(0, 8000)) } : {}),
   };
-  if (id) await sb.from("products").update(datos).eq("id", id).eq("business_id", negocio.id);
-  else await sb.from("products").insert({ ...datos, position: Date.now() % 1_000_000_000 });
+  const { error } = id
+    ? await sb.from("products").update(datos).eq("id", id).eq("business_id", negocio.id)
+    : await sb.from("products").insert({ ...datos, position: Date.now() % 1_000_000_000 });
+  // Sin esto, el aviso «Platillo agregado» saldría aunque no se haya guardado
+  if (error) throw new Error("No se pudo guardar el platillo. Revisa tu conexión e inténtalo otra vez.");
   refrescar(negocio.slug);
 }
 
@@ -125,14 +128,14 @@ export async function guardarNegocio(f: FormData) {
   redirect("/panel/negocio?ok=1");
 }
 
-// El dueño cambia la contraseña que le mandamos por WhatsApp (así deja de servir si alguien ve ese chat).
+// El dueño puede cambiar su contraseña desde su panel.
 export async function cambiarClave(_: ResultadoAlta | null, f: FormData): Promise<ResultadoAlta> {
   const { sb } = await requiereDueno();
   const clave = String(f.get("clave") ?? "");
   if (clave.length < 8) return { ok: false, mensaje: "Usa al menos 8 letras o números." };
   if (clave !== String(f.get("clave2") ?? "")) return { ok: false, mensaje: "Las dos contraseñas no son iguales." };
   const { error } = await sb.auth.updateUser({ password: clave, data: { clave_cambiada: true } });
-  if (error) return { ok: false, mensaje: "No se pudo cambiar. Intenta con otra contraseña o escríbenos por WhatsApp." };
+  if (error) return { ok: false, mensaje: "No se pudo cambiar. Intenta otra vez." };
   revalidatePath("/panel", "layout"); // quita el aviso de "cambia tu contraseña"
   return { ok: true, mensaje: "Listo, tu contraseña cambió. Úsala la próxima vez que entres." };
 }

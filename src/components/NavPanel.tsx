@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { CSSProperties } from "react";
 
 const I = (d: string) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>
@@ -21,7 +22,11 @@ export default function NavPanel({ cocina = false }: { cocina?: boolean }) {
   const ruta = usePathname();
   const secciones = cocina ? [SECCIONES[0], COCINA, ...SECCIONES.slice(1)] : SECCIONES;
   return (
-    <nav className="nav" aria-label="Secciones">
+    <nav
+      className="nav"
+      aria-label="Secciones"
+      style={{ "--nav-items": secciones.length } as CSSProperties}
+    >
       {secciones.map((s) => {
         const activa = s.href === "/panel" ? ruta === "/panel" : ruta.startsWith(s.href);
         return (

@@ -39,6 +39,7 @@ export default function Menu({
   const [buscar, setBuscar] = useState("");
   const [catActiva, setCatActiva] = useState<string | null>(null);
   const [eleccion, setEleccion] = useState<Eleccion | null>(null);
+  const [pendienteBorrado, setPendienteBorrado] = useState<string | null>(null);
   // Fuera del horario se puede ver el menú, pero no mandar pedidos. Se calcula en el celular y se revisa cada minuto.
   const [cerrado, setCerrado] = useState<string | null>(null);
   useEffect(() => {
@@ -101,6 +102,10 @@ export default function Menu({
 
   const cambiar = (k: string, d: number) =>
     setCarrito((c) => { const n = Math.max(0, (c[k] || 0) + d); const x = { ...c, [k]: n }; if (!n) delete x[k]; return x; });
+  const quitarUno = (k: string) => {
+    if ((carrito[k] || 0) <= 1) setPendienteBorrado(k);
+    else cambiar(k, -1);
+  };
   // Productos con ingredientes: el "+" abre una hojita para quitar lo que no quieren
   // Si un grupo de "elige uno" es obligatorio, arranca con la primera opción ya marcada
   const agregar = (p: Producto) => (personalizable(p)
@@ -119,13 +124,18 @@ export default function Menu({
     { id: "otros", nombre: "Otros", items: visibles.filter((p) => !p.category_id || !categorias.some((c) => c.id === p.category_id)) },
   ].filter((g) => g.items.length);
 
-  // Plan Restaurante: los pedidos para comer aquí van directo a la pantalla de cocina (necesita la mesa)
-  const aCocina = Boolean(negocio.cocina) && tipo === "mesa" && negocio.id !== "demo";
+  // Plan Restaurante: los pedidos para comer aquí (con mesa) y para recoger van directo a la pantalla de cocina.
+  // A domicilio sigue por WhatsApp, porque hay que acordar la dirección y el envío.
+  const aCocina = Boolean(negocio.cocina) && (tipo === "mesa" || tipo === "recoger") && negocio.id !== "demo";
   const [enviando, setEnviando] = useState(false);
   const [errorCocina, setErrorCocina] = useState(false);
-  const falta = tipo === "domicilio" && !direccion.trim() ? "Escribe tu dirección"
-    : aCocina && !mesa.trim() ? "Escribe tu número de mesa"
-    : !nombre.trim() ? "Escribe tu nombre" : null;
+  const [mostrarErrores, setMostrarErrores] = useState(false);
+  const errorDireccion = tipo === "domicilio" && !direccion.trim();
+  const errorMesa = aCocina && tipo === "mesa" && !mesa.trim();
+  const errorNombre = !nombre.trim();
+  const falta = errorDireccion ? "Escribe tu dirección"
+    : errorMesa ? "Escribe tu número de mesa"
+    : errorNombre ? "Escribe tu nombre" : null;
 
   const itemsServidor = () => entradas.map((e) => ({ id: e.id, cantidad: e.n, ...(e.o ? { o: e.o } : {}), ...(e.sin.length ? { sin: e.sin } : {}) }));
 
@@ -147,7 +157,7 @@ export default function Menu({
     try {
       const r = await fetch("/api/orden", {
         method: "POST", headers: { "Content-Type": "application/json" }, signal: corte.signal,
-        body: JSON.stringify({ business_id: negocio.id, clave: clavePedido(), mesa: mesa.trim(), nombre: nombre.trim(), notas: notas.trim(), items: itemsServidor() }),
+        body: JSON.stringify({ business_id: negocio.id, clave: clavePedido(), tipo, mesa: tipo === "mesa" ? mesa.trim() : "", nombre: nombre.trim(), notas: notas.trim(), items: itemsServidor() }),
       });
       const d = await r.json();
       if (!d.ok) throw new Error(d.motivo);
@@ -162,6 +172,7 @@ export default function Menu({
   }
 
   function enviar(porWhatsapp = false) {
+    if (falta) { setMostrarErrores(true); return; }
     if (negocio.horario && !abiertoAhora(negocio.horario)) { setCerrado(proximaApertura(negocio.horario) || "Por ahora no está recibiendo pedidos"); return; }
     if (aCocina && !porWhatsapp) { enviarACocina(); return; }
     const texto = mensajePedido({
@@ -203,40 +214,58 @@ export default function Menu({
         )}
 
         {grupos.map((g) => (
-          <section key={g.id} id={`c-${g.id}`} style={{ scrollMarginTop: 60, paddingTop: 18 }}>
+          <section key={g.id} id={`c-${g.id}`} className="grupo-menu" style={{ scrollMarginTop: 60, paddingTop: 18 }}>
             <h2 style={{ fontSize: "1.15rem" }}>{g.nombre}</h2>
+            <div className="lista-productos">
             {g.items.map((p) => {
               const n = enCarrito(p.id);
               const conIngredientes = personalizable(p);
+              const inicialPlatillo = p.name.trim().charAt(0).toUpperCase() || "•";
               return (
-                <div key={p.id} className={`prod ${p.available ? "" : "agotado"}`}>
-                  {p.image_url && <div className="prod-img" style={{ backgroundImage: `url(${p.image_url})` }} role="img" aria-label={p.name} />}
-                  <div className="grow">
+                <article key={p.id} className={`prod ${p.available ? "" : "agotado"}`}>
+                  <div
+                    className={`prod-img ${p.image_url ? "prod-img-foto" : "prod-img-sello"}`}
+                    style={p.image_url ? { backgroundImage: `url(${p.image_url})` } : undefined}
+                    role="img"
+                    aria-label={p.image_url ? p.name : `Identificador de ${p.name}`}
+                  >
+                    {!p.image_url && <>
+                      <span aria-hidden="true">{inicialPlatillo}</span>
+                    </>}
+                  </div>
+                  <div className="grow prod-contenido">
                     <h3>{p.name}</h3>
                     {p.description && <p>{p.description}</p>}
-                    <div className="row between">
+                    <div className="prod-pie">
                       <span className="precio">{dinero(Number(p.price))}</span>
                       {!p.available ? (
-                        <span className="pill">Agotado</span>
-                      ) : cerrado ? null : conIngredientes ? (
-                        <span className="row" style={{ gap: 8 }}>
+                        <span className="pill pill-bad">Agotado</span>
+                      ) : cerrado ? (
+                        <span className="pill pill-warn">Pedidos cerrados</span>
+                      ) : conIngredientes ? (
+                        <span className="prod-accion">
                           {n > 0 && <span className="pill">{n} en tu pedido</span>}
-                          <button className="mas" aria-label={`Agregar ${p.name}`} onClick={() => agregar(p)}>+</button>
+                          <button className="prod-agregar" aria-label={`Personalizar y agregar ${p.name}`} onClick={() => agregar(p)}>
+                            <span aria-hidden="true">+</span> Agregar
+                          </button>
                         </span>
                       ) : n === 0 ? (
-                        <button className="mas" aria-label={`Agregar ${p.name}`} onClick={() => cambiar(p.id, 1)}>+</button>
+                        <button className="prod-agregar" aria-label={`Agregar ${p.name}`} onClick={() => cambiar(p.id, 1)}>
+                          <span aria-hidden="true">+</span> Agregar
+                        </button>
                       ) : (
                         <span className="cant">
-                          <button aria-label="Quitar uno" onClick={() => cambiar(p.id, -1)}>−</button>
+                          <button aria-label="Quitar uno" onClick={() => quitarUno(p.id)}>−</button>
                           <span>{n}</span>
                           <button aria-label="Agregar uno" onClick={() => cambiar(p.id, 1)}>+</button>
                         </span>
                       )}
                     </div>
                   </div>
-                </div>
+                </article>
               );
             })}
+            </div>
           </section>
         ))}
         {!grupos.length && <p className="muted" style={{ padding: "24px 0" }}>{q ? "No encontramos nada con esa palabra." : "Pronto verás aquí el menú."}</p>}
@@ -271,7 +300,7 @@ export default function Menu({
                     <div className="small muted">{dinero(n * unitario(e))}</div>
                   </div>
                   <span className="cant">
-                    <button aria-label="Quitar uno" onClick={() => cambiar(k, -1)}>−</button>
+                    <button aria-label="Quitar uno" onClick={() => quitarUno(k)}>−</button>
                     <span>{n}</span>
                     <button aria-label="Agregar uno" onClick={() => cambiar(k, 1)}>+</button>
                   </span>
@@ -292,16 +321,19 @@ export default function Menu({
               )}
               {tipo === "mesa" && (
                 <label className="f">Número de mesa {!aCocina && <span className="h">Opcional</span>}
-                  <input className="i" inputMode="numeric" value={mesa} onChange={(e) => setMesa(e.target.value)} />
+                  <input className="i" inputMode="numeric" value={mesa} onChange={(e) => setMesa(e.target.value)} aria-invalid={mostrarErrores && errorMesa} aria-describedby={mostrarErrores && errorMesa ? "error-mesa" : undefined} />
+                  {mostrarErrores && errorMesa && <span className="error-campo" id="error-mesa" role="alert">Escribe tu número de mesa para enviarlo a la cocina.</span>}
                 </label>
               )}
               <label className="f">Tu nombre
-                <input className="i" autoComplete="name" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+                <input className="i" autoComplete="name" value={nombre} onChange={(e) => setNombre(e.target.value)} aria-invalid={mostrarErrores && errorNombre} aria-describedby={mostrarErrores && errorNombre ? "error-nombre" : undefined} />
+                {mostrarErrores && errorNombre && <span className="error-campo" id="error-nombre" role="alert">Escribe tu nombre para continuar.</span>}
               </label>
               {tipo === "domicilio" && (
                 <label className="f">Dirección de entrega
                   {negocio.delivery_note && <span className="h">{negocio.delivery_note}</span>}
-                  <textarea className="i" autoComplete="street-address" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Calle, número, colonia y una referencia" />
+                  <textarea className="i" autoComplete="street-address" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Calle, número, colonia y una referencia" aria-invalid={mostrarErrores && errorDireccion} aria-describedby={mostrarErrores && errorDireccion ? "error-direccion" : undefined} />
+                  {mostrarErrores && errorDireccion && <span className="error-campo" id="error-direccion" role="alert">Escribe la dirección de entrega.</span>}
                 </label>
               )}
               <label className="f">Notas <span className="h">Ej. sin cebolla, con salsa aparte</span>
@@ -316,8 +348,8 @@ export default function Menu({
               </div>
               {aCocina ? (
                 <>
-                  <button className="btn btn-p btn-block" style={{ fontSize: "1.05rem", padding: 14 }} disabled={!lineas.length || Boolean(falta) || Boolean(cerrado) || enviando} onClick={() => enviar()}>
-                    {cerrado ? "Cerrado ahorita" : falta || (enviando ? "Enviando…" : "Enviar pedido a la cocina")}
+                  <button className="btn btn-p btn-block" style={{ fontSize: "1.05rem", padding: 14 }} disabled={!lineas.length || Boolean(cerrado) || enviando} onClick={() => enviar()}>
+                    {cerrado ? "Cerrado ahorita" : enviando ? "Enviando…" : "Enviar pedido a la cocina"}
                   </button>
                   {errorCocina ? (
                     <div className="alerta" style={{ marginTop: 8 }}>
@@ -332,8 +364,8 @@ export default function Menu({
                 </>
               ) : (
                 <>
-                  <button className="btn btn-wa btn-block" style={{ fontSize: "1.05rem", padding: 14 }} disabled={!lineas.length || Boolean(falta) || Boolean(cerrado)} onClick={() => enviar()}>
-                    {cerrado ? "Cerrado ahorita" : falta || "Enviar pedido por WhatsApp"}
+                  <button className="btn btn-wa btn-block" style={{ fontSize: "1.05rem", padding: 14 }} disabled={!lineas.length || Boolean(cerrado)} onClick={() => enviar()}>
+                    {cerrado ? "Cerrado ahorita" : "Enviar pedido por WhatsApp"}
                   </button>
                   <p className="small muted" style={{ textAlign: "center", margin: "8px 0 0" }}>
                     Se abre WhatsApp con tu pedido ya escrito. Solo dale enviar.
@@ -423,6 +455,24 @@ export default function Menu({
                 <p className="small muted" style={{ textAlign: "center", margin: "8px 0 0" }}>
                   ¿Uno diferente? Agrega este y vuelve a tocar + para armar el otro.
                 </p>
+              </div>
+            </div>
+          </>
+        );
+      })()}
+
+      {pendienteBorrado && (() => {
+        const linea = entradas.find((e) => e.k === pendienteBorrado);
+        if (!linea) return null;
+        return (
+          <>
+            <div className="velo" onClick={() => setPendienteBorrado(null)} />
+            <div className="dialogo" role="dialog" aria-modal="true" aria-labelledby="quitar-titulo">
+              <h2 id="quitar-titulo" style={{ fontSize: "1.15rem" }}>¿Quitar {linea.p!.name}?</h2>
+              <p className="muted">Es el último de este platillo en tu pedido.</p>
+              <div className="row" style={{ justifyContent: "flex-end", marginTop: 16 }}>
+                <button className="btn" autoFocus onClick={() => setPendienteBorrado(null)}>Conservar</button>
+                <button className="btn btn-bad" onClick={() => { cambiar(pendienteBorrado, -1); setPendienteBorrado(null); }}>Sí, quitar</button>
               </div>
             </div>
           </>

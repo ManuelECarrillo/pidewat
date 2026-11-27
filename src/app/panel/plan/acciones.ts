@@ -20,7 +20,8 @@ export async function irAPagar(f: FormData) {
       : await crearSuscripcion({ negocioId: negocio.id, nombre: negocio.name, plan, correo, monto: precioDe(negocio).mensual });
   } catch (e) {
     console.error(e);
-    redirect("/panel/plan?mp=error");
+    // MP responde 400 «User bad request» cuando el correo no es el de la cuenta de Mercado Pago de quien paga
+    redirect(ciclo === "mensual" && /preapproval: 400/.test(String((e as Error)?.message)) ? "/panel/plan?mp=correo" : "/panel/plan?mp=error");
   }
   redirect(destino);
 }

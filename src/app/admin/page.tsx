@@ -28,6 +28,7 @@ export default async function Admin() {
 
   return (
     <div className="stack">
+      <div className="row wrap-flex"><Link href="/admin/embudo" className="btn btn-sm">Embudo de la landing y registros</Link><Link href="/admin/cuenta" className="btn btn-sm">Mi correo de acceso</Link></div>
       <div className="grid2">
         <div className="card">
           <div className="small muted">Ingreso mensual (pagando)</div>

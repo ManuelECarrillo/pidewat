@@ -13,36 +13,55 @@ export default async function PaginaPedido({ params }: { params: Promise<{ slug:
   const { slug, id } = await params;
   if (!UUID.test(id)) notFound();
   const sb = supabaseAdmin();
-  const { data: o } = await sb.from("orders").select("id, business_id, numero, mesa, nombre, notas, items, total, estado").eq("id", id).maybeSingle();
+  const { data: o } = await sb.from("orders").select("id, business_id, numero, tipo, mesa, nombre, notas, items, total, estado").eq("id", id).maybeSingle();
   if (!o) notFound();
   const { data: n } = await sb.from("businesses").select("slug, name, color, whatsapp").eq("id", o.business_id).maybeSingle();
   if (!n || n.slug !== slug) notFound();
   const items = (o.items || []) as Linea[];
 
   return (
-    <main style={{ ["--c" as string]: n.color }}>
-      <div className="wrap" style={{ paddingTop: 24, paddingBottom: 40 }}>
-        <p className="muted" style={{ margin: 0 }}>{n.name}</p>
-        <EstadoPedido id={o.id} numero={o.numero} mesa={o.mesa} estadoInicial={o.estado} />
-        <section className="card" style={{ marginTop: 16 }}>
-          <h2 style={{ fontSize: "1.05rem" }}>Lo que pediste</h2>
-          {items.map((l, i) => (
-            <div key={i} className="row between" style={{ padding: "6px 0", borderBottom: "1px solid var(--line)" }}>
-              <div className="grow">
-                <div>{l.cantidad} × {l.nombre}</div>
-                {l.nota && <div className="small muted">{l.nota}</div>}
-              </div>
-              <span>{dinero(l.cantidad * l.precio)}</span>
+    <main className={`pedido-seguimiento${o.tipo === "recoger" ? " pedido-para-llevar" : ""}`} style={{ ["--c" as string]: n.color }}>
+      <div className="wrap pedido-wrap">
+        <header className="pedido-local">
+          <p>Seguimiento de tu pedido</p>
+          <strong>{n.name}</strong>
+        </header>
+
+        <EstadoPedido id={o.id} numero={o.numero} mesa={o.mesa} paraLlevar={o.tipo === "recoger"} estadoInicial={o.estado} />
+
+        <section className="card pedido-detalle" aria-labelledby="detalle-titulo">
+          <div className="pedido-detalle-cabecera">
+            <div>
+              <p className="pedido-sobretitulo">Resumen</p>
+              <h2 id="detalle-titulo">Lo que pediste</h2>
             </div>
-          ))}
-          {o.notas && <p className="small muted" style={{ margin: "8px 0 0" }}>📝 {o.notas}</p>}
-          <div className="row between" style={{ fontWeight: 800, marginTop: 10 }}><span>Total</span><span>{dinero(Number(o.total))}</span></div>
-          <p className="small muted" style={{ margin: "6px 0 0" }}>Pagas en el local, como siempre.</p>
+            <span>{items.length} {items.length === 1 ? "artículo" : "artículos"}</span>
+          </div>
+
+          <div className="pedido-lineas">
+            {items.map((l, i) => (
+              <article key={i} className="pedido-linea">
+                <div className="pedido-linea-descripcion">
+                  <span className="pedido-cantidad">{l.cantidad}×</span>
+                  <div>
+                    <strong>{l.nombre}</strong>
+                    {l.nota && <p>{l.nota}</p>}
+                  </div>
+                </div>
+                <strong className="pedido-subtotal">{dinero(l.cantidad * l.precio)}</strong>
+              </article>
+            ))}
+          </div>
+
+          {o.notas && <p className="pedido-nota"><span aria-hidden="true">Nota</span>{o.notas}</p>}
+          <div className="pedido-total"><span>Total</span><strong>{dinero(Number(o.total))}</strong></div>
+          <p className="pedido-pago">Pagas en el local, como siempre.</p>
         </section>
-        <div className="row wrap-flex" style={{ marginTop: 16 }}>
-          <a className="btn" href={`/${n.slug}?mesa=${encodeURIComponent(o.mesa || "")}`}>Pedir algo más</a>
+
+        <nav className="pedido-acciones" aria-label="Acciones del pedido">
+          <a className="btn btn-p" href={`/${n.slug}?mesa=${encodeURIComponent(o.mesa || "")}`}>Pedir algo más</a>
           <a className="btn" href={`https://wa.me/${n.whatsapp}`}>Escribir al negocio</a>
-        </div>
+        </nav>
       </div>
     </main>
   );

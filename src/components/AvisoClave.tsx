@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// Al entrar, recomienda cambiar la contraseña que le mandamos por WhatsApp (hasta que la cambie).
+// Al entrar, recuerda elegir una contraseña que solo conozca el dueño (hasta que la cambie).
 export default function AvisoClave() {
   const ruta = usePathname();
   const [ver, setVer] = useState(false);
@@ -16,7 +16,7 @@ export default function AvisoClave() {
   return (
     <div className="alerta" style={{ marginBottom: 16 }}>
       <strong>Te recomendamos cambiar tu contraseña.</strong>
-      <p style={{ margin: "4px 0 10px" }}>La que te mandamos por WhatsApp la pudo ver alguien más. Pon una que solo tú sepas.</p>
+      <p style={{ margin: "4px 0 10px" }}>Elige una contraseña que solo tú sepas y úsala la próxima vez que entres.</p>
       <div className="row wrap-flex">
         <Link className="btn btn-sm btn-p" href="/panel/negocio#clave" onClick={despues}>Cambiarla ahora</Link>
         <button type="button" className="btn btn-sm" onClick={despues}>Después</button>
