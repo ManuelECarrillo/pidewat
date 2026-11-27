@@ -220,7 +220,6 @@ export default function Menu({
             {g.items.map((p) => {
               const n = enCarrito(p.id);
               const conIngredientes = personalizable(p);
-              const categoria = categorias.find((c) => c.id === p.category_id)?.name;
               const inicialPlatillo = p.name.trim().charAt(0).toUpperCase() || "•";
               return (
                 <article key={p.id} className={`prod ${p.available ? "" : "agotado"}`}>
@@ -232,11 +231,9 @@ export default function Menu({
                   >
                     {!p.image_url && <>
                       <span aria-hidden="true">{inicialPlatillo}</span>
-                      {categoria && <small>{categoria}</small>}
                     </>}
                   </div>
                   <div className="grow prod-contenido">
-                    {categoria && <span className="prod-categoria">{categoria}</span>}
                     <h3>{p.name}</h3>
                     {p.description && <p>{p.description}</p>}
                     <div className="prod-pie">

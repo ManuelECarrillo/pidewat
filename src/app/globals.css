@@ -13,8 +13,8 @@
   --warn: #b7791f;
   --bad: #c53030;
   --wa: #25d366;
-  --font-body: "Aptos", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-display: "Aptos Display", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  --font-body: var(--fuente-texto), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: var(--fuente-titulos), "Segoe UI", system-ui, sans-serif;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -190,12 +190,16 @@ input.i[aria-invalid="true"], textarea.i[aria-invalid="true"] { border-color: va
 }
 .prod-img { width: 96px; height: 108px; border-radius: 12px; flex: none; overflow: hidden; background: #eee center/cover no-repeat; }
 .prod-img-foto { background-size: cover; background-position: center; }
+/* Claude (QA 2026-11-27): tono suave del color del negocio con la inicial; el bloque sólido competía con «Agregar». */
 .prod-img-sello {
-  display: grid; align-content: space-between; padding: 10px; color: #fff;
-  background: linear-gradient(145deg, color-mix(in srgb, var(--c) 72%, #fff), var(--c));
+  display: grid; place-items: center; color: color-mix(in srgb, var(--c) 82%, #000);
+  border: 1px solid color-mix(in srgb, var(--c) 16%, #fff);
+  background:
+    radial-gradient(circle at 78% 18%, color-mix(in srgb, var(--c) 20%, #fff) 0 22%, transparent 23%),
+    radial-gradient(circle at 12% 92%, color-mix(in srgb, var(--c) 16%, #fff) 0 18%, transparent 19%),
+    color-mix(in srgb, var(--c) 9%, #fff);
 }
-.prod-img-sello::after { content: ""; width: 34px; height: 4px; border-radius: 99px; background: rgba(255,255,255,.68); }
-.prod-img-sello > span { font-size: 2.65rem; font-weight: 850; line-height: .9; letter-spacing: -.06em; text-shadow: 0 2px 12px rgba(0,0,0,.12); }
+.prod-img-sello > span { font-family: var(--font-display); font-size: 2.3rem; font-weight: 800; line-height: 1; letter-spacing: -.04em; }
 .prod-img-sello small { align-self: start; max-width: 100%; overflow: hidden; font-size: .68rem; font-weight: 750; letter-spacing: .03em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .prod-contenido { display: flex; min-width: 0; flex-direction: column; }
 .prod-categoria { overflow: hidden; margin-bottom: 2px; color: color-mix(in srgb, var(--c) 80%, var(--text)); font-size: .7rem; font-weight: 800; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }

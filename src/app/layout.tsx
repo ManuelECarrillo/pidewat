@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
+
+// Claude (QA 2026-11-27): una sola tipografía para landing, registro, panel y menú. «Aptos» solo existe en Windows;
+// en Android y iPhone se veía la del sistema. next/font las sirve desde el mismo dominio, sin pedir nada a Google al abrir.
+const titulos = Bricolage_Grotesque({ subsets: ["latin"], display: "swap", variable: "--fuente-titulos" });
+const texto = Inter({ subsets: ["latin"], display: "swap", variable: "--fuente-texto" });
 
 export const metadata: Metadata = {
   title: { default: "Pidewat · Pedidos ordenados por WhatsApp", template: "%s · Pidewat" },
@@ -13,7 +19,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-MX">
+    <html lang="es-MX" className={`${titulos.variable} ${texto.variable}`}>
       <body>{children}</body>
     </html>
   );
