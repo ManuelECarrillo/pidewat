@@ -34,8 +34,8 @@ const INCLUYE_RESTAURANTE = [
 ];
 
 const CONFIANZA = [
-  // La instalación a distancia todavía no está definida (Eduardo, 2026-11-26): no prometerla
-  { t: "Te lo dejamos funcionando", d: "En Durango te lo dejamos funcionando en persona. Si estás en otra ciudad, escríbenos por WhatsApp y te decimos cómo podemos ayudarte." },
+  // Eduardo (2026-11-27): nada que dependa de que él vaya en persona. Solo lo que el dueño ya puede hacer solo.
+  { t: "Lo manejas tú, sin esperar a nadie", d: "Cambias precios, productos, extras y agotados desde tu panel en el celular, cuando quieras." },
   { t: "Sin comisión por pedido", d: "Pagas tu mensualidad y ya. Lo que vendes es tuyo." },
   { t: "Tu cliente no descarga nada", d: "Abre tu menú con un link o escaneando el QR, desde cualquier celular." },
   { t: "Tu mismo WhatsApp", d: "El pedido te llega al número que ya usas. Contestas como siempre." },
