@@ -76,7 +76,8 @@
 }
 .ctaMovilBoton {
   display: flex; min-height: 48px; align-items: center; justify-content: center; border-radius: var(--radius-control);
-  background: var(--tinta); box-shadow: var(--sombra-alta); color: #fff; font-weight: 800; text-decoration: none;
+  /* Claude (QA 2026-11-27): verde como el botón principal del hero; en negro se perdía sobre la sección oscura de la demo. */
+  background: var(--verde); box-shadow: 0 10px 24px -10px rgba(31, 138, 76, .7), var(--sombra-alta); color: #fff; font-weight: 800; text-decoration: none;
 }
 
 /* ---------- Hero ---------- */
