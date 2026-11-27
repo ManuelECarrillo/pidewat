@@ -3,6 +3,7 @@
 import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { extenderPago } from "@/lib/estado";
+import { correoAcceso, correoActivo, enlaceAuth } from "@/lib/correo";
 import { normalizarWhatsapp, siteUrl, slugify } from "@/lib/formato";
 import { cancelarPreapproval } from "@/lib/mercadopago";
 import { DIAS_PRUEBA, SLUGS_RESERVADOS } from "@/lib/planes";
@@ -14,9 +15,11 @@ const claveNueva = () => {
   return Array.from(crypto.randomBytes(10), (b) => letras[b % letras.length]).join("");
 };
 
-export type ResultadoAlta = { ok: boolean; mensaje: string; whatsapp?: string; texto?: string };
+// enlace: acceso de un solo uso al panel (se muestra también como QR para que el dueño lo escanee ahí mismo)
+export type ResultadoAlta = { ok: boolean; mensaje: string; whatsapp?: string; texto?: string; enlace?: string };
 
-// Alta de un negocio nuevo: crea la cuenta del dueño con contraseña y su negocio en prueba.
+// Alta de un negocio nuevo: crea la cuenta del dueño y su negocio en prueba, y regresa un enlace de acceso de un solo uso
+// (QR o WhatsApp). El dueño entra directo a su panel y ahí elige su contraseña: nadie más la conoce.
 export async function altaNegocio(_: ResultadoAlta | null, f: FormData): Promise<ResultadoAlta> {
   await requiereAdmin();
   const sb = supabaseAdmin();
@@ -40,30 +43,48 @@ export async function altaNegocio(_: ResultadoAlta | null, f: FormData): Promise
   if (e2) return { ok: false, mensaje: `No se pudo crear el negocio: ${e2.message}` };
 
   revalidatePath("/admin");
-  return { ok: true, mensaje: `Negocio creado: /${slug}`, whatsapp, texto: textoBienvenida(name, slug, correo, cuenta.clave, true) };
+  const enlace = await enlaceEntrada(sb, correo);
+  if (!enlace) return { ok: true, mensaje: `Negocio creado: /${slug}, pero no se pudo crear el enlace de acceso. Usa «Enlace de acceso» en su ficha.` };
+  const salio = await mandarAcceso(correo, name, enlace);
+  return { ok: true, mensaje: `Negocio creado: /${slug}. ${avisoEnvio(correo, salio)}`, whatsapp, enlace, texto: textoBienvenida(name, slug, enlace, true) };
 }
 
-// Crea la cuenta del dueño con contraseña nueva; si ya tenía cuenta (otro negocio), la reutiliza sin cambiarle la contraseña.
-async function cuentaDueno(sb: ReturnType<typeof supabaseAdmin>, correo: string): Promise<{ id: string; clave: string } | { error: string }> {
-  const clave = claveNueva();
-  const { data: creado, error } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true });
-  if (!error) return { id: creado.user.id, clave };
+// Crea la cuenta del dueño con una contraseña al azar que nadie ve (la elige él al entrar con el enlace);
+// si ya tenía cuenta (otro negocio), la reutiliza sin tocarla.
+async function cuentaDueno(sb: ReturnType<typeof supabaseAdmin>, correo: string): Promise<{ id: string } | { error: string }> {
+  const { data: creado, error } = await sb.auth.admin.createUser({ email: correo, password: claveNueva() + claveNueva(), email_confirm: true });
+  if (!error) return { id: creado.user.id };
   const { data: lista } = await sb.auth.admin.listUsers({ perPage: 1000 });
   const u = lista?.users.find((x) => x.email?.toLowerCase() === correo);
   if (!u) return { error: `No se pudo crear la cuenta: ${error.message}` };
-  return { id: u.id, clave: "(la misma que ya tienes)" };
+  return { id: u.id };
 }
 
-function textoBienvenida(name: string, slug: string, correo: string, clave: string, prueba: boolean) {
+// Enlace de un solo uso que deja al dueño dentro de su panel (vence según Supabase, normalmente 1 hora).
+async function enlaceEntrada(sb: ReturnType<typeof supabaseAdmin>, correo: string): Promise<string | null> {
+  const { data, error } = await sb.auth.admin.generateLink({ type: "magiclink", email: correo });
+  if (error || !data?.properties?.hashed_token) return null;
+  return enlaceAuth(data.properties.hashed_token, "magiclink", siteUrl());
+}
+
+// Manda el enlace de acceso al correo del dueño para que entre solo, sin pasar por WhatsApp. true si salió.
+async function mandarAcceso(correo: string, negocio: string, enlace: string): Promise<boolean> {
+  if (!correoActivo()) return false;
+  try { await correoAcceso(correo, negocio, enlace); return true; }
+  catch (e) { console.error("correo de acceso", e); return false; }
+}
+
+const avisoEnvio = (correo: string, salio: boolean) =>
+  salio ? `Le llegó a ${correo} un correo para entrar a su panel. Si estás con él, también puede escanear el QR.`
+        : `No se pudo mandar el correo a ${correo}: que escanee el QR o mándale el enlace.`;
+
+function textoBienvenida(name: string, slug: string, enlace: string, prueba: boolean) {
   return `¡Listo! Ya quedó tu menú de *${name}* 🎉
 
 Tu link para clientes: ${siteUrl()}/${slug}
 
-Tu panel para cambiar precios y platillos:
-${siteUrl()}/entrar
-Correo: ${correo}
-Contraseña: ${clave}
-(Al entrar, cámbiala en "Mi negocio" por una que solo tú sepas.)
+Toca este enlace para entrar a tu panel y elegir tu contraseña (sirve una sola vez y vence en 1 hora):
+${enlace}
 ${prueba ? `\nTienes ${DIAS_PRUEBA} días gratis. ` : "\n"}Cualquier cosa me escribes por aquí.`;
 }
 
@@ -86,7 +107,10 @@ export async function darCuenta(_: ResultadoAlta | null, f: FormData): Promise<R
   revalidatePath(`/admin/${id}`);
   revalidatePath(`/${n.slug}`);
   const pagado = !!n.paid_until && new Date(n.paid_until) > new Date();
-  return { ok: true, mensaje: `Cuenta lista para ${correo}.`, whatsapp, texto: textoBienvenida(name, n.slug, correo, cuenta.clave, !pagado) };
+  const enlace = await enlaceEntrada(sb, correo);
+  if (!enlace) return { ok: true, mensaje: `Cuenta lista para ${correo}, pero no se pudo crear el enlace de acceso. Intenta con «Enlace de acceso».` };
+  const salio = await mandarAcceso(correo, name, enlace);
+  return { ok: true, mensaje: `Cuenta lista. ${avisoEnvio(correo, salio)}`, whatsapp, enlace, texto: textoBienvenida(name, n.slug, enlace, !pagado) };
 }
 
 async function negocio(f: FormData) {
@@ -151,15 +175,18 @@ export async function cancelarCobro(f: FormData) {
   revalidatePath(`/admin/${id}`);
 }
 
+// Si el dueño no puede entrar: enlace de acceso de un solo uso (no cambia ni revela su contraseña).
+// Al entrar le aparece el aviso para elegir una contraseña nueva.
 export async function nuevaClave(_: ResultadoAlta | null, f: FormData): Promise<ResultadoAlta> {
   const { sb, n } = await negocio(f);
-  if (!n.owner_id) return { ok: false, mensaje: "Este negocio no tiene dueño." };
-  const clave = claveNueva();
-  const { error } = await sb.auth.admin.updateUserById(n.owner_id, { password: clave });
-  if (error) return { ok: false, mensaje: error.message };
+  if (!n.owner_id || !n.owner_email) return { ok: false, mensaje: "Este negocio no tiene dueño." };
+  await sb.auth.admin.updateUserById(n.owner_id, { user_metadata: { clave_cambiada: false } });
+  const enlace = await enlaceEntrada(sb, n.owner_email);
+  if (!enlace) return { ok: false, mensaje: "No se pudo crear el enlace. Intenta otra vez." };
+  const salio = await mandarAcceso(n.owner_email, n.name, enlace);
   return {
-    ok: true, mensaje: "Contraseña nueva creada.", whatsapp: n.whatsapp,
-    texto: `Tu nueva contraseña de Pidewat es: ${clave}\nEntra en ${siteUrl()}/entrar con tu correo ${n.owner_email}`,
+    ok: true, mensaje: avisoEnvio(n.owner_email, salio), whatsapp: n.whatsapp, enlace,
+    texto: `Toca este enlace para entrar a tu panel de Pidewat y elegir una contraseña nueva (sirve una sola vez y vence en 1 hora):\n${enlace}`,
   };
 }
 

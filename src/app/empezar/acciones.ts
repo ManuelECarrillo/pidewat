@@ -52,8 +52,10 @@ export async function enviarSolicitud(_: ResultadoSolicitud | null, f: FormData)
 }
 
 // Plan Esencial: alta automática, sin intervención de nadie.
-// Con correo configurado: crea la cuenta SIN confirmar + su negocio con 14 días y manda el enlace de confirmación;
-// al tocarlo entra directo a «Mi menú». Sin correo configurado: entra al momento (comportamiento anterior).
+// Crea la cuenta + su negocio con 14 días y deja al dueño DENTRO de su panel en ese momento (Eduardo 27/11:
+// ir al correo y regresar da flojera). Si hay correo configurado, además le manda un enlace para confirmar su
+// correo; mientras no lo confirme ve un aviso en su panel (correo_pendiente).
+// (correo_pendiente es solo nuestro: en Supabase la cuenta queda confirmada para que pueda entrar.)
 export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Promise<ResultadoSolicitud> {
   const { ip, huella } = await ipYHuella();
   if (await pareceRobot(f, ip)) return { ok: false, error: "No se pudo crear la cuenta. Intenta otra vez en un momento." };
@@ -95,16 +97,10 @@ export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Pr
   }
 
   const verificar = correoActivo();
-  let userId: string | undefined;
-  let tokenHash: string | undefined;
-  let errAlta: string | undefined;
-  if (verificar) {
-    const { data, error } = await sb.auth.admin.generateLink({ type: "signup", email: correo, password: clave, options: { data: { nombre, clave_cambiada: true } } }); // eligió su propia contraseña: sin aviso de cambiarla
-    userId = data?.user?.id; tokenHash = data?.properties?.hashed_token; errAlta = error?.message;
-  } else {
-    const { data, error } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true, user_metadata: { nombre, clave_cambiada: true } });
-    userId = data?.user?.id; errAlta = error?.message;
-  }
+  // eligió su propia contraseña: sin aviso de cambiarla
+  const { data: alta, error: eAlta } = await sb.auth.admin.createUser({ email: correo, password: clave, email_confirm: true, user_metadata: { nombre, clave_cambiada: true, correo_pendiente: verificar } });
+  const userId = alta?.user?.id;
+  const errAlta = eAlta?.message;
   if (!userId) {
     const ya = /already|registered|exists/i.test(errAlta || "");
     return ya
@@ -123,18 +119,20 @@ export async function crearPrueba(_: ResultadoSolicitud | null, f: FormData): Pr
   await sb.from("solicitudes").insert({ negocio, nombre, whatsapp, giro, ciudad: null, plan: "esencial", estado: "prueba", business_id: neg.id, utm, ip_hash: huella, acepto_privacidad: true });
   await sb.from("eventos_landing").insert({ evento: "registro_enviado", pagina: "/empezar", detalle: "prueba_activada", utm_source: utm.utm_source ?? null, utm_medium: utm.utm_medium ?? null, utm_campaign: utm.utm_campaign ?? null, utm_content: utm.utm_content ?? null });
 
-  if (verificar && tokenHash) {
-    try {
-      await correoConfirmar(correo, negocio, enlaceAuth(tokenHash, "signup", await origen()));
-    } catch (e) {
-      console.error("correo confirmar", (e as Error).message);
-      return { ok: true, plan: "esencial", negocio, revisaCorreo: correo, error: "envio" };
-    }
-    return { ok: true, plan: "esencial", negocio, revisaCorreo: correo };
-  }
+  if (verificar) await mandarConfirmacion(sb, correo, negocio);
   const { error: e3 } = await (await supabaseServidor()).auth.signInWithPassword({ email: correo, password: clave });
   if (e3) return { ok: true, plan: "esencial", negocio, entrar: true };
-  redirect("/panel/menu?bienvenida=1");
+  redirect("/panel?bienvenida=1");
+}
+
+// Enlace de un solo uso para confirmar el correo. Si falla el envío no se frena el alta: el aviso del panel deja reenviarlo.
+async function mandarConfirmacion(sb: ReturnType<typeof supabaseAdmin>, correo: string, negocio: string) {
+  try {
+    const { data } = await sb.auth.admin.generateLink({ type: "magiclink", email: correo });
+    if (data?.properties?.hashed_token) await correoConfirmar(correo, negocio, enlaceAuth(data.properties.hashed_token, "magiclink", await origen()));
+  } catch (e) {
+    console.error("correo confirmar", (e as Error).message);
+  }
 }
 
 // Reenviar el enlace de confirmación (cuenta creada pero sin confirmar). Siempre responde lo mismo.
@@ -150,7 +148,7 @@ export async function reenviarConfirmacion(_: { ok: boolean } | null, f: FormDat
   }
   const { data: neg } = await sb.from("businesses").select("name").eq("owner_email", correo).limit(1).maybeSingle();
   const { data } = await sb.auth.admin.generateLink({ type: "magiclink", email: correo });
-  if (data?.properties?.hashed_token && data.user && !data.user.email_confirmed_at) {
+  if (data?.properties?.hashed_token && data.user && (!data.user.email_confirmed_at || data.user.user_metadata?.correo_pendiente)) {
     try { await correoConfirmar(correo, neg?.name || "tu negocio", enlaceAuth(data.properties.hashed_token, "magiclink", await origen())); } catch (e) { console.error("reenvio", (e as Error).message); }
   }
   return { ok: true };
