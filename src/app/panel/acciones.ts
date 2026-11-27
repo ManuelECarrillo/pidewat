@@ -6,6 +6,7 @@ import { requiereDueno } from "@/lib/sesion";
 import { normalizarWhatsapp } from "@/lib/formato";
 import { leerHorario, resumenHorario } from "@/lib/horario";
 import type { ResultadoAlta } from "@/app/admin/acciones";
+import { limpiarOpciones } from "@/lib/opciones";
 
 const txt = (f: FormData, k: string, max = 300) => String(f.get(k) ?? "").trim().slice(0, max) || null;
 // QA-002: "$1,250", "28.50" y "28,50" se leen bien; antes "28.50.1" o "28,50" terminaban en 0 o en 2850
@@ -56,6 +57,7 @@ export async function guardarProducto(f: FormData) {
     image_url: imagen(f, "image_url"),
     available: !f.has("available_present") || si(f, "available"),
     ...(f.has("ingredientes") ? { ingredientes: lista(f, "ingredientes") } : {}),
+    ...(f.has("opciones") ? { opciones: limpiarOpciones(String(f.get("opciones")).slice(0, 8000)) } : {}),
   };
   if (id) await sb.from("products").update(datos).eq("id", id).eq("business_id", negocio.id);
   else await sb.from("products").insert({ ...datos, position: Date.now() % 1_000_000_000 });

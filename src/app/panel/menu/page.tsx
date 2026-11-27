@@ -2,6 +2,7 @@ import { Acordeon, Desplegable } from "@/components/Acordeon";
 import BotonEnviar from "@/components/BotonEnviar";
 import Selector from "@/components/Selector";
 import ImagenInput from "@/components/ImagenInput";
+import OpcionesInput from "@/components/OpcionesInput";
 import { dinero } from "@/lib/formato";
 import { requiereDueno } from "@/lib/sesion";
 import type { Categoria, Producto } from "@/lib/tipos";
@@ -29,6 +30,7 @@ function FormProducto({ p, categorias, negocioId, catDefecto }: { p?: Producto; 
       <label className="f">Ingredientes que el cliente puede quitar <span className="h">Opcional. Separados por coma, ej. mostaza, mayonesa, cátsup. Al pedir, el cliente toca lo que no quiere.</span>
         <input className="i" name="ingredientes" defaultValue={(p?.ingredientes || []).join(", ")} placeholder="Ej. mostaza, mayonesa, cátsup, chile" />
       </label>
+      <OpcionesInput valor={p?.opciones} />
       <ImagenInput name="image_url" negocioId={negocioId} valor={p?.image_url} />
       <input type="hidden" name="available_present" value="1" />
       <label className="check"><input type="checkbox" name="available" defaultChecked={p ? p.available : true} /> Disponible</label>

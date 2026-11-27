@@ -5,12 +5,12 @@ import BotonEnviar from "@/components/BotonEnviar";
 import FormConResultado from "@/components/FormConResultado";
 import { estadoNegocio } from "@/lib/estado";
 import { dinero, fecha, siteUrl } from "@/lib/formato";
-import { precioDe } from "@/lib/planes";
+import { PLANES, precioDe } from "@/lib/planes";
+import Selector from "@/components/Selector";
 import { requiereAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { NegocioCompleto } from "@/lib/tipos";
 import { alternarPausa, cancelarCobro, darCuenta, extenderPrueba, guardarInterno, importarMenu, nuevaClave, registrarPago } from "../acciones";
-import Selector from "@/components/Selector";
 
 const EJEMPLO = `# Gorditas
 Gordita de chicharrón | 28 | De maíz, hecha a mano
@@ -120,6 +120,11 @@ export default async function AdminNegocio({ params }: { params: Promise<{ id: s
               <input className="i" name="precio_mensual" inputMode="decimal" defaultValue={n.precio_mensual ?? ""} placeholder={String(precioDe(null).mensual)} />
             </label>
           </div>
+          <div className="f">Plan
+            <Selector name="plan" valor={n.plan} opciones={[{ value: "base", label: `${PLANES.base.nombre} · ${PLANES.base.mensual} al mes` }, { value: "plus", label: `${PLANES.plus.nombre} · ${PLANES.plus.mensual} al mes` }]} />
+          </div>
+          <input type="hidden" name="cocina_present" value="1" />
+          <label className="check"><input type="checkbox" name="cocina" defaultChecked={Boolean(n.cocina)} /> Pantalla de cocina (pedidos de mesa van a cocina, no a WhatsApp)</label>
           <label className="f">Notas (solo las vemos nosotros)<textarea className="i" name="notes" defaultValue={n.notes || ""} /></label>
           <BotonEnviar>Guardar</BotonEnviar>
         </form>

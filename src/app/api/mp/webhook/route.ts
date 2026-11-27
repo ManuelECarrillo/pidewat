@@ -34,7 +34,9 @@ async function suscripcion(id: string) {
   if (!ref) return;
   const sb = supabaseAdmin();
   if (s.status === "authorized") await sb.from("businesses").update({ mp_preapproval_id: s.id, plan: ref.plan }).eq("id", ref.id);
-  if (s.status === "cancelled") await sb.from("businesses").update({ mp_preapproval_id: null }).eq("id", ref.id).eq("mp_preapproval_id", s.id);
+  // Cancelada o pausada (por el dueño o por Mercado Pago tras cobros rechazados): ya no hay cobro automático.
+  // No se quita el acceso aquí: el menú sigue hasta paid_until y luego corren los días de gracia.
+  if (s.status === "cancelled" || s.status === "paused") await sb.from("businesses").update({ mp_preapproval_id: null }).eq("id", ref.id).eq("mp_preapproval_id", s.id);
 }
 
 async function cobroMensual(id: string) {

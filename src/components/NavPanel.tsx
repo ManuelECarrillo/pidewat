@@ -14,12 +14,15 @@ const SECCIONES = [
   { href: "/panel/plan", texto: "Plan", icono: I("M3 7h18v10H3zM3 11h18M7 15h3") },
 ];
 
-// Las 4 secciones siempre a la vista (sin menú que haya que deslizar).
-export default function NavPanel() {
+const COCINA = { href: "/panel/cocina", texto: "Cocina", icono: I("M6 3v8a3 3 0 0 0 6 0V3M9 3v18M17 3c-2 2-2 6 0 8v10") };
+
+// Las secciones siempre a la vista (sin menú que haya que deslizar). "Cocina" solo en el plan Restaurante.
+export default function NavPanel({ cocina = false }: { cocina?: boolean }) {
   const ruta = usePathname();
+  const secciones = cocina ? [SECCIONES[0], COCINA, ...SECCIONES.slice(1)] : SECCIONES;
   return (
     <nav className="nav" aria-label="Secciones">
-      {SECCIONES.map((s) => {
+      {secciones.map((s) => {
         const activa = s.href === "/panel" ? ruta === "/panel" : ruta.startsWith(s.href);
         return (
           <Link key={s.href} href={s.href} className={activa ? "on" : ""} aria-current={activa ? "page" : undefined}>
