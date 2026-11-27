@@ -1,6 +1,7 @@
 /*
- * Auditoría Fase 1. Ejecutar con la app local en http://localhost:3130:
+ * Capturas de auditoría. Ejecutar con la app local en http://localhost:3130:
  *   node docs/ui-ux/scripts/capturar-antes.cjs
+ * Para la evidencia posterior: node docs/ui-ux/scripts/capturar-antes.cjs despues
  *
  * No abre WhatsApp ni envía pedidos. Solo llega al botón de envío.
  */
@@ -9,7 +10,8 @@ const path = require("node:path");
 const { chromium } = require("C:/Users/Familia CA/.claude/skills/gstack/node_modules/playwright-core");
 
 const baseUrl = process.env.PIDEWAT_AUDIT_URL || "http://localhost:3130";
-const output = path.resolve(__dirname, "../capturas/antes");
+const destino = process.argv[2] || process.env.PIDEWAT_CAPTURAS || "antes";
+const output = path.resolve(__dirname, "../capturas", destino);
 const viewports = [
   { nombre: "movil-360", width: 360, height: 800, isMobile: true },
   { nombre: "movil-390", width: 390, height: 844, isMobile: true },

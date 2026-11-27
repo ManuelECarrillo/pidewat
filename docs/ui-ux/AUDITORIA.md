@@ -163,6 +163,44 @@ Un “toque” es una pulsación sobre un control de la app; escribir con teclad
 9. **§9 Calidad responsive:** revisar 320–430 px, tableta y escritorio con menús largos, sin foto, carrito lleno, teclado y red lenta; eliminar desbordes y contenido tapado.
 10. **§9 Calidad de entrega:** hacer reproducible el build local con una estrategia de fuentes compatible con entornos sin salida a Google, y después validar con `tsc` y `next build`.
 
+## Después
+
+### Evidencia y límites
+
+- Se regeneraron 21 capturas de `/demo` en 360, 390 y 1440 px con `node docs/ui-ux/scripts/capturar-antes.cjs despues`. Quedaron en `capturas/despues/`, con las mismas rutas y estados ficticios de la auditoría inicial.
+- La evidencia pública cubre menú, hojas de personalización, carrito, entrar, landing y empezar. Las pantallas autenticadas siguieron verificándose por código: no se crearon usuarios, negocios, pagos ni pedidos reales.
+- En la cabecera del menú, el estado se calcula con el horario estructurado. Si un negocio no configura ese horario, la aplicación permite pedidos a cualquier hora y por eso se muestra como abierto.
+
+### Toques ANTES y DESPUÉS
+
+Un “toque” mantiene la definición de la fase inicial: una pulsación sobre un control; escribir y desplazarse no suman. Las filas de panel y cocina siguen medidas en código.
+
+| Rol y tarea | Toques ANTES | Toques DESPUÉS | Recorrido DESPUÉS / evidencia |
+|---|---:|---:|---|
+| Cliente: encontrar, personalizar y agregar | 9 | 9 | Flujo reproducido en `/demo`; conserva la respuesta al agregar y ahora la cabecera informa si recibe pedidos. |
+| Cliente: revisar total, elegir tipo y llegar a enviar | 3 | 3 | Flujo reproducido en `/demo`; al intentar enviar incompleto, el campo faltante explica cómo corregirlo. |
+| Cliente: flujo completo solicitado | 12 | 12 | Suma de las dos filas anteriores; no se abrió WhatsApp. |
+| Cliente: quitar la última unidad de una línea | 1 | 2 | − → confirmar “Sí, quitar”; la confirmación evita perder una personalización por error. |
+| Dueño: agregar platillo sencillo, con o sin categoría | 5 / 7 | 3 | Inicio → Nombre → Precio → Agregar (el formulario está en Inicio y guarda disponible, sin categoría obligatoria). |
+| Dueño: cambiar un precio | 4 | 3 | Inicio → Cambiar precio → Precio → Guardar precio. |
+| Dueño: marcar agotado | 3 | 2 | Inicio → Marcar agotado → Marcar agotado en la ficha visible. |
+| Dueño: cambiar horario estructurado | 4 | 4 | Mi negocio → selector del lunes → elegir hora → Guardar; el resto de días queda plegado. |
+| Dueño: encontrar y compartir enlace | 1 | 1 | Inicio → Compartir link. |
+| Dueño: abrir y exportar tarjetas QR | 2 | 2 | Inicio → Crear tarjetas para mesas → Guardar hoja o Imprimir. |
+| Dueño: compartir o guardar el QR individual | No medido | 1 | Inicio → Compartir o guardar QR. |
+| Cocina: recibir un pedido nuevo | 2 (1 tras configurar sonido) | 2 (1 tras configurar sonido) | Medido en código; consulta automática y control de sonido se conservan. |
+| Cocina: iniciar preparación | 1 | 1 | El botón de la tarjeta queda deshabilitado mientras se guarda. |
+| Cocina: marcar listo | 1 | 1 | El botón de la tarjeta queda deshabilitado mientras se guarda. |
+| Cocina: recuperarse de un fallo de transición | 0 | 1 | Reintentar en la misma tarjeta tras un fallo recuperable. |
+
+### Resultado por problema
+
+- **UX-001 / UX-003:** Inicio con alta rápida, atajos diarios y estadísticas sin importes que se puedan interpretar como ventas o ingresos confirmados.
+- **UX-002:** La barra móvil calcula columnas según cuatro o cinco secciones.
+- **UX-004 / UX-005 / UX-006:** El carrito confirma el último borrado, sitúa validaciones en los campos y el menú señala abierto/cerrado junto al nombre.
+- **UX-007 / UX-008 / UX-009 / UX-010 / UX-013:** Cubiertos en esta fase; véase `CAMBIOS.md` para archivos y alcance de cada bloque.
+- **UX-012:** No se modificó por pertenecer a autenticación; el pedido está en `PEDIDOS-A-CLAUDE.md`.
+
 ## No seguro o no viable en esta fase
 
 - No fue seguro capturar ni mutar pantallas autenticadas sin una sesión y base de ejemplo; por instrucción se auditaron por código.
