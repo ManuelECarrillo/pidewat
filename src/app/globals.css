@@ -358,6 +358,8 @@ div.d.on > .d-titulo { border-bottom: 1px solid var(--line); }
 .pedido-listo { display: flex; align-items: center; gap: 12px; margin: 18px 18px 0; padding: 14px; border: 1px solid #9bdfb8; border-radius: 14px; background: #e9faef; color: #146b37; text-align: left; }
 .pedido-listo-icono { display: flex; flex: none; width: 42px; height: 42px; align-items: center; justify-content: center; line-height: 0; border-radius: 50%; background: var(--ok); color: #fff; }
 .pedido-listo-icono svg { display: block; }
+/* QA: la regla ".pedido-listo span { display:block }" le ganaba al ícono y dejaba el check arriba a la izquierda */
+.pedido-listo .pedido-listo-icono { display: flex; }
 .pedido-listo strong, .pedido-listo span { display: block; }
 .pedido-listo strong { font-size: 1rem; }
 .pedido-listo div > span { margin-top: 1px; font-size: .86rem; }
