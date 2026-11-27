@@ -16,3 +16,11 @@ Nombres de prueba: correo `pidewat.soporte+e2e<N>@gmail.com`, negocio `Prueba E2
 9. Antirrobot: honeypot, envío en menos de 2.5 s y límite por IP rechazan.
 
 Limpieza: borrar negocios `prueba-e2e-*`, sus productos, solicitudes, eventos y usuarios de Auth.
+
+## Resultado 27/11/2026
+Pasos 1-6, 8 y 9 (trampa) aprobados en la vista previa. Paso 7 dependía de WhatsApp: se conecta Mercado Pago.
+
+## Mercado Pago en modo prueba (vista previa)
+- `MP_ACCESS_TOKEN` de prueba solo en Preview. Production sigue sin token: ahí no se puede cobrar todavía.
+- Probar: negocio ficticio con prueba vencida → /panel/plan → «Activar mi plan» → autorizar con usuario comprador de prueba → regresa a /panel/plan?mp=ok de la vista previa.
+- Avisos (webhook) a la vista previa requieren la llave de paso de Vercel para automatizaciones; sin ella el aviso no llega y `paid_until` no se mueve.
