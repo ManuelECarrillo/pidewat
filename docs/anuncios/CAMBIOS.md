@@ -1,5 +1,10 @@
 # Cambios de anuncios
 
+## Vuelta 20
+
+- C2 espera a que la imagen real de la tarjeta QR termine de generarse y desaparezca su estado de carga antes de grabar; P2 vuelve a mostrar el QR de El Fogón tanto en el gancho como en «TU QR Y TU LINK».
+- R3 recorta la tarjeta QR dentro del soporte de acrílico desde el contenido de la tarjeta, sin el texto residual «panel.» de la página de grabación.
+
 ## Vuelta 17 (correcciones visuales v2)
 
 - P2 y R1 bajan sus placas de demostraciÃ³n a partir de y=255 en 9:16, con una banda fÃ­sica antes de la interfaz. R1 conserva el gancho exacto: Â«Â¿Tu QR solo muestra un PDF?Â».

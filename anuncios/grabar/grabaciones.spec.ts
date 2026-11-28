@@ -129,6 +129,21 @@ async function hamburguesa(page: Page, lista: Fotograma[], posiciones?: Posicion
   await foto(page, "carrito", 1.4, lista);
 }
 
+// C2 and C3 must demonstrate the exact same two-item order that their
+// WhatsApp message reports. C1/C4 intentionally keep their existing flows.
+async function pedidoDosHamburguesas(page: Page, lista: Fotograma[]) {
+  const abrir = page.getByRole("button", { name: /Personalizar y agregar Hamburguesa de la casa/ });
+  await tocar(page, abrir); await foto(page, "hamburguesa-doble", 1.2, lista);
+  await tocar(page, page.getByRole("button", { name: /Doble carne/ })); await foto(page, "doble-carne", 1, lista);
+  await tocar(page, page.getByRole("button", { name: /Queso extra/ })); await foto(page, "queso-extra", 1, lista);
+  await tocar(page, page.getByRole("button", { name: /Agregar 1/ })); await foto(page, "agregar-doble", 1, lista);
+  await tocar(page, abrir); await foto(page, "hamburguesa-clasica", 1.2, lista);
+  await tocar(page, page.getByRole("button", { name: /Clásica/ })); await foto(page, "clasica", 1, lista);
+  await tocar(page, page.getByRole("button", { name: /Cebolla/ })); await foto(page, "sin-cebolla", 1.2, lista);
+  await tocar(page, page.getByRole("button", { name: /Agregar 1/ })); await foto(page, "agregar-clasica", 1, lista);
+  await tocar(page, page.getByRole("button", { name: /Ver pedido/ })); await foto(page, "carrito-total-217", 1.4, lista);
+}
+
 async function finalizarWhatsapp(page: Page, lista: Fotograma[], mesa = false, posiciones?: Posicion[]) {
   if (!mesa) await tocar(page, page.getByRole("button", { name: "Recoger" }), posiciones, "recoger");
   const nombre = page.getByLabel("Tu nombre");
@@ -154,20 +169,25 @@ test("C1 pedido de hamburguesa y captura P3", async ({ page }) => {
 test("C2 menú, tarjeta QR y carrito", async ({ page }) => {
   const lista: Fotograma[] = [];
   await preparar(page, "/grabacion/pedido"); await foto(page, "menu", .8, lista);
-  await preparar(page, "/grabacion/qr"); await foto(page, "tarjeta-qr", 1.8, lista);
+  await preparar(page, "/grabacion/qr");
+  // La tarjeta se dibuja de forma asíncrona: no grabar el estado temporal
+  // «Generando tarjeta QR…». La imagen real confirma que el QR ya existe.
+  await expect(page.getByAltText("Tarjeta QR real")).toBeVisible();
+  await expect(page.getByText("Generando tarjeta QR…")).toHaveCount(0);
+  await foto(page, "tarjeta-qr", 1.8, lista);
   await preparar(page, "/grabacion/pedido");
-  await hamburguesa(page, lista); await finalizarWhatsapp(page, lista);
+  await pedidoDosHamburguesas(page, lista); await finalizarWhatsapp(page, lista);
   await mp4(page, "c2-menu-qr-carrito", lista);
 });
 
 test("C3 pedido desde mesa y captura R3", async ({ page }) => {
   const lista: Fotograma[] = [];
   await preparar(page, "/grabacion/mesa"); await foto(page, "menu-mesa-7", 1.1, lista);
-  await hamburguesa(page, lista);
+  await quitarToque(page);
+  await page.screenshot({ path: join(salida, "r3-menu-mesa-7.png"), animations: "disabled" });
+  await pedidoDosHamburguesas(page, lista);
   const nombre = page.getByLabel("Tu nombre"); await nombre.fill("Ana demo");
   await foto(page, "pedido-mesa", 1.8, lista);
-  await quitarToque(page);
-  await page.screenshot({ path: join(salida, "r3-menu-pedido-mesa.png"), animations: "disabled" });
   await tocar(page, page.getByRole("button", { name: "Enviar pedido por WhatsApp" }));
   await expect(page.getByTestId("mensaje-whatsapp")).toBeVisible(); await foto(page, "mensaje-mesa", 2, lista);
   await mp4(page, "c3-mesa-qr", lista);

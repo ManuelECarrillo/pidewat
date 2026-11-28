@@ -45,6 +45,29 @@ function DeviceScreen({ f }: { f: FormatoV2 }) {
   </AbsoluteFill>;
 }
 
+/** The same table-seven WhatsApp text produced by src/lib/whatsapp.ts, rendered
+ * as formatted text (instead of displaying its Markdown control characters). */
+function MesaOrderMessage({ f }: { f: FormatoV2 }) {
+  const frame = useCurrentFrame();
+  const emphasis = (start: number): React.CSSProperties => ({ background: frame >= fr(start) ? "#a8ebba" : "transparent", borderRadius: 8, padding: "1px 4px" });
+  const p = spring({ fps, frame, config: { damping: 17, stiffness: 160 } });
+  const textSize = is9(f) ? 43 : 34;
+  return <AbsoluteFill style={{ background: "#e8e1d8", padding: is9(f) ? "280px 46px 0" : "150px 42px 0", boxSizing: "border-box" }}>
+    <div style={{ height: is9(f) ? 115 : 88, margin: is9(f) ? "-280px -46px 42px" : "-150px -42px 28px", padding: is9(f) ? "32px 46px" : "24px 42px", boxSizing: "border-box", background: "#1d6e45", color: "#fff", ...bodyFont, fontSize: is9(f) ? 44 : 36 }}>Pidewat · mensaje de pedido</div>
+    <div style={{ padding: is9(f) ? "31px 32px" : "23px 25px", borderRadius: "30px 30px 8px 30px", background: "#d7f7d8", color: "#17251b", boxShadow: "0 9px 20px #0003", transform: `translateY(${interpolate(p, [0, 1], [80, 0])}px)`, opacity: p, fontSize: textSize, lineHeight: 1.2, ...bodyFont }}>
+      <div>Hola <b>El Fogón</b>, quiero hacer un pedido:</div><br />
+      <div>• 1 × <b style={emphasis(.35)}>Hamburguesa de la casa</b> — $132</div>
+      <div style={{ fontStyle: "italic", ...emphasis(.7) }}>Doble carne · Queso extra</div><br />
+      <div>• 1 × <b>Hamburguesa de la casa</b> — $85</div>
+      <div style={{ fontStyle: "italic" }}>Clásica · Sin cebolla</div><br />
+      <div><b style={emphasis(1.05)}>Total: $217</b></div>
+      <div><b>Para comer aquí</b>, mesa 7</div>
+      <div><b>Nombre:</b> Ana demo</div>
+      <div style={{ marginTop: is9(f) ? 18 : 12, fontSize: is9(f) ? 30 : 24, fontStyle: "italic", opacity: .78 }}>Pedido hecho en pidewat.vercel.app/demo</div>
+    </div>
+  </AbsoluteFill>;
+}
+
 function P2Close({ f }: { f: FormatoV2 }) {
   const frame = useCurrentFrame();
   const p = spring({ fps, frame, config: { damping: 17, stiffness: 150 } });
@@ -60,11 +83,12 @@ export function P2v2({ formato: f }: { formato: FormatoV2 }) {
   return <AbsoluteFill><Music />
     <P2Screen f={f} at={0} sourceAt={0} duration={2} focusY={610} title="0 % DE COMISIÓN POR PEDIDO" caption="¿Quieres un menú digital sin pagar comisión?" />
     <P2Screen f={f} at={2} sourceAt={.8} duration={1} focusY={780} title="TU MENÚ CON EXTRAS" />
-    <P2Screen f={f} at={3} sourceAt={3.8} duration={1} focusY={1180} title="TU MENÚ CON EXTRAS" />
-    <P2Screen f={f} at={4} sourceAt={4.8} duration={1} focusY={1440} title="TU MENÚ CON EXTRAS" />
-    <P2Screen f={f} at={5} sourceAt={8} duration={1} focusY={1910} title="TU MENÚ CON EXTRAS" />
-    <Sequence from={fr(6)} durationInFrames={fr(5)}><DeviceScreen f={f} /></Sequence>
-    <P2Screen f={f} at={11} sourceAt={.8} duration={1.5} focusY={960} title="TU QR Y TU LINK" />
+    <P2Screen f={f} at={3} sourceAt={2.6} duration={1} focusY={1180} title="TU MENÚ CON EXTRAS" />
+    <P2Screen f={f} at={4} sourceAt={3.8} duration={1} focusY={1440} title="TU MENÚ CON EXTRAS" />
+    <P2Screen f={f} at={5} sourceAt={4.8} duration={1} focusY={1910} title="TU MENÚ CON EXTRAS" />
+    <Sequence from={fr(6)} durationInFrames={fr(1.5)}><DeviceScreen f={f} /></Sequence>
+    <P2Screen f={f} at={7.5} sourceAt={7} duration={3} focusY={1180} title="ELIGE Y PERSONALIZA" />
+    <P2Screen f={f} at={10.5} sourceAt={11.2} duration={2} focusY={1830} title="TOTAL $217" />
     <Sequence from={fr(12.5)} durationInFrames={fr(1.5)}><OrderMessage f={f} /></Sequence>
     <Sequence from={fr(14)} durationInFrames={fr(5.3)}><P2Close f={f} /></Sequence>
     <Sequence from={0} durationInFrames={fr(3.01)}><Audio src={staticFile("assets/voz/P2-1.mp3")} /></Sequence>
@@ -87,6 +111,23 @@ function R1Close({ f }: { f: FormatoV2 }) {
   return <AbsoluteFill><Clip name="fonda-cliente-qr.mp4" dark={.58} /><div style={{ position: "absolute", ...safe(f), top: is9(f) ? 440 : 210, color: "#fff" }}><Wordmark f={f} /><div style={{ marginTop: 45, fontSize: is9(f) ? 84 : 68, ...titleFont }}>Pidewat Esencial</div><div style={{ marginTop: 22, fontSize: is9(f) ? 54 : 48, lineHeight: 1.12, ...bodyFont }}>14 días gratis · sin tarjeta</div><div style={{ marginTop: 19, fontSize: is9(f) ? 48 : 48, ...bodyFont }}>Después $249/mes</div><div style={{ marginTop: 48, display: "inline-block", padding: is9(f) ? "20px 30px" : "16px 25px", borderRadius: 20, background: "#49bd72", fontSize: is9(f) ? 50 : 42, ...bodyFont }}>Toca Registrarte ↓</div></div></AbsoluteFill>;
 }
 
+/** The cart is scaled only in this R1 shot so its table mode, table number and
+ * total stay visible together instead of hiding the mode under the title bar. */
+function TableCartPreview({ f }: { f: FormatoV2 }) {
+  const topBand = is9(f) ? 470 : 315;
+  const subtitleBand = is9(f) ? 360 : 230;
+  const scale = is9(f) ? .7 : .55;
+  const width = 1080 * scale;
+  const top = is9(f) ? -540 : -440;
+  return <AbsoluteFill style={{ background: "#f6f3ee", overflow: "hidden" }}>
+    <div style={{ position: "absolute", left: 0, right: 0, top: topBand, bottom: subtitleBand, overflow: "hidden", background: "#f6f3ee" }}>
+      <Freeze frame={0}><OffthreadVideo src={staticFile("assets/grabaciones/c3-mesa-qr.mp4")} startFrom={fr(10)} volume={0} style={{ position: "absolute", width, height: 2338 * scale, left: (1080 - width) / 2, top, objectFit: "fill" }} /></Freeze>
+    </div>
+    <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: topBand, background: "#f6f3ee" }} />
+    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: subtitleBand, background: "#f6f3ee" }} />
+  </AbsoluteFill>;
+}
+
 /** Problem → real table-7 order flow. The voice starts at second 2 by direction. */
 export function R1v2({ formato: f }: { formato: FormatoV2 }) {
   const topBand = is9(f) ? 470 : 315;
@@ -95,8 +136,8 @@ export function R1v2({ formato: f }: { formato: FormatoV2 }) {
     <Sequence from={fr(2)} durationInFrames={fr(3.2)}><PdfProblem f={f} /></Sequence>
     <UiPan video="c3-mesa-qr.mp4" at={5.2} sourceAt={0} duration={1.4} focusY={660} f={f} topBand={topBand} /><Sequence from={fr(5.2)} durationInFrames={fr(1.4)}><ScreenHeader f={f}>AQUÍ TAMBIÉN PIDEN</ScreenHeader></Sequence>
     <UiPan video="c3-mesa-qr.mp4" at={6.6} sourceAt={1.1} duration={2.1} focusY={1280} f={f} topBand={topBand} /><Sequence from={fr(6.6)} durationInFrames={fr(2.1)}><ScreenHeader f={f}>ELIGE Y PERSONALIZA</ScreenHeader></Sequence>
-    <UiPan video="c3-mesa-qr.mp4" at={8.7} sourceAt={7.9} duration={2.2} focusY={1830} f={f} topBand={topBand} /><Sequence from={fr(8.7)} durationInFrames={fr(2.2)}><ScreenHeader f={f}>MESA 7 EN EL CARRITO</ScreenHeader></Sequence>
-    <Sequence from={fr(10.9)} durationInFrames={fr(2.6)}><OrderMessage f={f} /></Sequence>
+    <Sequence from={fr(8.7)} durationInFrames={fr(2.2)}><TableCartPreview f={f} /><ScreenHeader f={f}>MESA 7 EN EL CARRITO</ScreenHeader></Sequence>
+    <Sequence from={fr(10.9)} durationInFrames={fr(2.6)}><MesaOrderMessage f={f} /></Sequence>
     <Sequence from={fr(13.54)} durationInFrames={fr(6.14)}><R1Close f={f} /></Sequence>
     <Sequence from={fr(2)} durationInFrames={fr(3.28)}><Audio src={staticFile("assets/voz/R1-1.mp3")} /></Sequence><Sequence from={fr(5.28)} durationInFrames={fr(8.34)}><Audio src={staticFile("assets/voz/R1-2.mp3")} /></Sequence><Sequence from={fr(13.54)} durationInFrames={fr(6.14)}><Audio src={staticFile("assets/voz/R1-3.mp3")} /></Sequence>
     <TimedCaptions f={f} at={5.28} bottom={is9(f) ? 72 : 35} blocks={[{ from: 0, to: 2.8, text: "Con Pidewat, tus clientes consultan el menú," }, { from: 2.8, to: 5.65, text: "eligen productos y envían su pedido" }, { from: 5.65, to: 8.34, text: "organizado. Sin instalar apps." }]} />
@@ -125,13 +166,13 @@ function QrCard({ f }: { f: FormatoV2 }) {
   const card = is9(f)
     ? { left: 16, top: 1370, width: 300, height: 310 }
     : { left: 143, top: 958, width: 247, height: 258 };
-  return <div style={{ position: "absolute", overflow: "hidden", borderRadius: 4, boxShadow: "0 2px 5px #0004", transformOrigin: "center", transform: "perspective(1100px) rotateX(1deg) rotateZ(-.4deg) skewY(-.8deg)", ...card }}><Img src={staticFile("assets/grabaciones/qr-el-fogon.png")} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 45%" }} /></div>;
+  return <div style={{ position: "absolute", overflow: "hidden", borderRadius: 4, background: "#fff", boxShadow: "0 2px 5px #0004", transformOrigin: "center", transform: "perspective(1100px) rotateX(1deg) rotateZ(-.4deg) skewY(-.8deg)", ...card }}><Img src={staticFile("assets/grabaciones/qr-el-fogon.png")} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%" }} /></div>;
 }
 
 export function R3v2({ formato: f }: { formato: FormatoV2 }) {
-  const phoneW = is9(f) ? 560 : 490;
-  const phoneH = is9(f) ? 890 : 650;
-  return <AbsoluteFill style={{ overflow: "hidden", background: "#18231d" }}><Img src={staticFile("assets/escenas/fonda-qr-4x5.jpg")} style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scale(1.05)" }} /><AbsoluteFill style={{ background: "rgba(9,13,10,.34)" }} /><div style={{ position: "absolute", ...safe(f), top: is9(f) ? 120 : 55 }}><Wordmark f={f} /><div style={{ marginTop: 22, color: "#fff", fontSize: is9(f) ? 70 : 55, textShadow: "0 3px 10px #000", ...titleFont }}>Tu menú con QR para pedir</div></div><QrCard f={f} /><div style={{ position: "absolute", right: is9(f) ? 62 : 55, bottom: is9(f) ? 250 : 100, width: phoneW, height: phoneH, padding: 12, borderRadius: 43, background: "linear-gradient(145deg,#343a36,#0e100f)", boxShadow: "0 22px 44px #0009", transform: "rotate(5deg)" }}><div style={{ width: "100%", height: "100%", overflow: "hidden", borderRadius: 32, background: "#f6f3ee" }}><Img src={staticFile("assets/grabaciones/r3-menu-pedido-mesa.png")} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 74%" }} /></div></div><div style={{ position: "absolute", ...safe(f), bottom: is9(f) ? 105 : 42, color: "#fff", fontSize: is9(f) ? 48 : 39, textShadow: "0 3px 9px #000", ...bodyFont }}>14 días gratis</div></AbsoluteFill>;
+  const phoneW = is9(f) ? 560 : 430;
+  const phoneH = is9(f) ? 890 : 710;
+  return <AbsoluteFill style={{ overflow: "hidden", background: "#18231d" }}><Img src={staticFile("assets/escenas/fonda-qr-4x5.jpg")} style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scale(1.05)" }} /><AbsoluteFill style={{ background: "rgba(9,13,10,.34)" }} /><div style={{ position: "absolute", ...safe(f), top: is9(f) ? 120 : 55 }}><Wordmark f={f} /><div style={{ marginTop: 22, color: "#fff", fontSize: is9(f) ? 70 : 55, textShadow: "0 3px 10px #000", ...titleFont }}>Tu menú con QR para pedir</div></div><QrCard f={f} /><div style={{ position: "absolute", right: is9(f) ? 62 : 55, bottom: is9(f) ? 250 : 50, width: phoneW, height: phoneH, padding: 12, borderRadius: 43, background: "linear-gradient(145deg,#343a36,#0e100f)", boxShadow: "0 22px 44px #0009", transform: "rotate(5deg)" }}><div style={{ width: "100%", height: "100%", overflow: "hidden", borderRadius: 32, background: "#f6f3ee" }}><Img src={staticFile("assets/grabaciones/r3-menu-mesa-7.png")} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} /></div></div><div style={{ position: "absolute", ...safe(f), bottom: is9(f) ? 105 : 42, color: "#fff", fontSize: is9(f) ? 48 : 39, textShadow: "0 3px 9px #000", ...bodyFont }}>14 días gratis</div></AbsoluteFill>;
 }
 
 export const pieceDuration = (id: "P2v2" | "R1v2") => fr(id === "P2v2" ? 19.3 : 19.7);
