@@ -1,6 +1,6 @@
 // Render sin CLI: evita que la detección de configuración suba fuera del sandbox.
 import { bundle } from "@remotion/bundler";
-import { renderMedia, selectComposition } from "@remotion/renderer";
+import { renderMedia, renderStill, selectComposition } from "@remotion/renderer";
 import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -16,5 +16,10 @@ const serveUrl = await bundle({
 });
 const composition = await selectComposition({ serveUrl, id });
 console.log(`Rendering ${id}…`);
-await renderMedia({ composition, serveUrl, codec: "h264", audioCodec: "aac", crf: 20, outputLocation: resolve(root, output), concurrency: 2 });
+const outputLocation = resolve(root, output);
+if (output.toLowerCase().endsWith(".png")) {
+  await renderStill({ composition, serveUrl, output: outputLocation, frame: 0 });
+} else {
+  await renderMedia({ composition, serveUrl, codec: "h264", audioCodec: "aac", crf: 20, outputLocation, concurrency: 2 });
+}
 console.log(`Done: ${output}`);

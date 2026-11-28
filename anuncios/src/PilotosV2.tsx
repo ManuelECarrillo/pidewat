@@ -14,54 +14,54 @@ const titleFont: React.CSSProperties = { fontFamily: "Bricolage Grotesque", font
 const bodyFont: React.CSSProperties = { fontFamily: "Inter", fontWeight: 700 };
 const subtitle = (id: string) => tiempos.find((t) => t.id === id)?.subtitulo ?? "";
 
-function Music() {
+export function Music() {
   // Pista licenciada entregada: no desactivar sin reemplazo autorizado.
   const existe = true;
   const frame = useCurrentFrame();
   return existe ? <Audio src={staticFile("assets/musica/pista.mp3")} volume={interpolate(frame, [0, 12 * fps], [.12, .06], { extrapolateRight: "clamp" })} /> : null;
 }
 
-function Sfx({ kind, at }: { kind: "ping" | "tap" | "whoosh" | "bell"; at: number }) {
+export function Sfx({ kind, at }: { kind: "ping" | "tap" | "whoosh" | "bell"; at: number }) {
   return <Sequence from={fr(at)} durationInFrames={fr(1.2)}><Audio src={staticFile(`assets/sfx/${kind}.wav`)} volume={.22} /></Sequence>;
 }
 
 /** A title is deliberately kept in its own solid safe-area plaque. */
-function TitlePlate({ children, f, top }: { children: React.ReactNode; f: Formato; top?: number }) {
+export function TitlePlate({ children, f, top }: { children: React.ReactNode; f: Formato; top?: number }) {
   return <div style={{ position: "absolute", left: is9(f) ? 65 : 55, right: is9(f) ? 65 : 55, top: top ?? (is9(f) ? 270 : 62), display: "flex", justifyContent: "center", pointerEvents: "none" }}>
     <div style={{ maxWidth: is9(f) ? 930 : 900, padding: is9(f) ? "18px 28px" : "14px 23px", borderRadius: 24, background: "rgba(29,27,25,.92)", color: "#fff", boxShadow: "0 9px 24px rgba(0,0,0,.34)", fontSize: is9(f) ? 84 : 68, textAlign: "center", ...titleFont }}>{children}</div>
   </div>;
 }
 
-function Caption({ id, f, bottom, text }: { id: string; f: Formato; bottom?: number; text?: string }) {
+export function Caption({ id, f, bottom, text }: { id: string; f: Formato; bottom?: number; text?: string }) {
   return <div style={{ position: "absolute", ...safe(f), top: "auto", bottom: bottom ?? safe(f).bottom, display: "flex", alignItems: "flex-end", justifyContent: "center", pointerEvents: "none" }}>
     <div style={{ maxWidth: is9(f) ? 960 : 900, padding: "12px 18px", borderRadius: 18, background: "rgba(8,12,9,.89)", color: "#fff", fontSize: is9(f) ? 54 : 47, lineHeight: 1.08, textAlign: "center", ...bodyFont }}>{text ?? subtitle(id)}</div>
   </div>;
 }
 
 /** Short, word-timed subtitle blocks: never more than two readable lines. */
-function TimedCaptions({ f, at, blocks }: { f: Formato; at: number; blocks: { from: number; to: number; text: string }[] }) {
-  return <>{blocks.map((block) => <Sequence key={`${block.from}-${block.text}`} from={fr(at + block.from)} durationInFrames={fr(block.to - block.from)}><Caption id="" f={f} text={block.text} /></Sequence>)}</>;
+export function TimedCaptions({ f, at, blocks, bottom }: { f: Formato; at: number; blocks: { from: number; to: number; text: string }[]; bottom?: number }) {
+  return <>{blocks.map((block) => <Sequence key={`${block.from}-${block.text}`} from={fr(at + block.from)} durationInFrames={fr(block.to - block.from)}><Caption id="" f={f} bottom={bottom} text={block.text} /></Sequence>)}</>;
 }
 
-function Clip({ name, dark = .2, slow = 1 }: { name: string; dark?: number; slow?: number }) {
+export function Clip({ name, dark = .2, slow = 1 }: { name: string; dark?: number; slow?: number }) {
   return <AbsoluteFill style={{ background: "#142218", overflow: "hidden" }}><OffthreadVideo src={staticFile(`assets/clips/${name}`)} volume={0} playbackRate={slow} style={{ height: "100%", width: "100%", objectFit: "cover", transform: "scale(1.035)" }} /><AbsoluteFill style={{ background: `rgba(4,9,6,${dark})` }} /></AbsoluteFill>;
 }
 
 /** Full-width app recording. It never zooms horizontally: only its y origin pans. */
-function UiPan({ video, at, sourceAt = 0, duration, focusY, frozen = false, f }: { video: string; at: number; sourceAt?: number; duration: number; focusY: number; frozen?: boolean; f: Formato }) {
+export function UiPan({ video, at, sourceAt = 0, duration, focusY, frozen = false, f, topBand = 0 }: { video: string; at: number; sourceAt?: number; duration: number; focusY: number; frozen?: boolean; f: Formato; topBand?: number }) {
   const h = viewportH(f);
   const sourceH = 2338;
   // The capture is shorter than the delivery canvas; reserve a branded cream
   // subtitle band so the uncovered lower area can never turn black.
   const subtitleBand = is9(f) ? 360 : 230;
-  const usableH = h - subtitleBand;
+  const usableH = h - subtitleBand - topBand;
   // Source and composition are both 1080 px wide. Keep that scale: no UI word
   // may be amputated at either side of the ad.
   const desiredTop = Math.round(usableH * .58 - focusY);
   const top = Math.max(usableH - sourceH, Math.min(0, desiredTop));
-  const recording = <OffthreadVideo src={staticFile(`assets/grabaciones/${video}`)} startFrom={fr(sourceAt)} volume={0} style={{ position: "absolute", width: 1080, height: sourceH, left: 0, top, objectFit: "fill" }} />;
+  const recording = <OffthreadVideo src={staticFile(`assets/grabaciones/${video}`)} startFrom={fr(sourceAt)} volume={0} style={{ position: "absolute", width: 1080, height: sourceH, left: 0, top: topBand + top, objectFit: "fill" }} />;
   const image = frozen ? <Freeze frame={0}>{recording}</Freeze> : recording;
-  return <Sequence from={fr(at)} durationInFrames={fr(duration)}><AbsoluteFill style={{ background: "#f6f3ee", overflow: "hidden" }}>{image}<div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: subtitleBand, background: "#f6f3ee" }} /></AbsoluteFill></Sequence>;
+  return <Sequence from={fr(at)} durationInFrames={fr(duration)}><AbsoluteFill style={{ background: "#f6f3ee", overflow: "hidden" }}>{image}{topBand ? <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: topBand, background: "#f6f3ee" }} /> : null}<div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: subtitleBand, background: "#f6f3ee" }} /></AbsoluteFill></Sequence>;
 }
 
 function Chat({ f, exit = false }: { f: Formato; exit?: boolean }) {
@@ -78,7 +78,7 @@ function Chat({ f, exit = false }: { f: Formato; exit?: boolean }) {
   </AbsoluteFill>;
 }
 
-function OrderMessage({ f }: { f: Formato }) {
+export function OrderMessage({ f }: { f: Formato }) {
   const frame = useCurrentFrame();
   const emphasis = (start: number) => ({ background: frame >= fr(start) ? "#a8ebba" : "transparent", borderRadius: 8, padding: "1px 4px" });
   const p = spring({ fps, frame, config: { damping: 17, stiffness: 160 } });
@@ -126,14 +126,14 @@ export function P1v2({ formato: f }: { formato: Formato }) {
   </AbsoluteFill>;
 }
 
-function StatusPill({ f, text, color, attached = false }: { f: Formato; text: string; color: string; attached?: boolean }) {
+function StatusPill({ f, text, color, attached = false, attachedTop }: { f: Formato; text: string; color: string; attached?: boolean; attachedTop?: number }) {
   // C4's native badge is at y=870 in the 1080 × 2338 capture. Keep the
   // explanatory badge directly over it after the same vertical pan as UiPan.
   const usableH = viewportH(f) - (is9(f) ? 360 : 230);
   const uiTop = Math.max(usableH - 2338, Math.min(0, Math.round(usableH * .58 - 1351)));
-  return <div style={attached ? { position: "absolute", right: is9(f) ? 76 : 62, top: uiTop + 870, whiteSpace: "nowrap", padding: is9(f) ? "15px 26px" : "12px 21px", borderRadius: 999, background: color, color: "#fff", boxShadow: "0 8px 20px #0006", fontSize: is9(f) ? 47 : 43, ...bodyFont } : { position: "absolute", left: "50%", top: is9(f) ? 1260 : 830, transform: "translateX(-50%)", whiteSpace: "nowrap", padding: is9(f) ? "17px 30px" : "13px 24px", borderRadius: 999, background: color, color: "#fff", boxShadow: "0 8px 20px #0006", fontSize: is9(f) ? 51 : 43, ...bodyFont }}>{text}</div>;
+  return <div style={attached ? { position: "absolute", zIndex: 4, right: is9(f) ? 76 : 62, top: attachedTop ?? uiTop + 870, whiteSpace: "nowrap", padding: is9(f) ? "15px 26px" : "12px 21px", borderRadius: 999, background: color, color: "#fff", boxShadow: "0 8px 20px #0006", fontSize: is9(f) ? 47 : 43, ...bodyFont } : { position: "absolute", left: "50%", top: is9(f) ? 1260 : 830, transform: "translateX(-50%)", whiteSpace: "nowrap", padding: is9(f) ? "17px 30px" : "13px 24px", borderRadius: 999, background: color, color: "#fff", boxShadow: "0 8px 20px #0006", fontSize: is9(f) ? 51 : 43, ...bodyFont }}>{text}</div>;
 }
-function KitchenStatusPill({ f }: { f: Formato }) {
+function KitchenStatusPill({ f, top }: { f: Formato; top: number }) {
   const frame = useCurrentFrame();
   // LEEME.md: C4 reaches kitchen at 8.8 s, Preparando at 10.2 s and
   // Listos (1) at 11.6 s. The two controls are documented in C4's positions JSON.
@@ -142,10 +142,10 @@ function KitchenStatusPill({ f }: { f: Formato }) {
     : frame < fr(11.6 - 8.8)
       ? { text: "PREPARANDO", color: "#db8b27" }
       : { text: "LISTO", color: "#249c58" };
-  return <StatusPill f={f} attached {...status} />;
+  return <StatusPill f={f} attached attachedTop={top} {...status} />;
 }
 function Ticket({ f }: { f: Formato }) { const frame = useCurrentFrame(); const p = spring({ fps, frame, config: { damping: 17, stiffness: 180 } }); return <div style={{ position: "absolute", left: is9(f) ? 70 : 55, right: is9(f) ? 70 : 55, top: is9(f) ? 720 : 390, padding: is9(f) ? "34px 36px" : "27px 30px", borderRadius: 24, background: "#fffdf5", boxShadow: "0 16px 36px #0008", transform: `scale(1.1) translateY(${interpolate(p, [0, 1], [120, 0])}px)`, color: "#24221f" }}><div style={{ fontSize: is9(f) ? 39 : 35, whiteSpace: "nowrap", textAlign: "center", ...bodyFont }}>{"MESA 7 · 1 Hamburguesa de la casa · NUEVO"}</div></div>; }
-function PlanPill({ f }: { f: Formato }) {
+export function PlanPill({ f }: { f: Formato }) {
   // This remains above every shot, but lives in the dedicated header band rather
   // than over a card or input. 4:5 uses the proportional equivalent of y=255.
   return <div style={{ position: "absolute", zIndex: 30, left: "50%", top: is9(f) ? 255 : 180, transform: "translateX(-50%)", padding: is9(f) ? "12px 24px" : "9px 19px", whiteSpace: "nowrap", borderRadius: 999, background: "#173c26", color: "#fff", boxShadow: "0 6px 16px #0005", fontSize: is9(f) ? 32 : 25, lineHeight: 1, ...bodyFont }}>Plan Restaurante · en pruebas</div>;
@@ -156,12 +156,12 @@ function R2TimedCaptions({ f, at, blocks, bottom }: { f: Formato; at: number; bl
 }
 
 function TabletTicket({ f, listo = false }: { f: Formato; listo?: boolean }) {
-  // These are crops from C4 at 8.9 s and 12.2 s, respectively. They cover the
-  // physical tablet screen, with a modest perspective cue rather than a redrawn UI.
+  // These are crops from C4 at 8.9 s and 12.2 s. The enlarged crop deliberately
+  // covers the physical tablet so the native #7 · Mesa 7 line reads at ad scale.
   const screen = is9(f)
-    ? { left: "5.5%", top: "44.4%", width: "33.8%", height: "18.5%" }
-    : { left: "5.5%", top: "41.5%", width: "33.8%", height: "26.0%" };
-  return <img src={staticFile(`assets/escenas/r2-ticket-${listo ? "listo" : "nuevo"}.png`)} style={{ position: "absolute", zIndex: 4, ...screen, objectFit: "fill", transform: "rotate(-1.5deg) skewY(-1deg)", transformOrigin: "center", boxShadow: "0 2px 7px #0008" }} />;
+    ? { left: "0%", top: "39.5%", width: "49%", height: "28%" }
+    : { left: "0%", top: "38%", width: "50%", height: "33%" };
+  return <><img src={staticFile(`assets/escenas/r2-ticket-${listo ? "listo" : "nuevo"}.png`)} style={{ position: "absolute", zIndex: 4, ...screen, objectFit: "fill", transform: "rotate(-1.5deg) skewY(-1deg)", transformOrigin: "center", boxShadow: "0 3px 10px #0008" }} /><div style={{ position: "absolute", zIndex: 5, left: is9(f) ? 34 : 28, top: is9(f) ? 792 : 540, padding: is9(f) ? "9px 15px" : "7px 12px", borderRadius: 12, background: "rgba(255,253,245,.96)", color: "#24221f", boxShadow: "0 2px 6px #0004", fontSize: is9(f) ? 40 : 34, lineHeight: 1, ...bodyFont }}>#7 · Mesa 7</div></>;
 }
 
 /** App footage is physically constrained below the 340 px header and above the subtitle band. */
@@ -184,19 +184,28 @@ function KitchenSplit({ f }: { f: Formato }) {
   const frame = useCurrentFrame();
   const contentTop = is9(f) ? 340 : 240;
   const contentBottom = is9(f) ? 260 : 180;
-  const usableH = viewportH(f) - contentTop - contentBottom;
-  const upper = Math.round(usableH * .48);
-  const labelH = is9(f) ? 78 : 58;
-  // Leave a cream gutter after the lower-half header so its first app pixels
-  // never touch the words in that header.
-  const lowerTop = contentTop + upper + labelH + 28;
-  const kitchenRecording = <OffthreadVideo src={staticFile("assets/grabaciones/c4-mesa-a-cocina.mp4")} startFrom={fr(8.8)} volume={0} style={{ position: "absolute", width: 1080, height: 2338, left: 0, top: -600, objectFit: "fill" }} />;
+  const labelH = is9(f) ? 82 : 62;
+  // Kitchen comes first, then the physical divider, then the customer's phone.
+  // That keeps the native #7 · Mesa 7 header, its state, and both card buttons
+  // together instead of burying the important line under the divider.
+  const kitchenTop = contentTop;
+  const kitchenH = is9(f) ? 640 : 500;
+  const labelTop = kitchenTop + kitchenH + 24;
+  const lowerTop = labelTop + labelH + 24;
+  // 4:5 scales the same full-width recording down slightly so the whole order
+  // card (header through action button) still fits above the divider.
+  const kitchenScale = is9(f) ? 1 : .78;
+  const recordingTop = is9(f) ? -760 : -593;
+  const recordingLeft = Math.round((1080 - 1080 * kitchenScale) / 2);
+  const statusTop = recordingTop + 870 * kitchenScale;
+  // The crop starts below Chromium's transient autoplay notice.
+  const kitchenRecording = <OffthreadVideo src={staticFile("assets/grabaciones/c4-mesa-a-cocina.mp4")} startFrom={fr(8.8)} volume={0} style={{ position: "absolute", width: 1080 * kitchenScale, height: 2338 * kitchenScale, left: recordingLeft, top: recordingTop, objectFit: "fill" }} />;
   const kitchen = frame < fr(4.3) ? kitchenRecording : <Freeze frame={fr(4.3)}>{kitchenRecording}</Freeze>;
   return <AbsoluteFill style={{ background: "#f6f3ee", overflow: "hidden" }}>
-    <div style={{ position: "absolute", left: 0, right: 0, top: contentTop, height: upper, overflow: "hidden", background: "#f6f3ee" }}>{kitchen}</div>
-    <div style={{ position: "absolute", left: 0, right: 0, top: contentTop + upper, height: labelH + 8, display: "flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box", borderTop: "8px solid #173c26", background: "#173c26", color: "#fff", fontSize: is9(f) ? 35 : 27, ...bodyFont }}>Pedido desde Mesa 7</div>
+    <div style={{ position: "absolute", left: 0, right: 0, top: kitchenTop, height: kitchenH, overflow: "hidden", background: "#f6f3ee" }}>{kitchen}<KitchenStatusPill f={f} top={statusTop} /></div>
+    <div style={{ position: "absolute", left: 0, right: 0, top: labelTop, height: labelH, display: "flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box", background: "#173c26", color: "#fff", fontSize: is9(f) ? 35 : 27, ...bodyFont }}>Pedido desde Mesa 7</div>
     <div style={{ position: "absolute", left: 0, right: 0, top: lowerTop, bottom: contentBottom, overflow: "hidden", background: "#f6f3ee" }}>
-      <Freeze frame={0}><OffthreadVideo src={staticFile("assets/grabaciones/c4-mesa-a-cocina.mp4")} startFrom={fr(7)} volume={0} style={{ position: "absolute", width: 1080, height: 2338, left: 0, top: -1050, objectFit: "fill" }} /></Freeze>
+      <Freeze frame={0}><OffthreadVideo src={staticFile("assets/grabaciones/c4-mesa-a-cocina.mp4")} startFrom={fr(7)} volume={0} style={{ position: "absolute", width: 1080, height: 2338, left: 0, top: -960, objectFit: "fill" }} /></Freeze>
     </div>
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: contentBottom, background: "#f6f3ee" }} />
   </AbsoluteFill>;
@@ -212,9 +221,8 @@ export function R2v2({ formato: f }: { formato: Formato }) {
     <Sequence from={fr(2)} durationInFrames={fr(2)}><Clip name="fonda-cliente-qr.mp4" dark={.22} /><TitlePlate f={f} top={is9(f) ? 350 : 250}>PIDE DESDE EL QR DE SU MESA</TitlePlate><div style={{ position: "absolute", left: 0, right: 0, bottom: is9(f) ? 480 : 190, textAlign: "center", color: "#fff", fontSize: is9(f) ? 75 : 58, ...titleFont, textShadow: "0 4px 12px #000" }}>MESA 7</div></Sequence>
     <R2AppPanel f={f} at={4} sourceAt={0} duration={1.4} focusY={1742} />
     <R2AppPanel f={f} at={5.4} sourceAt={1.4} duration={1.6} focusY={1351} />
-    <R2AppPanel f={f} at={7} sourceAt={8.8} duration={.6} focusY={1200} />
     {/* One monotonically advancing pass through C4: Nuevo → Preparando → Listo → Listos (1). */}
-    <Sequence from={fr(7.6)} durationInFrames={fr(6.4)}><KitchenSplit f={f} /></Sequence>
+    <Sequence from={fr(7)} durationInFrames={fr(7)}><KitchenSplit f={f} /></Sequence>
     <R2TimedCaptions f={f} at={5} blocks={[
       { from: 0, to: 1.54, text: "Estamos probando Pidewat Restaurante:" },
       { from: 1.54, to: 3.75, text: "pedidos desde la mesa" },

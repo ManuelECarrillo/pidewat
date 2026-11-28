@@ -1,5 +1,27 @@
 # Cambios de anuncios
 
+## Vuelta 17 (correcciones visuales v2)
+
+- P2 y R1 bajan sus placas de demostraciÃ³n a partir de y=255 en 9:16, con una banda fÃ­sica antes de la interfaz. R1 conserva el gancho exacto: Â«Â¿Tu QR solo muestra un PDF?Â».
+- P2 sustituye la cuadrÃ­cula C5 por dos capturas reales independientes del mismo menÃº de El FogÃ³n (Chromium 360 e iPhone/WebKit 390), grandes y lado a lado. El segundo tramo incluye la barra legible `pidewat.vercel.app` y Â«Sin descargar appsÂ».
+- Los momentos de mensaje de P2 y R1 ahora usan la burbuja formateada de P1 v2, sin marcadores Markdown visibles. El cierre R1 eleva Â«Pidewat EsencialÂ» a 84 px en 9:16 y mantiene la oferta en 54/48 px.
+- R2 elimina el corte que exponÃ­a el aviso transitorio del navegador, sube el recorte seguro de cocina y agranda la comanda de Mesa 7 sobre la tablet (etiqueta #7 Â· Mesa 7 de 40 px en 9:16 y 34 px en 4:5).
+- R3 reubica la tarjeta QR dentro del soporte acrÃ­lico de `fonda-qr-4x5.jpg`, con sus coordenadas y perspectiva ajustadas por formato.
+
+
+## Vuelta 16 (P2, R1, P3, R3 v2 y detalles de R2)
+
+- Se creó `anuncios/src/PiezasV2.tsx` y se registraron P2/R1 en video y P3/R3 en imagen con IDs v2. P2 es una demo rápida a sangre; R1 compara PDF contra pedido desde Mesa 7; P3 es antes/después y R3 deja la fotografía y el QR real como protagonistas. Comparten música, SFX, placas, subtítulos, paneos verticales y mensaje formateado de los pilotos sin reutilizar su estructura narrativa.
+- R2 separa «Pedido desde Mesa 7» en una cabecera completa antes de los dos paneles y adelanta el paneo cliente, por lo que Comer aquí, Recoger y A domicilio ya no quedan debajo de la franja ni cortados. El recorte de cocina baja por debajo del aviso transitorio del navegador.
+- El script `render-sandbox.mjs` detecta PNG y usa `renderStill` con el mismo bundle. Se entregaron los crudos v2 solicitados y las cuatro PNG; `qa-v16/` conserva las capturas de revisión a un segundo.
+
+Autoevaluación honesta:
+- **P2:** la demostración es rápida, legible y reserva bandas físicas para placas/subtítulos; Android y iPhone aparecen en C5. El tramo de dispositivos muestra además panel y cocina porque así está compuesta la grabación C5, aunque el foco principal sigue siendo los dos teléfonos.
+- **R1:** el contraste PDF sin interacción → menú de Mesa 7 es claro y conserva productos/extras de hamburguesa. El PDF es una simulación genérica, intencionalmente sin marca; la voz entra al segundo 2 como indicó el guion.
+- **P3:** los seis mensajes y las dos hamburguesas con total $217 se leen completos en ambas proporciones. Es la pieza con menos aire decorativo y mantiene sólo título, etiquetas, oferta y wordmark.
+- **R3:** usa la foto de fonda completa, una sola captura grande del menú de Mesa 7 y la tarjeta QR real de El Fogón en perspectiva. La tarjeta se integra sobre el soporte/mesa pero la perspectiva es una composición 2D, no una fotografía impresa nueva.
+- **R2:** los dos detalles pedidos quedan corregidos. Persisten los subtítulos dentro de su franja inferior de seguridad; no cubren controles. La revisión visual a 1 fps incluyó los dos formatos y los cuadros de transición.
+
 ## Vuelta 15 (R2: tablet real y franjas seguras)
 
 - R2 vuelve a abrir y cerrar con `cocina-tablet.mp4` a pantalla completa. La pantalla física de la tablet se cubre con recortes reales de C4: `#7 · Mesa 7 · Nuevo` al inicio y la misma comanda en `Listo` al cierre; no se redibujó la tarjeta. La placa de título queda arriba de la tablet y el cierre usa el botón «Solicita una demostración ↓» fuera de ella.

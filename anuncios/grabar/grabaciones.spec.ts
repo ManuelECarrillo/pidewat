@@ -191,24 +191,30 @@ test("C4 mesa a cocina", async ({ page }) => {
 
 test("C5 dispositivos", async ({ page }) => {
   const lista: Fotograma[] = [];
-  // Capturas de rutas reales, ya estabilizadas. Se componen como PNG para que
-  // ningún iframe incompleto convierta los marcos del anuncio en pantallas blancas.
-  const android = join(temporal, "android-chromium.png");
-  const iphone = join(temporal, "iphone-webkit.png");
+  // P2 uses the current public demo, not the old recording fixture.  Write the
+  // two source images directly where Remotion reads them so C5 and P2 cannot
+  // silently diverge to an older restaurant name.
+  const raizAnuncios = existsSync(join(process.cwd(), "anuncios")) ? join(process.cwd(), "anuncios") : process.cwd();
+  const android = join(raizAnuncios, "public", "assets", "grabaciones", "p2-android-360.png");
+  const iphone = join(raizAnuncios, "public", "assets", "grabaciones", "p2-iphone-390.png");
   const tablet = join(temporal, "tablet-qr.png");
   const computadora = join(temporal, "computadora-cocina.png");
 
   await page.setViewportSize({ width: 360, height: 800 });
-  await preparar(page, "/grabacion/pedido");
+  await preparar(page, "/demo");
   await expect(page.getByRole("button", { name: /Personalizar y agregar Hamburguesa de la casa/ })).toBeVisible();
+  await page.getByRole("button", { name: "Aceptar" }).click();
   await page.screenshot({ path: android, animations: "disabled" });
 
   const navegadorWebkit = await webkit.launch();
   try {
     const contextoWebkit = await navegadorWebkit.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
     const paginaIphone = await contextoWebkit.newPage();
-    await paginaIphone.goto(`${process.env.GRABACION_BASE_URL || "http://127.0.0.1:3001"}/grabacion/pedido`);
+    await paginaIphone.goto(`${process.env.GRABACION_BASE_URL || "http://127.0.0.1:3001"}/demo`);
+    await paginaIphone.evaluate(() => localStorage.clear());
+    await paginaIphone.reload();
     await expect(paginaIphone.getByRole("button", { name: /Personalizar y agregar Hamburguesa de la casa/ })).toBeVisible();
+    await paginaIphone.getByRole("button", { name: "Aceptar" }).click();
     await paginaIphone.screenshot({ path: iphone, animations: "disabled" });
     await contextoWebkit.close();
   } finally { await navegadorWebkit.close(); }

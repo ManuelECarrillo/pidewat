@@ -5,6 +5,7 @@ import {
 } from "remotion";
 import tiemposRaw from "../public/assets/tiempos.json";
 import { P1v2, R2v2, pilotDuration } from "./PilotosV2";
+import { P2v2, P3v2, R1v2, R3v2, pieceDuration } from "./PiezasV2";
 
 const fps = 30;
 const tiempos = tiemposRaw as Array<{ id: string; archivo: string; duracion_s: number; subtitulo: string; palabras_voz: Array<{ p: string; ini: number; fin: number }> }>;
@@ -254,10 +255,12 @@ function Imagen({ tipo, formato: f }: { tipo: "P3" | "R3"; formato: Formato }) {
 const specs = [
   ["P1v2", P1v2, pilotDuration("P1v2")],
   ["R2v2", R2v2, pilotDuration("R2v2")],
+  ["P2v2", P2v2, pieceDuration("P2v2")],
+  ["R1v2", R1v2, pieceDuration("R1v2")],
   ["P1", P1, frames(7 + duracion("P1-3") + .8 + cierre("P1-4"))],
   ["P2", P2, frames(duracion("P2-1") + duracion("P2-2") + cierre("P2-3"))],
   ["R1", R1, frames(duracion("R1-1") + duracion("R1-2") + cierre("R1-3"))],
   ["R2", R2, frames(duracion("R2-1") + duracion("R2-2") + cierre("R2-3"))],
 ] as const;
 
-export function Root() { return <>{specs.flatMap(([id, Componente, durationInFrames]) => (["9x16", "4x5"] as Formato[]).map((f) => { const size = medidas(f); return <Composition key={`${id}-${f}`} id={`${id}-${f}`} component={Componente} durationInFrames={durationInFrames} fps={fps} width={size.width} height={size.height} defaultProps={{ formato: f }} />; }))}<Composition id="P3-4x5" component={Imagen} durationInFrames={1} fps={fps} width={1080} height={1350} defaultProps={{ tipo: "P3", formato: "4x5" }} /><Composition id="P3-9x16" component={Imagen} durationInFrames={1} fps={fps} width={1080} height={1920} defaultProps={{ tipo: "P3", formato: "9x16" }} /><Composition id="R3-4x5" component={Imagen} durationInFrames={1} fps={fps} width={1080} height={1350} defaultProps={{ tipo: "R3", formato: "4x5" }} /><Composition id="R3-9x16" component={Imagen} durationInFrames={1} fps={fps} width={1080} height={1920} defaultProps={{ tipo: "R3", formato: "9x16" }} /></>; }
+export function Root() { return <>{specs.flatMap(([id, Componente, durationInFrames]) => (["9x16", "4x5"] as Formato[]).map((f) => { const size = medidas(f); return <Composition key={`${id}-${f}`} id={`${id}-${f}`} component={Componente} durationInFrames={durationInFrames} fps={fps} width={size.width} height={size.height} defaultProps={{ formato: f }} />; }))}<Composition id="P3v2-4x5" component={P3v2} durationInFrames={1} fps={fps} width={1080} height={1350} defaultProps={{ formato: "4x5" }} /><Composition id="P3v2-9x16" component={P3v2} durationInFrames={1} fps={fps} width={1080} height={1920} defaultProps={{ formato: "9x16" }} /><Composition id="R3v2-4x5" component={R3v2} durationInFrames={1} fps={fps} width={1080} height={1350} defaultProps={{ formato: "4x5" }} /><Composition id="R3v2-9x16" component={R3v2} durationInFrames={1} fps={fps} width={1080} height={1920} defaultProps={{ formato: "9x16" }} /></>; }
