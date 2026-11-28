@@ -1,0 +1,1078 @@
+[
+ {
+  "id": "P1-1",
+  "archivo": "rapida/P1-1.mp3",
+  "duracion_s": 4.62,
+  "subtitulo": "¿Te piden dos hamburguesas por WhatsApp y luego te cambian todo en cinco mensajes?",
+  "palabras_voz": [
+   {
+    "p": "¿Te",
+    "ini": 0,
+    "fin": 0.066
+   },
+   {
+    "p": "piden",
+    "ini": 0.137,
+    "fin": 0.351
+   },
+   {
+    "p": "dos",
+    "ini": 0.423,
+    "fin": 0.566
+   },
+   {
+    "p": "hamburguesas",
+    "ini": 0.637,
+    "fin": 1.137
+   },
+   {
+    "p": "por",
+    "ini": 1.208,
+    "fin": 1.28
+   },
+   {
+    "p": "WhatsApp...",
+    "ini": 1.351,
+    "fin": 2.28
+   },
+   {
+    "p": "y",
+    "ini": 2.316,
+    "fin": 2.351
+   },
+   {
+    "p": "luego",
+    "ini": 2.423,
+    "fin": 2.637
+   },
+   {
+    "p": "te",
+    "ini": 2.708,
+    "fin": 2.78
+   },
+   {
+    "p": "cambian",
+    "ini": 2.827,
+    "fin": 3.208
+   },
+   {
+    "p": "todo",
+    "ini": 3.316,
+    "fin": 3.423
+   },
+   {
+    "p": "en",
+    "ini": 3.494,
+    "fin": 3.637
+   },
+   {
+    "p": "cinco",
+    "ini": 3.708,
+    "fin": 3.923
+   },
+   {
+    "p": "mensajes?",
+    "ini": 3.994,
+    "fin": 4.78
+   }
+  ]
+ },
+ {
+  "id": "P1-3",
+  "archivo": "rapida/P1-3.mp3",
+  "duracion_s": 6.88,
+  "subtitulo": "Con Pidewat, tu cliente arma su pedido desde un menú digital y te lo envía ordenado, con cantidades, extras y total.",
+  "palabras_voz": [
+   {
+    "p": "Con",
+    "ini": 0,
+    "fin": 0.093
+   },
+   {
+    "p": "Pídewat,",
+    "ini": 0.165,
+    "fin": 0.807
+   },
+   {
+    "p": "tu",
+    "ini": 0.879,
+    "fin": 0.95
+   },
+   {
+    "p": "cliente",
+    "ini": 1.022,
+    "fin": 1.307
+   },
+   {
+    "p": "arma",
+    "ini": 1.415,
+    "fin": 1.522
+   },
+   {
+    "p": "su",
+    "ini": 1.593,
+    "fin": 1.665
+   },
+   {
+    "p": "pedido",
+    "ini": 1.843,
+    "fin": 2.022
+   },
+   {
+    "p": "desde",
+    "ini": 2.129,
+    "fin": 2.307
+   },
+   {
+    "p": "un",
+    "ini": 2.343,
+    "fin": 2.379
+   },
+   {
+    "p": "menú",
+    "ini": 2.45,
+    "fin": 2.629
+   },
+   {
+    "p": "digital",
+    "ini": 2.665,
+    "fin": 3.165
+   },
+   {
+    "p": "y",
+    "ini": 3.236,
+    "fin": 3.307
+   },
+   {
+    "p": "te",
+    "ini": 3.343,
+    "fin": 3.379
+   },
+   {
+    "p": "lo",
+    "ini": 3.45,
+    "fin": 3.522
+   },
+   {
+    "p": "envía",
+    "ini": 3.593,
+    "fin": 3.807
+   },
+   {
+    "p": "ordenado,",
+    "ini": 3.95,
+    "fin": 4.736
+   },
+   {
+    "p": "con",
+    "ini": 4.807,
+    "fin": 4.879
+   },
+   {
+    "p": "cantidades,",
+    "ini": 4.95,
+    "fin": 5.736
+   },
+   {
+    "p": "extras",
+    "ini": 5.986,
+    "fin": 6.236
+   },
+   {
+    "p": "y",
+    "ini": 6.307,
+    "fin": 6.379
+   },
+   {
+    "p": "total.",
+    "ini": 6.45,
+    "fin": 7.093
+   }
+  ]
+ },
+ {
+  "id": "P1-4",
+  "archivo": "rapida/P1-4.mp3",
+  "duracion_s": 7.32,
+  "subtitulo": "Sin comisión por pedido. Desde $249 al mes después de tu prueba. Pruébalo 14 días gratis, sin tarjeta.",
+  "palabras_voz": [
+   {
+    "p": "Sin",
+    "ini": 0,
+    "fin": 0.196
+   },
+   {
+    "p": "comisión",
+    "ini": 0.267,
+    "fin": 0.624
+   },
+   {
+    "p": "por",
+    "ini": 0.696,
+    "fin": 0.767
+   },
+   {
+    "p": "pedido.",
+    "ini": 0.839,
+    "fin": 1.482
+   },
+   {
+    "p": "Desde",
+    "ini": 1.589,
+    "fin": 1.696
+   },
+   {
+    "p": "doscientos",
+    "ini": 1.767,
+    "fin": 2.16
+   },
+   {
+    "p": "cuarenta",
+    "ini": 2.196,
+    "fin": 2.446
+   },
+   {
+    "p": "y",
+    "ini": 2.482,
+    "fin": 2.517
+   },
+   {
+    "p": "nueve",
+    "ini": 2.553,
+    "fin": 2.696
+   },
+   {
+    "p": "pesos",
+    "ini": 2.767,
+    "fin": 2.982
+   },
+   {
+    "p": "al",
+    "ini": 3.053,
+    "fin": 3.124
+   },
+   {
+    "p": "mes",
+    "ini": 3.196,
+    "fin": 3.41
+   },
+   {
+    "p": "después",
+    "ini": 3.517,
+    "fin": 3.839
+   },
+   {
+    "p": "de",
+    "ini": 3.874,
+    "fin": 3.91
+   },
+   {
+    "p": "tu",
+    "ini": 3.982,
+    "fin": 4.053
+   },
+   {
+    "p": "prueba.",
+    "ini": 4.089,
+    "fin": 4.696
+   },
+   {
+    "p": "¡Pruébalo",
+    "ini": 4.732,
+    "fin": 5.053
+   },
+   {
+    "p": "catorce",
+    "ini": 5.089,
+    "fin": 5.482
+   },
+   {
+    "p": "días",
+    "ini": 5.553,
+    "fin": 5.767
+   },
+   {
+    "p": "gratis,",
+    "ini": 5.839,
+    "fin": 6.482
+   },
+   {
+    "p": "sin",
+    "ini": 6.553,
+    "fin": 6.696
+   },
+   {
+    "p": "tarjeta!",
+    "ini": 6.767,
+    "fin": 7.482
+   }
+  ]
+ },
+ {
+  "id": "P2-1",
+  "archivo": "rapida/P2-1.mp3",
+  "duracion_s": 3.01,
+  "subtitulo": "¿Quieres un menú digital sin pagar comisión por cada pedido?",
+  "palabras_voz": [
+   {
+    "p": "¿Quieres",
+    "ini": 0,
+    "fin": 0.236
+   },
+   {
+    "p": "un",
+    "ini": 0.272,
+    "fin": 0.308
+   },
+   {
+    "p": "menú",
+    "ini": 0.379,
+    "fin": 0.558
+   },
+   {
+    "p": "digital",
+    "ini": 0.594,
+    "fin": 1.022
+   },
+   {
+    "p": "sin",
+    "ini": 1.094,
+    "fin": 1.236
+   },
+   {
+    "p": "pagar",
+    "ini": 1.308,
+    "fin": 1.522
+   },
+   {
+    "p": "comisión",
+    "ini": 1.594,
+    "fin": 2.022
+   },
+   {
+    "p": "por",
+    "ini": 2.094,
+    "fin": 2.236
+   },
+   {
+    "p": "cada",
+    "ini": 2.308,
+    "fin": 2.522
+   },
+   {
+    "p": "pedido?",
+    "ini": 2.594,
+    "fin": 3.236
+   }
+  ]
+ },
+ {
+  "id": "P2-2",
+  "archivo": "rapida/P2-2.mp3",
+  "duracion_s": 9.74,
+  "subtitulo": "Pidewat tiene una mensualidad fija. Tus clientes ven tus platillos, personalizan su pedido y te lo envían organizado por WhatsApp. Tú conservas el control de tu negocio.",
+  "palabras_voz": [
+   {
+    "p": "Pídewat",
+    "ini": 0,
+    "fin": 0.453
+   },
+   {
+    "p": "tiene",
+    "ini": 0.596,
+    "fin": 0.81
+   },
+   {
+    "p": "una",
+    "ini": 0.881,
+    "fin": 1.024
+   },
+   {
+    "p": "mensualidad",
+    "ini": 1.131,
+    "fin": 1.596
+   },
+   {
+    "p": "fija.",
+    "ini": 1.667,
+    "fin": 2.203
+   },
+   {
+    "p": "Tus",
+    "ini": 2.381,
+    "fin": 2.524
+   },
+   {
+    "p": "clientes",
+    "ini": 2.739,
+    "fin": 2.953
+   },
+   {
+    "p": "ven",
+    "ini": 3.024,
+    "fin": 3.096
+   },
+   {
+    "p": "tus",
+    "ini": 3.167,
+    "fin": 3.239
+   },
+   {
+    "p": "platillos,",
+    "ini": 3.31,
+    "fin": 4.096
+   },
+   {
+    "p": "personalizan",
+    "ini": 4.274,
+    "fin": 4.667
+   },
+   {
+    "p": "su",
+    "ini": 4.703,
+    "fin": 4.739
+   },
+   {
+    "p": "pedido",
+    "ini": 4.81,
+    "fin": 5.167
+   },
+   {
+    "p": "y",
+    "ini": 5.31,
+    "fin": 5.381
+   },
+   {
+    "p": "te",
+    "ini": 5.453,
+    "fin": 5.524
+   },
+   {
+    "p": "lo",
+    "ini": 5.56,
+    "fin": 5.596
+   },
+   {
+    "p": "envían",
+    "ini": 5.667,
+    "fin": 5.953
+   },
+   {
+    "p": "organizado",
+    "ini": 6.06,
+    "fin": 6.524
+   },
+   {
+    "p": "por",
+    "ini": 6.596,
+    "fin": 6.667
+   },
+   {
+    "p": "WhatsApp.",
+    "ini": 6.81,
+    "fin": 7.417
+   },
+   {
+    "p": "Tú",
+    "ini": 7.596,
+    "fin": 7.739
+   },
+   {
+    "p": "conservas",
+    "ini": 7.881,
+    "fin": 8.381
+   },
+   {
+    "p": "el",
+    "ini": 8.453,
+    "fin": 8.524
+   },
+   {
+    "p": "control",
+    "ini": 8.739,
+    "fin": 8.953
+   },
+   {
+    "p": "de",
+    "ini": 8.989,
+    "fin": 9.024
+   },
+   {
+    "p": "tu",
+    "ini": 9.096,
+    "fin": 9.167
+   },
+   {
+    "p": "negocio.",
+    "ini": 9.274,
+    "fin": 9.953
+   }
+  ]
+ },
+ {
+  "id": "P2-3",
+  "archivo": "rapida/P2-3.mp3",
+  "duracion_s": 6.54,
+  "subtitulo": "$249 al mes. Primero pruébalo 14 días gratis, sin tarjeta. Entra y compruébalo.",
+  "palabras_voz": [
+   {
+    "p": "Doscientos",
+    "ini": 0,
+    "fin": 0.5
+   },
+   {
+    "p": "cuarenta",
+    "ini": 0.571,
+    "fin": 0.881
+   },
+   {
+    "p": "y",
+    "ini": 0.904,
+    "fin": 0.929
+   },
+   {
+    "p": "nueve",
+    "ini": 0.964,
+    "fin": 1.143
+   },
+   {
+    "p": "pesos",
+    "ini": 1.286,
+    "fin": 1.5
+   },
+   {
+    "p": "al",
+    "ini": 1.571,
+    "fin": 1.643
+   },
+   {
+    "p": "mes.",
+    "ini": 1.714,
+    "fin": 2.143
+   },
+   {
+    "p": "Primero",
+    "ini": 2.286,
+    "fin": 2.571
+   },
+   {
+    "p": "pruébalo",
+    "ini": 2.643,
+    "fin": 2.929
+   },
+   {
+    "p": "catorce",
+    "ini": 3.0,
+    "fin": 3.429
+   },
+   {
+    "p": "días",
+    "ini": 3.5,
+    "fin": 3.714
+   },
+   {
+    "p": "gratis,",
+    "ini": 3.786,
+    "fin": 4.286
+   },
+   {
+    "p": "sin",
+    "ini": 4.357,
+    "fin": 4.5
+   },
+   {
+    "p": "tarjeta.",
+    "ini": 4.571,
+    "fin": 5.286
+   },
+   {
+    "p": "¡Entra",
+    "ini": 5.357,
+    "fin": 5.643
+   },
+   {
+    "p": "y",
+    "ini": 5.786,
+    "fin": 5.821
+   },
+   {
+    "p": "compruébalo!",
+    "ini": 5.857,
+    "fin": 6.714
+   }
+  ]
+ },
+ {
+  "id": "R1-1",
+  "archivo": "rapida/R1-1.mp3",
+  "duracion_s": 3.28,
+  "subtitulo": "Un QR en tu mesa puede hacer más que enseñar una carta.",
+  "palabras_voz": [
+   {
+    "p": "Un",
+    "ini": 0,
+    "fin": 0.122
+   },
+   {
+    "p": "QR",
+    "ini": 0.193,
+    "fin": 0.551
+   },
+   {
+    "p": "en",
+    "ini": 0.586,
+    "fin": 0.622
+   },
+   {
+    "p": "tu",
+    "ini": 0.693,
+    "fin": 0.765
+   },
+   {
+    "p": "mesa",
+    "ini": 0.872,
+    "fin": 1.122
+   },
+   {
+    "p": "puede",
+    "ini": 1.265,
+    "fin": 1.479
+   },
+   {
+    "p": "hacer",
+    "ini": 1.575,
+    "fin": 1.765
+   },
+   {
+    "p": "más",
+    "ini": 1.836,
+    "fin": 2.051
+   },
+   {
+    "p": "que",
+    "ini": 2.122,
+    "fin": 2.193
+   },
+   {
+    "p": "enseñar",
+    "ini": 2.336,
+    "fin": 2.622
+   },
+   {
+    "p": "una",
+    "ini": 2.693,
+    "fin": 2.765
+   },
+   {
+    "p": "carta.",
+    "ini": 2.836,
+    "fin": 3.479
+   }
+  ]
+ },
+ {
+  "id": "R1-2",
+  "archivo": "rapida/R1-2.mp3",
+  "duracion_s": 8.34,
+  "subtitulo": "Con Pidewat, tus clientes pueden consultar el menú, elegir sus productos y enviarte el pedido organizado. Sin instalar apps y sin comisión por pedido.",
+  "palabras_voz": [
+   {
+    "p": "Con",
+    "ini": 0,
+    "fin": 0.12
+   },
+   {
+    "p": "Pídewat,",
+    "ini": 0.192,
+    "fin": 0.834
+   },
+   {
+    "p": "tus",
+    "ini": 0.87,
+    "fin": 0.977
+   },
+   {
+    "p": "clientes",
+    "ini": 1.049,
+    "fin": 1.406
+   },
+   {
+    "p": "pueden",
+    "ini": 1.477,
+    "fin": 1.692
+   },
+   {
+    "p": "consultar",
+    "ini": 1.763,
+    "fin": 2.12
+   },
+   {
+    "p": "el",
+    "ini": 2.192,
+    "fin": 2.263
+   },
+   {
+    "p": "menú,",
+    "ini": 2.334,
+    "fin": 2.763
+   },
+   {
+    "p": "elegir",
+    "ini": 2.799,
+    "fin": 3.12
+   },
+   {
+    "p": "sus",
+    "ini": 3.192,
+    "fin": 3.334
+   },
+   {
+    "p": "productos",
+    "ini": 3.62,
+    "fin": 3.906
+   },
+   {
+    "p": "y",
+    "ini": 3.942,
+    "fin": 3.977
+   },
+   {
+    "p": "enviarte",
+    "ini": 4.084,
+    "fin": 4.406
+   },
+   {
+    "p": "el",
+    "ini": 4.477,
+    "fin": 4.549
+   },
+   {
+    "p": "pedido",
+    "ini": 4.727,
+    "fin": 4.906
+   },
+   {
+    "p": "organizado.",
+    "ini": 5.013,
+    "fin": 5.834
+   },
+   {
+    "p": "Sin",
+    "ini": 5.906,
+    "fin": 5.977
+   },
+   {
+    "p": "instalar",
+    "ini": 6.049,
+    "fin": 6.406
+   },
+   {
+    "p": "apps",
+    "ini": 6.477,
+    "fin": 6.834
+   },
+   {
+    "p": "y",
+    "ini": 6.87,
+    "fin": 6.906
+   },
+   {
+    "p": "sin",
+    "ini": 7.049,
+    "fin": 7.192
+   },
+   {
+    "p": "comisión",
+    "ini": 7.263,
+    "fin": 7.692
+   },
+   {
+    "p": "por",
+    "ini": 7.763,
+    "fin": 7.834
+   },
+   {
+    "p": "pedido.",
+    "ini": 8.049,
+    "fin": 8.549
+   }
+  ]
+ },
+ {
+  "id": "R1-3",
+  "archivo": "rapida/R1-3.mp3",
+  "duracion_s": 6.14,
+  "subtitulo": "Prueba Pidewat Esencial 14 días gratis. Sin tarjeta. Después, $249 al mes.",
+  "palabras_voz": [
+   {
+    "p": "¡Prueba",
+    "ini": 0,
+    "fin": 0.21
+   },
+   {
+    "p": "Pídewat",
+    "ini": 0.282,
+    "fin": 0.71
+   },
+   {
+    "p": "Esencial",
+    "ini": 0.782,
+    "fin": 1.21
+   },
+   {
+    "p": "catorce",
+    "ini": 1.246,
+    "fin": 1.71
+   },
+   {
+    "p": "días",
+    "ini": 1.782,
+    "fin": 1.996
+   },
+   {
+    "p": "gratis!",
+    "ini": 2.067,
+    "fin": 2.782
+   },
+   {
+    "p": "Sin",
+    "ini": 2.853,
+    "fin": 2.924
+   },
+   {
+    "p": "tarjeta.",
+    "ini": 2.996,
+    "fin": 3.639
+   },
+   {
+    "p": "Después,",
+    "ini": 3.71,
+    "fin": 4.282
+   },
+   {
+    "p": "doscientos",
+    "ini": 4.389,
+    "fin": 4.782
+   },
+   {
+    "p": "cuarenta",
+    "ini": 4.853,
+    "fin": 5.032
+   },
+   {
+    "p": "y",
+    "ini": 5.067,
+    "fin": 5.103
+   },
+   {
+    "p": "nueve",
+    "ini": 5.139,
+    "fin": 5.282
+   },
+   {
+    "p": "pesos",
+    "ini": 5.353,
+    "fin": 5.639
+   },
+   {
+    "p": "al",
+    "ini": 5.71,
+    "fin": 5.782
+   },
+   {
+    "p": "mes.",
+    "ini": 5.924,
+    "fin": 6.282
+   }
+  ]
+ },
+ {
+  "id": "R2-1",
+  "archivo": "rapida/R2-1.mp3",
+  "duracion_s": 4.48,
+  "subtitulo": "Mesa 7 hace su pedido. ¿Y si cocina pudiera recibirlo directamente?",
+  "palabras_voz": [
+   {
+    "p": "Mesa",
+    "ini": 0,
+    "fin": 0.25
+   },
+   {
+    "p": "siete",
+    "ini": 0.321,
+    "fin": 0.679
+   },
+   {
+    "p": "hace",
+    "ini": 0.821,
+    "fin": 1.036
+   },
+   {
+    "p": "su",
+    "ini": 1.107,
+    "fin": 1.179
+   },
+   {
+    "p": "pedido.",
+    "ini": 1.25,
+    "fin": 1.679
+   },
+   {
+    "p": "¿Y",
+    "ini": 2.036,
+    "fin": 2.107
+   },
+   {
+    "p": "si",
+    "ini": 2.179,
+    "fin": 2.25
+   },
+   {
+    "p": "cocina",
+    "ini": 2.321,
+    "fin": 2.679
+   },
+   {
+    "p": "pudiera",
+    "ini": 2.75,
+    "fin": 3.107
+   },
+   {
+    "p": "recibirlo",
+    "ini": 3.179,
+    "fin": 3.679
+   },
+   {
+    "p": "directamente?",
+    "ini": 3.75,
+    "fin": 4.679
+   }
+  ]
+ },
+ {
+  "id": "R2-2",
+  "archivo": "rapida/R2-2.mp3",
+  "duracion_s": 6.59,
+  "subtitulo": "Estamos probando Pidewat Restaurante: pedidos desde la mesa y seguimiento para cocina en una misma plataforma.",
+  "palabras_voz": [
+   {
+    "p": "Estamos",
+    "ini": 0,
+    "fin": 0.324
+   },
+   {
+    "p": "probando",
+    "ini": 0.395,
+    "fin": 0.824
+   },
+   {
+    "p": "Pídewat",
+    "ini": 0.967,
+    "fin": 1.467
+   },
+   {
+    "p": "Restaurante:",
+    "ini": 1.538,
+    "fin": 2.538
+   },
+   {
+    "p": "pedidos",
+    "ini": 2.609,
+    "fin": 2.967
+   },
+   {
+    "p": "desde",
+    "ini": 3.038,
+    "fin": 3.181
+   },
+   {
+    "p": "la",
+    "ini": 3.217,
+    "fin": 3.252
+   },
+   {
+    "p": "mesa",
+    "ini": 3.324,
+    "fin": 3.609
+   },
+   {
+    "p": "y",
+    "ini": 3.752,
+    "fin": 3.824
+   },
+   {
+    "p": "seguimiento",
+    "ini": 3.895,
+    "fin": 4.324
+   },
+   {
+    "p": "para",
+    "ini": 4.395,
+    "fin": 4.467
+   },
+   {
+    "p": "cocina",
+    "ini": 4.538,
+    "fin": 4.967
+   },
+   {
+    "p": "en",
+    "ini": 5.109,
+    "fin": 5.252
+   },
+   {
+    "p": "una",
+    "ini": 5.324,
+    "fin": 5.467
+   },
+   {
+    "p": "misma",
+    "ini": 5.609,
+    "fin": 5.824
+   },
+   {
+    "p": "plataforma.",
+    "ini": 5.895,
+    "fin": 6.752
+   }
+  ]
+ },
+ {
+  "id": "R2-3",
+  "archivo": "rapida/R2-3.mp3",
+  "duracion_s": 2.53,
+  "subtitulo": "Solicita una demostración del plan Restaurante.",
+  "palabras_voz": [
+   {
+    "p": "Solicita",
+    "ini": 0,
+    "fin": 0.481
+   },
+   {
+    "p": "una",
+    "ini": 0.553,
+    "fin": 0.624
+   },
+   {
+    "p": "demostración",
+    "ini": 0.695,
+    "fin": 1.267
+   },
+   {
+    "p": "del",
+    "ini": 1.338,
+    "fin": 1.481
+   },
+   {
+    "p": "plan",
+    "ini": 1.553,
+    "fin": 1.695
+   },
+   {
+    "p": "Restaurante.",
+    "ini": 1.767,
+    "fin": 2.695
+   }
+  ]
+ }
+]

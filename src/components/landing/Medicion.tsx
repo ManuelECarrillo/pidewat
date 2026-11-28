@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, type ReactNode } from "react";
-import { guardarUtm, medir } from "@/lib/medicion";
+import { guardarUtm, leerUtm, medir } from "@/lib/medicion";
 
 // Se monta una vez en la landing: guarda las UTM del anuncio (para que lleguen a /empezar)
 // y cuenta la visita. No usa cookies ni datos personales.
 export function MedirVisita() {
   useEffect(() => {
     guardarUtm();
-    medir("landing_visita", { unaVez: true });
+    medir("landing_visita", { unaVez: true, detalle: leerUtm().p });
   }, []);
   return null;
 }

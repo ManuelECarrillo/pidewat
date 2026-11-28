@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "qa:compatibilidad": "playwright test --config=qa/playwright.config.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
@@ -19,6 +20,7 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@types/node": "22.15.3",
     "@types/nodemailer": "8.0.2",
     "@types/qrcode": "1.5.5",

@@ -1,0 +1,118 @@
+{
+  "video_px": {
+    "ancho": 1080,
+    "alto": 2338
+  },
+  "pasos": [
+    {
+      "paso": "abrir-hamburguesa",
+      "elemento": "Personalizar y agregar Hamburguesa de la casa",
+      "caja_px": {
+        "x": 802,
+        "y": 1742,
+        "ancho": 281,
+        "alto": 132
+      },
+      "total_px": null
+    },
+    {
+      "paso": "doble-carne",
+      "elemento": "Doble carne+$35",
+      "caja_px": {
+        "x": 48,
+        "y": 1050,
+        "ancho": 1074,
+        "alto": 144
+      },
+      "total_px": null
+    },
+    {
+      "paso": "queso-extra",
+      "elemento": "Queso extra+$12",
+      "caja_px": {
+        "x": 48,
+        "y": 1321,
+        "ancho": 1074,
+        "alto": 144
+      },
+      "total_px": null
+    },
+    {
+      "paso": "sin-cebolla",
+      "elemento": "✓ Cebolla",
+      "caja_px": {
+        "x": 48,
+        "y": 1836,
+        "ancho": 308,
+        "alto": 132
+      },
+      "total_px": null
+    },
+    {
+      "paso": "agregar-hamburguesa",
+      "elemento": "Agregar 1 · $132",
+      "caja_px": {
+        "x": 48,
+        "y": 2181,
+        "ancho": 1074,
+        "alto": 163
+      },
+      "total_px": null
+    },
+    {
+      "paso": "ver-pedido",
+      "elemento": "Ver pedido · 1 artículo$132",
+      "caja_px": {
+        "x": 48,
+        "y": 2333,
+        "ancho": 1074,
+        "alto": 163
+      },
+      "total_px": null
+    },
+    {
+      "paso": "enviar-cocina",
+      "elemento": "Enviar pedido a la cocina",
+      "caja_px": {
+        "x": 48,
+        "y": 2181,
+        "ancho": 1074,
+        "alto": 163
+      },
+      "total_px": null
+    },
+    {
+      "paso": "empezar-preparar",
+      "elemento": "Empezar a preparar",
+      "caja_px": {
+        "x": 114,
+        "y": 1351,
+        "ancho": 623,
+        "alto": 136
+      },
+      "total_px": null
+    },
+    {
+      "paso": "ya-listo",
+      "elemento": "Ya está listo",
+      "caja_px": {
+        "x": 114,
+        "y": 1351,
+        "ancho": 623,
+        "alto": 136
+      },
+      "total_px": null
+    },
+    {
+      "paso": "pestana-listos",
+      "elemento": "Listos (1)",
+      "caja_px": {
+        "x": 416,
+        "y": 649,
+        "ancho": 338,
+        "alto": 179
+      },
+      "total_px": null
+    }
+  ]
+}

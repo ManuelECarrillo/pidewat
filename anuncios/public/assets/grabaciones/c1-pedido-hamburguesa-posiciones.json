@@ -1,0 +1,129 @@
+{
+  "video_px": {
+    "ancho": 1080,
+    "alto": 2338
+  },
+  "pasos": [
+    {
+      "paso": "hamburguesa-1",
+      "elemento": "Personalizar y agregar Hamburguesa de la casa",
+      "caja_px": {
+        "x": 802,
+        "y": 1812,
+        "ancho": 281,
+        "alto": 132
+      },
+      "total_px": null
+    },
+    {
+      "paso": "doble-carne",
+      "elemento": "Doble carne+$35",
+      "caja_px": {
+        "x": 48,
+        "y": 1050,
+        "ancho": 1074,
+        "alto": 144
+      },
+      "total_px": null
+    },
+    {
+      "paso": "queso-extra",
+      "elemento": "Queso extra+$12",
+      "caja_px": {
+        "x": 48,
+        "y": 1321,
+        "ancho": 1074,
+        "alto": 144
+      },
+      "total_px": null
+    },
+    {
+      "paso": "agregar-primera",
+      "elemento": "Agregar 1 · $132",
+      "caja_px": {
+        "x": 48,
+        "y": 2181,
+        "ancho": 1074,
+        "alto": 163
+      },
+      "total_px": null
+    },
+    {
+      "paso": "hamburguesa-2",
+      "elemento": "Personalizar y agregar Hamburguesa de la casa",
+      "caja_px": {
+        "x": 757,
+        "y": 1909,
+        "ancho": 281,
+        "alto": 132
+      },
+      "total_px": null
+    },
+    {
+      "paso": "clasica",
+      "elemento": "✓Clásica",
+      "caja_px": {
+        "x": 48,
+        "y": 882,
+        "ancho": 1074,
+        "alto": 144
+      },
+      "total_px": null
+    },
+    {
+      "paso": "sin-cebolla",
+      "elemento": "✓ Cebolla",
+      "caja_px": {
+        "x": 48,
+        "y": 1836,
+        "ancho": 308,
+        "alto": 132
+      },
+      "total_px": null
+    },
+    {
+      "paso": "agregar-segunda",
+      "elemento": "Agregar 1 · $85",
+      "caja_px": {
+        "x": 48,
+        "y": 2181,
+        "ancho": 1074,
+        "alto": 163
+      },
+      "total_px": null
+    },
+    {
+      "paso": "carrito",
+      "elemento": "Ver pedido · 2 artículos$217",
+      "caja_px": {
+        "x": 48,
+        "y": 2333,
+        "ancho": 1074,
+        "alto": 163
+      },
+      "total_px": null
+    },
+    {
+      "paso": "recoger",
+      "elemento": "Recoger",
+      "caja_px": {
+        "x": 416,
+        "y": 1127,
+        "ancho": 338,
+        "alto": 132
+      },
+      "total_px": null
+    },
+    {
+      "paso": "enviar-whatsapp",
+      "elemento": "Enviar pedido por WhatsApp",
+      "caja_px": {
+        "x": 48,
+        "y": 2181,
+        "ancho": 1074,
+        "alto": 163
+      },
+      "total_px": null
+    }
+  ]
+}

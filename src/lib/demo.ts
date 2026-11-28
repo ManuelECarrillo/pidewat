@@ -6,7 +6,7 @@ const B = "demo";
 export const negocioDemo: Negocio = {
   id: B,
   slug: "demo",
-  name: "El Fogón de Durango",
+  name: "El Fogón",
   whatsapp: process.env.NEXT_PUBLIC_PIDEWAT_WHATSAPP || "5216180000000",
   description: "Gorditas, caldillo y antojitos duranguenses hechos al momento.",
   address: "Av. 20 de Noviembre 123, Centro, Durango",
@@ -28,6 +28,7 @@ export const negocioDemo: Negocio = {
 };
 
 const cats: [string, string][] = [
+  ["hamburguesas", "Hamburguesas"],
   ["gorditas", "Gorditas"],
   ["platillos", "Platillos"],
   ["tacos", "Tacos"],
@@ -44,8 +45,14 @@ const p = (category_id: string, name: string, price: number, description: string
 // Para enseñar tamaños y extras (plan Esencial)
 const conOpciones = (x: Omit<Producto, "position" | "id">, opciones: unknown) => ({ ...x, opciones });
 const extrasGordita = [{ nombre: "Extras", tipo: "varias", obligatorio: false, max: 2, opciones: [{ nombre: "Queso extra", precio: 8 }, { nombre: "Aguacate", precio: 10 }] }];
+const opcionesHamburguesa = [
+  { nombre: "Tama\u00f1o", tipo: "una", obligatorio: true, opciones: [{ nombre: "Cl\u00e1sica", precio: 0 }, { nombre: "Doble carne", precio: 35 }] },
+  { nombre: "Extras", tipo: "varias", obligatorio: false, max: 2, opciones: [{ nombre: "Queso extra", precio: 12 }, { nombre: "Tocino", precio: 18 }] },
+];
 
 const lista = [
+  // Producto ficticio para la demostraci\u00f3n y las grabaciones: no existe en ning\u00fan negocio real.
+  conOpciones(p("hamburguesas", "Hamburguesa de la casa", 85, "Carne a la plancha, pan artesanal y papas.", true, ["Cebolla", "Jitomate", "Lechuga"]), opcionesHamburguesa),
   conOpciones(p("gorditas", "Gordita de chicharrón prensado", 28, "De maíz, hecha a mano en comal.", true, ["Salsa", "Cebolla"]), extrasGordita),
   p("gorditas", "Gordita de asado rojo", 28),
   p("gorditas", "Gordita de rajas con queso", 28),

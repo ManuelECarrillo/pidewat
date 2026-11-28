@@ -5,3 +5,12 @@ node_modules
 next-env.d.ts
 *.tsbuildinfo
 .vercel
+test-results/
+playwright-report/
+qa/.panel-state.json
+anuncios/revision/
+anuncios/salida/v2/crudo-*
+anuncios/salida/pilotos/
+anuncios/salida/v2/qa-*/
+anuncios/salida/v2/revision-*
+anuncios/salida/v2/qa-*

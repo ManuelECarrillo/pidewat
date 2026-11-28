@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
+import { Suspense } from "react";
+import MetaConsentimiento from "@/components/MetaConsentimiento";
 import "./globals.css";
 
 // Claude (QA 2026-11-27): una sola tipografía para landing, registro, panel y menú. «Aptos» solo existe en Windows;
@@ -20,7 +22,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-MX" className={`${titulos.variable} ${texto.variable}`}>
-      <body>{children}</body>
+      <body>{children}<Suspense fallback={null}><MetaConsentimiento /></Suspense></body>
     </html>
   );
 }

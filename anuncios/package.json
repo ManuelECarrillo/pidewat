@@ -1,0 +1,27 @@
+{
+  "name": "pidewat-anuncios",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Montaje de los anuncios de Meta con Remotion (fuera de la app; no entra en el build de Next).",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render:todo": "remotion render src/index.ts P1-9x16 salida/P1-9x16.mp4 --codec=h264 --audio-codec=aac --crf=20 && remotion render src/index.ts P1-4x5 salida/P1-4x5.mp4 --codec=h264 --audio-codec=aac --crf=20 && remotion render src/index.ts P2-9x16 salida/P2-9x16.mp4 --codec=h264 --audio-codec=aac --crf=20 && remotion render src/index.ts P2-4x5 salida/P2-4x5.mp4 --codec=h264 --audio-codec=aac --crf=20 && remotion render src/index.ts R1-9x16 salida/R1-9x16.mp4 --codec=h264 --audio-codec=aac --crf=20 && remotion render src/index.ts R1-4x5 salida/R1-4x5.mp4 --codec=h264 --audio-codec=aac --crf=20 && remotion render src/index.ts R2-9x16 salida/R2-9x16.mp4 --codec=h264 --audio-codec=aac --crf=20 && remotion render src/index.ts R2-4x5 salida/R2-4x5.mp4 --codec=h264 --audio-codec=aac --crf=20 && remotion still src/index.ts P3-4x5 salida/P3-4x5.png && remotion still src/index.ts P3-9x16 salida/P3-9x16.png && remotion still src/index.ts R3-4x5 salida/R3-4x5.png && remotion still src/index.ts R3-9x16 salida/R3-9x16.png && for %F in (salida\\*.mp4) do ffmpeg -y -ss 00:00:01 -i \"%F\" -frames:v 1 \"%~dpnF.jpg\"",
+    "qa:salida": "for %F in (salida\\*.mp4) do @echo === %F && ffmpeg -i \"%F\" -filter_complex ebur128=peak=true -f null NUL && ffmpeg -y -i \"%F\" -vf fps=1 \"salida\\revision-%~nF-%%03d.png\"",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/bricolage-grotesque": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@remotion/bundler": "^4.0.547",
+    "@remotion/cli": "^4.0.547",
+    "@remotion/media-utils": "^4.0.547",
+    "@remotion/renderer": "^4.0.547",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "remotion": "^4.0.547"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.10",
+    "typescript": "^5.8.3"
+  }
+}

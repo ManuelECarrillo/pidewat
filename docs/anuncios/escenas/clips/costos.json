@@ -1,0 +1,11 @@
+{
+ "saldo_antes": 4.462498,
+ "saldo_despues": 3.958498,
+ "costos": {
+  "p1-gancho-dueno.mp4": 0.168,
+  "p1-problema-celular.mp4": 0.084,
+  "puesto.mp4": 0.084,
+  "fonda-cliente-qr.mp4": 0.084,
+  "cocina-tablet.mp4": 0.084
+ }
+}

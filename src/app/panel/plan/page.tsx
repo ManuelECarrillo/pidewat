@@ -1,4 +1,5 @@
 import AvisoEstado, { pillEstado } from "@/components/AvisoEstado";
+import Link from "next/link";
 import BotonEnviar from "@/components/BotonEnviar";
 import { estadoNegocio } from "@/lib/estado";
 import { dinero, fecha } from "@/lib/formato";
@@ -23,6 +24,7 @@ export default async function PanelPlan({ searchParams }: { searchParams: Promis
         <h1 style={{ fontSize: "1.5rem", margin: 0 }}>Mi plan</h1>
         {pillEstado(estado)}
       </div>
+      <p className="small muted" style={{ margin: 0 }}>Al pagar aceptas las <Link href="/terminos">condiciones de contratación</Link>.</p>
       {mp === "ok" && <div className="alerta alerta-ok">¡Gracias! En cuanto Mercado Pago confirme el pago, tu plan se actualiza solo (tarda unos minutos).</div>}
       {mp === "pendiente" && <div className="alerta">Tu pago está pendiente. Si pagaste en OXXO, se acredita en unas horas.</div>}
       {mp === "error" && <div className="alerta alerta-bad">No se pudo completar con Mercado Pago. Intenta de nuevo o escríbenos.</div>}

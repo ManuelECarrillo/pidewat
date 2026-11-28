@@ -27,7 +27,7 @@ function pitido() {
 }
 
 // Pantalla para la cocina o el mesero: pregunta cada 4 segundos si hay pedidos nuevos y suena cuando llegan.
-export default function Cocina() {
+export default function Cocina({ apiUrl = "/api/cocina" }: { apiUrl?: string }) {
   const [ordenes, setOrdenes] = useState<Orden[] | null>(null);
   const [vista, setVista] = useState<Vista>("cocina");
   const [sonido, setSonido] = useState(false);
@@ -43,7 +43,7 @@ export default function Cocina() {
 
   const cargar = useCallback(async () => {
     try {
-      const r = await fetch("/api/cocina", { cache: "no-store" });
+      const r = await fetch(apiUrl, { cache: "no-store" });
       const d = await r.json();
       if (!d.ok) throw new Error();
       const lista = d.ordenes as Orden[];
@@ -53,7 +53,7 @@ export default function Cocina() {
       setOrdenes(lista);
       setSinRed(false);
     } catch { setSinRed(true); }
-  }, []);
+  }, [apiUrl]);
 
   useEffect(() => {
     cargar();
@@ -72,7 +72,7 @@ export default function Cocina() {
     setFallos((x) => { const { [id]: _, ...resto } = x; return resto; });
     setOrdenes((l) => l && l.map((o) => (o.id === id ? { ...o, estado } : o)));
     try {
-      const r = await fetch("/api/cocina", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, estado }) });
+      const r = await fetch(apiUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, estado }) });
       const d = await r.json().catch(() => null);
       if (!r.ok || !d?.ok) throw new Error();
       setSinRed(false);

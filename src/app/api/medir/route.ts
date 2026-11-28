@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
-const EVENTOS = new Set(["landing_visita", "ver_demo", "demo_interaccion", "probar_click", "registro_inicio", "registro_enviado"]);
+const EVENTOS = new Set(["landing_visita", "ver_demo", "demo_interaccion", "probar_click", "registro_inicio", "registro_enviado", "cookies_aceptar", "cookies_rechazar"]);
 const corto = (x: unknown, n: number) => (typeof x === "string" && x.trim() ? x.trim().slice(0, n) : null);
 
 // Embudo de la landing. Sin cookies ni datos personales: evento, página y UTM de la campaña.
