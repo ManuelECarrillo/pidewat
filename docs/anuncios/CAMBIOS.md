@@ -1,5 +1,11 @@
 # Cambios de anuncios
 
+## Vuelta 21 (sin indicador de Next)
+
+- Se volvieron a generar C1–C5 y las capturas asociadas desde `next start` de producción, compilado con `PIDEWAT_GRABACION=1`; no se modificó `next.config.mjs` ni el montaje. C1/C2/C3 conservan las dos hamburguesas y total $217; R1 conserva `Comer aquí · Mesa 7`.
+- Las fuentes actualizadas se sincronizaron en `docs/anuncios/grabaciones/` y `anuncios/public/assets/grabaciones/`. La revisión visual a 2 fps de C1–C5 no mostró el indicador de Next.
+- Se renderizaron de nuevo `crudo-P2-9x16.mp4`, `crudo-P2-4x5.mp4`, `crudo-R1-9x16.mp4` y `crudo-R1-4x5.mp4`; la revisión visual a 1 fps no mostró el indicador ni alteraciones fuera de las fuentes renovadas. `npx tsc --noEmit` pasó en `anuncios/`.
+
 ## Vuelta 20
 
 - C2 espera a que la imagen real de la tarjeta QR termine de generarse y desaparezca su estado de carga antes de grabar; P2 vuelve a mostrar el QR de El Fogón tanto en el gancho como en «TU QR Y TU LINK».
